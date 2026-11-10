@@ -56,7 +56,7 @@ assert(parsed.functions.some(fn => fn.name === "LocalHelper"), "workspace functi
 const externalSource = "extern AddCommand(int unit, int action, int x, int y, int z) 1;";
 const externalParsed = parseSource(externalSource, null);
 assert(externalParsed.functions.some(fn => fn.name === "AddCommand" && fn.external), "engine prototypes should be identified as external declarations");
-const bundledAddCommand = makeFunctionMap(null, externalParsed).get("AddCommand");
+const bundledAddCommand = makeFunctionMap(externalParsed).get("AddCommand");
 assert(bundledAddCommand && bundledAddCommand.source === "export.lgc", "external engine prototypes must not replace bundled API documentation");
 assert(parsed.variables.has("counter"), "typed variables should be indexed");
 assert(parsed.variables.has("label"), "string variables should be indexed");
@@ -73,7 +73,7 @@ const document = {
 	}
 };
 
-const functions = makeFunctionMap(document, parsed);
+const functions = makeFunctionMap(parsed);
 const constants = makeConstantMap(parsed);
 const diagnostics = analyzeDocument(document, parsed, functions, constants);
 assert(diagnostics.some(item => item.message.includes("expects int, but the expression is string")),
@@ -141,7 +141,7 @@ const scopedDocument = {
 		return new vscodeMock.Position(line, offset - lastNewline - 1);
 	}
 };
-const scopedFunctions = makeFunctionMap(scopedDocument, scopedParsed);
+const scopedFunctions = makeFunctionMap(scopedParsed);
 const scopedDiagnostics = analyzeDocument(scopedDocument, scopedParsed, scopedFunctions, makeConstantMap(scopedParsed));
 assert(scopedDiagnostics.some(item => item.message.includes("Cannot assign int to string variable 's'")),
 	"assignments to string locals must be checked using the local declaration type");
@@ -168,7 +168,7 @@ const returnTypeDocument = {
 	}
 };
 const returnTypeDiagnostics = analyzeDocument(returnTypeDocument, returnTypeParsed,
-	makeFunctionMap(returnTypeDocument, returnTypeParsed), makeConstantMap(returnTypeParsed));
+	makeFunctionMap(returnTypeParsed), makeConstantMap(returnTypeParsed));
 assert(returnTypeDiagnostics.some(item => item.message.includes("expects string, but the expression is int")),
 	"known function return types must be checked when passed as arguments");
 
@@ -198,7 +198,7 @@ const inferredReturnDocument = {
 	}
 };
 const inferredReturnDiagnostics = analyzeDocument(inferredReturnDocument, inferredReturnParsed,
-	makeFunctionMap(inferredReturnDocument, inferredReturnParsed), makeConstantMap(inferredReturnParsed));
+	makeFunctionMap(inferredReturnParsed), makeConstantMap(inferredReturnParsed));
 assert(inferredReturnDiagnostics.some(item => item.message.includes("expects string, but the expression is int")),
 	"inferred helper return types should be used for function argument validation");
 

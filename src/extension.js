@@ -5,6 +5,7 @@ const VSCODE = require("vscode");
 const FUNCTION_CATALOG = require("../data/functions.json");
 const CONSTANT_CATALOG = require("../data/constants.json");
 const { formatLgcText } = require("./formatter");
+const { Lazy } = require("./lazy");
 
 const CONTROL_WORDS = new Set(["if", "iff", "else", "while", "for", "do", "switch", "case", "return", "sizeof"]);
 const TYPE_WORDS = new Set(["int", "string", "char", "void"]);
@@ -13,6 +14,8 @@ const KEYWORDS = [
 	"break", "continue", "return", "static", "extern", "int", "string", "char", "void"
 ];
 const MULTI_OPERATORS = ["==", "!=", "<=", ">=", "++", "--", "&&", "||", "<<", ">>", "+=", "-=", "*=", "/=", "%=", "->"];
+
+const DOCUMENT_CACHE = new Map();
 
 /** @type {VSCODE.DiagnosticCollection} */
 let diagnosticCollection;
@@ -144,6 +147,14 @@ let refreshTimer;
  * @typedef {object} ActiveFunctionCall
  * @property {LgcFunction} fn Resolved function signature.
  * @property {number} activeParameter Zero-based index of the argument currently being edited.
+ */
+
+/**
+ * @typedef {object} DocumentCache
+ * @property {number} version
+ * @property {Lazy<ParsedSource>} parsedSource
+ * @property {Lazy<Map<string, LgcFunction>>} functionsMap
+ * @property {Lazy<Map<string, LgcConstant>>} constantsMap
  */
 
 /**
@@ -655,13 +666,41 @@ function parseSource(text, uri) {
 }
 
 /**
+ * Uses cached parsed document version for look up, if there is no such - parses document and returns it.
+ * @param {VSCODE.TextDocument} document Document whose diagnostics should be refreshed.
+ * @returns {DocumentCache}
+ */
+function getDocumentCache(document) {
+	const key = document.uri.toString();
+	const cached = DOCUMENT_CACHE.get(key);
+	const version = document.version;
+
+	if (cached && cached.version === version) {
+		return cached;
+	}
+
+	const text = document.getText();
+	const parsedSource = parseSource(text, document.uri);
+
+	const documentCache = {
+		version: version,
+		parsedSource: parsedSource,
+		functionsMap: new Lazy(() => makeFunctionMap(parsedSource)),
+		constantsMap: new Lazy(() => makeConstantMap(parsedSource))
+	}
+
+	DOCUMENT_CACHE.set(key, documentCache);
+	return documentCache;
+}
+
+/**
  * Merges bundled API functions, workspace declarations and current-document declarations.
  * Later sources override earlier entries with the same function name.
  * @param {VSCODE.TextDocument} document Document requesting the symbol map.
  * @param {ParsedSource} parsed Parsed representation of that document.
  * @returns {Map<string, LgcFunction>} Functions indexed by name.
  */
-function makeFunctionMap(document, parsed) {
+function makeFunctionMap(parsed) {
 	const result = new Map();
 	for (const item of FUNCTION_CATALOG) result.set(item.name, item);
 	for (const [name, item] of workspaceFunctions) result.set(name, item);
@@ -1172,10 +1211,13 @@ function scheduleWorkspaceRefresh() {
  */
 function updateDiagnostics(document) {
 	if (!diagnosticCollection || document.languageId !== "lgc") return;
-	const parsed = parseSource(document.getText(), document.uri);
-	const functions = makeFunctionMap(document, parsed);
-	const constants = makeConstantMap(parsed);
-	diagnosticCollection.set(document.uri, analyzeDocument(document, parsed, functions, constants));
+	const cachedDocument = getDocumentCache(document);
+	diagnosticCollection.set(document.uri, analyzeDocument(
+		document,
+		cachedDocument.parsedSource,
+		cachedDocument.functionsMap.get(),
+		cachedDocument.constantsMap.get()
+	));
 }
 
 /**
@@ -1240,9 +1282,9 @@ function activate(context) {
 		 * @returns {VSCODE.CompletionList} Completion items in extension-defined priority order.
 		 */
 		provideCompletionItems(document, position) {
-			const parsed = parseSource(document.getText(), document.uri);
-			const functions = makeFunctionMap(document, parsed);
-			const constants = makeConstantMap(parsed);
+			const cachedDocument = getDocumentCache(document);
+			const functions = cachedDocument.functionsMap.get();
+			const constants = cachedDocument.constantsMap.get();
 			const items = [];
 			const prefixRange = wordRangeAt(document, position);
 			const prefix = prefixRange ? document.getText(prefixRange) : "";
@@ -1281,10 +1323,10 @@ function activate(context) {
 			const range = document.getWordRangeAtPosition(position, /[A-Za-z_]\w*/);
 			if (!range) return null;
 			const name = document.getText(range);
-			const parsed = parseSource(document.getText(), document.uri);
-			const functions = makeFunctionMap(document, parsed);
-			const constants = makeConstantMap(parsed);
-			const variable = resolveVariable(parsed.variables, name, document.offsetAt(position));
+			const cachedDocument = getDocumentCache(document);
+			const functions = cachedDocument.functionsMap.get();
+			const constants = cachedDocument.constantsMap.get();
+			const variable = resolveVariable(cachedDocument.parsedSource.variables, name, document.offsetAt(position));
 			if (variable) return new VSCODE.Hover(new VSCODE.MarkdownString(`**\`${name}\`**\n\nType: \`${variable.type}\``), range);
 			const fn = functions.get(name);
 			if (fn) return new VSCODE.Hover(new VSCODE.MarkdownString(markdownForFunction(fn)), range);
@@ -1304,8 +1346,8 @@ function activate(context) {
 		 * @returns {VSCODE.SignatureHelp | null} Signature information, or `null` when no known call is active.
 		 */
 		provideSignatureHelp(document, position) {
-			const parsed = parseSource(document.getText(), document.uri);
-			const functions = makeFunctionMap(document, parsed);
+			const cachedDocument = getDocumentCache(document);
+			const functions = cachedDocument.functionsMap.get();
 			const active = currentFunctionAt(document, position, functions);
 			if (!active) return null;
 			const info = new VSCODE.SignatureInformation(active.fn.signature || `${active.fn.name}()`, active.fn.description || "");
