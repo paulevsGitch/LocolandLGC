@@ -42,6 +42,52 @@
  * @property {number} blankLinesBefore Number of blank lines between this token and the previous token.
  */
 
+/**
+ * A formatter token with exact source locations and preceding blank-line metadata.
+ * @property {string} value Exact source text represented by the token.
+ * @property {FormatterTokenKind} kind Lexical category.
+ * @property {number} start Inclusive UTF-16 source offset.
+ * @property {number} end Exclusive UTF-16 source offset.
+ * @property {number} line Zero-based source line.
+ * @property {number} blankLinesBefore Number of blank lines before the token.
+ */
+class FormatterToken {
+	constructor({ value, kind, start, end, line, blankLinesBefore = 0 }) {
+		this.value = value;
+		this.kind = kind;
+		this.start = start;
+		this.end = end;
+		this.line = line;
+		this.blankLinesBefore = blankLinesBefore;
+	}
+}
+
+/**
+ * Fully normalized, validated formatter configuration.
+ * @property {"spaces"|"tabs"} indentStyle Indentation character style.
+ * @property {number} indentSize Indentation width.
+ * @property {"sameLine"|"nextLine"} braceStyle Opening-brace placement.
+ * @property {boolean} spaceAroundOperators Whether operators are padded with spaces.
+ * @property {boolean} insertFinalNewline Whether output ends with a newline.
+ */
+class FormatterOptions {
+	constructor(values) {
+		Object.assign(this, values);
+	}
+}
+
+/**
+ * State associated with one open brace while formatting nested blocks.
+ * @property {boolean} isSwitch Whether the associated block is a switch body.
+ * @property {boolean} caseBodyExtraIndent Whether case-body indentation is currently active.
+ */
+class BraceContext {
+	constructor({ isSwitch = false, caseBodyExtraIndent = false } = {}) {
+		this.isSwitch = isSwitch;
+		this.caseBodyExtraIndent = caseBodyExtraIndent;
+	}
+}
+
 /** @type {Readonly<FormatterOptions>} */
 const DEFAULTS = Object.freeze({
 	indentStyle: "spaces",
@@ -188,14 +234,14 @@ function scanTokens(text) {
 		const tokenText = text.slice(start, i);
 		const gap = text.slice(previousEnd, start);
 		const newlineCount = (gap.match(/\r\n|\r|\n/g) || []).length;
-		tokens.push({
+		tokens.push(new FormatterToken({
 			value: tokenText,
 			kind,
 			start,
 			end: i,
 			line: startLine,
 			blankLinesBefore: Math.max(0, newlineCount - 1)
-		});
+		}));
 		previousEnd = i;
 	}
 	return tokens;
@@ -215,7 +261,7 @@ function normalizeOptions(options = {}) {
 	if (!["spaces", "tabs"].includes(result.indentStyle)) result.indentStyle = DEFAULTS.indentStyle;
 	if (!["sameLine", "nextLine"].includes(result.braceStyle)) result.braceStyle = DEFAULTS.braceStyle;
 	if (!["control", "always", "never"].includes(result.spaceBeforeParens)) result.spaceBeforeParens = DEFAULTS.spaceBeforeParens;
-	return result;
+	return new FormatterOptions(result);
 }
 
 /**
@@ -347,7 +393,10 @@ function formatLgcText(source, rawOptions = {}) {
 				space();
 			}
 			write("{");
-			braceContexts.push({ isSwitch: lastClosedParenContext === "switch", caseBodyExtraIndent: false });
+			braceContexts.push(new BraceContext({
+				isSwitch: lastClosedParenContext === "switch",
+				caseBodyExtraIndent: false
+			}));
 			lastClosedParenContext = null;
 			indent++;
 			newline();
@@ -570,5 +619,8 @@ module.exports = {
 	DEFAULTS,
 	scanTokens,
 	normalizeOptions,
-	formatLgcText
+	formatLgcText,
+	FormatterToken,
+	FormatterOptions,
+	BraceContext
 };

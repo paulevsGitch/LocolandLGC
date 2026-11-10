@@ -1,28 +1,36 @@
+"use strict";
+
 /**
- * Provides a value if it is cached, if not then creates it and caches.
+ * Computes a value on first access and reuses it for all subsequent accesses.
  * @template T
  */
 class Lazy {
 	/**
-	 * @param {() => T} supplier 
+	 * @param {() => T} supplier Value factory invoked at most once before reset.
 	 */
 	constructor(supplier) {
+		if (typeof supplier !== "function") {
+			throw new TypeError("Lazy expects a supplier function.");
+		}
 		this.supplier = supplier;
+		this.hasValue = false;
+		this.value = undefined;
 	}
 
-	/**
-	 * @returns {T}
-	 */
+	/** @returns {T} The cached value, including an explicitly returned `undefined`. */
 	get() {
-		let value = this.value;
-		if (value === undefined) {
-			value = this.supplier();
-			this.value = value;
+		if (!this.hasValue) {
+			this.value = this.supplier();
+			this.hasValue = true;
 		}
-		return value;
+		return this.value;
+	}
+
+	/** Forces the supplier to run again on the next call to {@link get}. */
+	reset() {
+		this.value = undefined;
+		this.hasValue = false;
 	}
 }
 
-module.exports = {
-	Lazy
-};
+module.exports = { Lazy };

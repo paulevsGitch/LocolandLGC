@@ -211,6 +211,6 @@
   },
   "scripts": {
     "check": "node --check src/extension.js && node --check src/formatter.js",
-    "test": "node test/smoke.js"
+    "test": "node test/smoke.js && node test/refactor-smoke.js"
   }
 }
