@@ -31,6 +31,9 @@ let refreshPromise;
 /** @type {NodeJS.Timeout} */
 let refreshTimer;
 
+/** @type {NodeJS.Timeout} */
+let debounceTimeout;
+
 /**
  * Primitive value types understood by the conservative LGC type analyser.
  * `unknown` is used whenever the source does not provide enough information.
@@ -448,7 +451,6 @@ function innermostScopeAt(scopes, offset) {
  * @param {VariableMap} variables Variable map to update.
  * @param {string} name Identifier used as the map key.
  * @param {VariableDeclaration} declaration Declaration metadata to append.
- * @returns {void}
  */
 function addVariable(variables, name, declaration) {
 	if (!variables.has(name)) variables.set(name, []);
@@ -774,7 +776,6 @@ function constantExpressionType(constant) {
  * @param {Token[]} tokens Token stream containing their bodies.
  * @param {VariableMap} variables Variables available to return expressions.
  * @param {Map<string, LgcConstant>} constants Known constants used by return expressions.
- * @returns {void}
  */
 function inferFunctionReturnTypes(functions, tokens, variables, constants) {
 	const functionMap = new Map(FUNCTION_CATALOG.map(fn => [fn.name, fn]));
@@ -1189,7 +1190,6 @@ async function refreshWorkspaceIndex() {
 
 /**
  * Schedules a debounced workspace-index refresh and then re-runs diagnostics for open LGC files.
- * @returns {void}
  */
 function scheduleWorkspaceRefresh() {
 	if (refreshTimer) clearTimeout(refreshTimer);
@@ -1207,7 +1207,6 @@ function scheduleWorkspaceRefresh() {
  * Parses the supplied LGC document and replaces its current static-analysis diagnostics.
  * Non-LGC documents and calls made before activation are ignored.
  * @param {VSCODE.TextDocument} document Document whose diagnostics should be refreshed.
- * @returns {void}
  */
 function updateDiagnostics(document) {
 	if (!diagnosticCollection || document.languageId !== "lgc") return;
@@ -1224,7 +1223,6 @@ function updateDiagnostics(document) {
  * Activates the LGC language extension and registers its formatter, IntelliSense providers,
  * navigation providers, workspace listeners and user commands.
  * @param {VSCODE.ExtensionContext} context VS Code extension context for disposable registrations.
- * @returns {void}
  */
 function activate(context) {
 	diagnosticCollection = VSCODE.languages.createDiagnosticCollection("lgc");
@@ -1407,20 +1405,26 @@ function activate(context) {
 	}));
 
 	context.subscriptions.push(VSCODE.workspace.onDidOpenTextDocument(document => {
-		if (document.languageId === "lgc") {
-			updateDiagnostics(document);
-			scheduleWorkspaceRefresh();
-		}
+		if (document.languageId !== "lgc") return;
+		updateDiagnostics(document);
+		scheduleWorkspaceRefresh();
 	}));
+
 	context.subscriptions.push(VSCODE.workspace.onDidChangeTextDocument(event => {
-		if (event.document.languageId === "lgc") updateDiagnostics(event.document);
+		if (event.document.languageId !== "lgc") return;
+		if (debounceTimeout) clearTimeout(debounceTimeout);
+		debounceTimeout = setTimeout(
+			() => updateDiagnostics(event.document),
+			200
+		);
 	}));
+
 	context.subscriptions.push(VSCODE.workspace.onDidSaveTextDocument(document => {
-		if (document.languageId === "lgc") {
-			updateDiagnostics(document);
-			scheduleWorkspaceRefresh();
-		}
+		if (document.languageId !== "lgc") return;
+		updateDiagnostics(document);
+		scheduleWorkspaceRefresh();
 	}));
+
 	context.subscriptions.push(VSCODE.workspace.onDidCloseTextDocument(document => {
 		if (document.languageId === "lgc") diagnosticCollection.delete(document.uri);
 	}));
@@ -1474,7 +1478,6 @@ function documentPositionFromOffset(uri, position) {
 
 /**
  * Releases the pending workspace-refresh timer when the extension is deactivated.
- * @returns {void}
  */
 function deactivate() {
 	if (refreshTimer) clearTimeout(refreshTimer);
