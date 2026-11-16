@@ -1,23 +1,19 @@
 "use strict";
 
 /**
- * Computes a value on first access and reuses it for all subsequent accesses.
+ * Computes a value on first access and reuses it until reset.
+ * The explicit `hasValue` flag also supports suppliers whose valid result is `undefined`.
  * @template T
  */
 class Lazy {
-	/**
-	 * @param {() => T} supplier Value factory invoked at most once before reset.
-	 */
+	/** @param {() => T} supplier Value factory invoked on the first `get()` after reset. */
 	constructor(supplier) {
-		if (typeof supplier !== "function") {
-			throw new TypeError("Lazy expects a supplier function.");
-		}
+		if (typeof supplier !== "function") throw new TypeError("Lazy expects a supplier function.");
 		this.supplier = supplier;
 		this.hasValue = false;
 		this.value = undefined;
 	}
-
-	/** @returns {T} The cached value, including an explicitly returned `undefined`. */
+	/** @returns {T} Cached value, computing it once when necessary. */
 	get() {
 		if (!this.hasValue) {
 			this.value = this.supplier();
@@ -25,12 +21,10 @@ class Lazy {
 		}
 		return this.value;
 	}
-
-	/** Forces the supplier to run again on the next call to {@link get}. */
+	/** Invalidates the cached value so the next `get()` invokes the supplier again. */
 	reset() {
 		this.value = undefined;
 		this.hasValue = false;
 	}
 }
-
 module.exports = { Lazy };

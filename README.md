@@ -9,7 +9,9 @@ Language support for Locoland `.lgc` scripts.
 - Completion and hover data for commonly used helpers from the supplied script set (`basefunctions.lgc`, `ai_functions.lgc`, capture, environment, weather and reinforcement scripts).
 - Workspace indexing of `.lgc` files for user-defined functions and `#define` constants.
 - Signature help, navigation to workspace function declarations and workspace symbol search.
-- Static diagnostics for unmatched delimiters, known function arity, inferable `int`/`string`/`char` argument mismatches and assignments to explicitly typed variables. Variable lookup respects function and nested-block scopes, including shadowing and function parameters; consistent script-function return types are inferred where safe.
+- Static diagnostics for unmatched delimiters, known function arity, inferable `int`/`string`/`char` argument mismatches, assignments to explicitly typed variables and non-constant variable initializers. Initializer diagnostics explain why the expression is runtime-dependent and how to rewrite it; a quick fix is available for simple local declarations.
+- Function-name collision diagnostics for duplicate definitions, unsupported overloads and user functions that reuse engine API names. The checker recognizes `#ifndef FunctionName` fallback declarations used by the supplied script library.
+- Scope-aware variable renaming with **F2** and the editor context menu. Only references bound to the selected declaration are renamed, so same-named variables in nested blocks remain untouched.
 - Snippets for functions, control flow, unit iteration, train iteration and common `Action()` patterns.
 - Configurable source formatting with indentation, brace placement, operator spacing, parenthesis spacing, comma spacing, blank-line and `switch` label options. Formatting preserves string literals, comments and preprocessor directives.
 
@@ -87,11 +89,41 @@ The following settings are available under **Locoland Logic Script**:
 | `lgc.analysis.checkFunctionArity` | `true` | Check calls against known required and optional parameter counts. |
 | `lgc.analysis.checkArgumentTypes` | `true` | Check known `int`, `string` and `char` parameter types when the expression type is clear. |
 | `lgc.analysis.checkAssignments` | `true` | Check assignments to explicitly typed variables when both sides have known types. |
+| `lgc.analysis.checkConstantInitializers` | `true` | Report initializers that depend on runtime variables or function calls. Literal values, known `#define` values and constant array initializers are accepted. Unknown all-uppercase identifiers are treated as possible build-time defines. |
+| `lgc.analysis.checkFunctionNameCollisions` | `true` | Report duplicate definitions, overload attempts, collisions with engine API names and same-name declarations in other indexed workspace scripts. |
 | `lgc.analysis.strictUnknownFunctions` | `false` | Warn about calls not found in the bundled catalog or workspace scripts. |
 | `lgc.analysis.severity` | `Warning` | Default severity for static-analysis findings. |
 | `lgc.analysis.maxWorkspaceFiles` | `500` | Maximum `.lgc` files indexed in a workspace. |
 
 Run **LGC: Analyze Current File** from the Command Palette to refresh diagnostics for the active document.
+
+### Variable initializers
+
+LGC variable initializers must be compile-time constant expressions. For example, this is diagnosed:
+
+```c
+int map_state_old = 0;
+int map_state = 1;
+
+StateWasChanged() {
+    int result = map_state - map_state_old; // Not a compile-time constant.
+}
+```
+
+Rewrite it as a declaration followed by a runtime assignment:
+
+```c
+StateWasChanged() {
+    int result;
+    result = map_state - map_state_old;
+}
+```
+
+For a simple, non-static local variable declaration, the diagnostic offers **Split declaration and runtime assignment** as a Quick Fix. The checker also accepts literals, recursively resolvable `#define` values, and arrays whose elements are compile-time constants. Unresolved all-uppercase names are assumed to be conditional build defines (for example, defines supplied by the game build) to avoid false positives; a variable declared in the current file is still treated as a runtime value.
+
+### Rename variables
+
+Place the cursor on a variable name and press **F2**, or choose **LGC: Rename Variable** from the editor context menu. The rename provider follows lexical bindings, including function parameters and nested-block shadowing. It does not rename function names, constants or unrelated variables with the same spelling.
 
 ## API data and language assumptions
 
@@ -110,10 +142,17 @@ LGC resembles a small C-like language, but it is not treated as standard C. The 
 ## Limitations
 
 - There is no formal LGC grammar or compiler specification in the supplied materials. Syntax coverage is based on the supplied scripts and engine declarations.
-- The static checker is not a game runtime or full compiler and does not execute preprocessor branches.
+- The static checker is not a game runtime or full compiler. It recognizes common `#ifndef NAME` fallback function guards but does not fully evaluate arbitrary preprocessor branches.
 - `Action()` and `AddCommand()` argument semantics depend on the selected `ACT_*` opcode; the checker validates their declared integer parameter types but cannot validate every action-specific payload.
 - The bundled helper catalogue documents common functions, not every mission-specific callback or function used by every map. Workspace indexing discovers additional functions from `.lgc` files included in the opened workspace.
 
 ## License
 
 MIT. This extension is an independent fan-made development aid and is not affiliated with Gromada, ESDigital Games or the OpenLocoland project.
+
+
+## Architecture compatibility
+
+This release follows the modular source layout used by the upstream [LocolandLGC repository](https://github.com/paulevsGitch/LocolandLGC): parsing and document modelling, static analysis, document caching, workspace indexing and language providers remain separate modules. The initializer diagnostics, safe Quick Fix, scope-aware variable rename and function-name collision checks are integrated into those modules rather than relying on the earlier monolithic extension implementation.
+
+Run `npm test` to perform JavaScript syntax checks and the regression smoke suite.

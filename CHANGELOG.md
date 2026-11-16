@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.4
+
+- Expanded `docs/LANGUAGE_NOTES.md` with primitive type rules, expression inference, numeric `int`/`char` compatibility, scoped declarations, return-type inference and compile-time initializer behavior.
+- Added JSDoc type contracts and module/API documentation across the parser, analyser, semantic models, providers, refactoring, workspace index, formatter and extension lifecycle.
+- Added `.editorconfig` to preserve the repository's tab-based JavaScript and Json style.
+- Added workspace-wide declaration indexing so duplicate function names across separate scripts are diagnosed.
+- Integrated compile-time initializer diagnostics into the modular analyzer, including reason text and a safe Quick Fix for simple local declarations.
+- Added scope-aware variable rename through the VS Code Rename Provider, F2 and the editor context-menu command.
+- Added function-name collision diagnostics for engine API functions, bundled helper functions, duplicate definitions and unsupported overloads.
+- Preserved guarded `#ifndef FunctionName` fallback implementations and valid external engine declarations.
+- Added syntax checks for all source modules to the npm check/test workflow.
+
+## 0.1.3
+
+- Diagnose variable initializers that are not compile-time constant expressions; include the reason and a suggested runtime-assignment rewrite.
+- Add a Quick Fix that splits safe, simple local initializers into a declaration and a runtime assignment.
+- Accept literal and recursively resolved `#define` initializers, constant array initializers and unresolved uppercase build-time defines.
+- Diagnose user-defined functions that collide with engine API names, duplicate definitions, overload attempts or same-name declarations in other indexed workspace scripts.
+- Recognize `#ifndef FunctionName` fallback declarations to avoid reporting guarded event-hook defaults as duplicate functions.
+- Add scope-aware variable rename support through F2 and the editor context menu; rename edits follow the selected variable binding and preserve nested-block shadowing.
+- Add configuration switches for constant-initializer and function-name collision diagnostics, plus regression tests for diagnostics, quick fixes, guarded functions and scope-safe rename.
+
 ## 0.1.2
 
 - Add an LGC document formatter and the `LGC: Format Document` command.

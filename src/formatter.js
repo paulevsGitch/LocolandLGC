@@ -2,93 +2,28 @@
 
 /**
  * Lexical formatter and configurable pretty-printer for Locoland Logic Script (LGC).
- * This module intentionally performs formatting without compiling or semantically rewriting code.
- */
-
-/**
- * Normalized formatting options accepted by the LGC formatter.
+ * Formatting is independent from semantic analysis: it changes whitespace and brace layout
+ * while preserving token order, literals, comments and preprocessor lines.
+ *
  * @typedef {object} FormatterOptions
- * @property {"spaces" | "tabs"} indentStyle Character sequence used for each indentation level.
- * @property {number} indentSize Number of spaces per indentation level; clamped to 1-8.
- * @property {"sameLine" | "nextLine"} braceStyle Placement of opening braces.
- * @property {"control" | "always" | "never"} spaceBeforeParens When to insert a space before `(`.
- * @property {boolean} spaceInsideParentheses Whether to pad non-empty parenthesized expressions.
- * @property {boolean} spaceInsideBrackets Whether to pad non-empty array-index brackets.
- * @property {boolean} spaceAroundOperators Whether to insert spaces around operators.
- * @property {boolean} spaceAfterComma Whether to insert a space after commas.
- * @property {boolean} spaceBeforeColon Whether to insert a space before ternary-expression colons.
- * @property {boolean} spaceAfterColon Whether to insert a space after ternary-expression colons.
- * @property {number} blankLinesBetweenFunctions Number of blank lines between top-level blocks.
- * @property {boolean} preserveBlankLines Whether blank lines from the source should be retained.
- * @property {number} maxBlankLines Maximum number of consecutive blank lines to retain.
- * @property {boolean} indentCaseLabels Whether `case` and `default` labels receive an extra indent.
- * @property {boolean} keepEmptyBlocksSingleLine Whether empty blocks are formatted as `{}`.
- * @property {boolean} insertFinalNewline Whether to append a newline to non-empty formatted output.
- */
-
-/**
- * Token kinds recognized by the formatter's independent lexical scanner.
- * @typedef {"preprocessor" | "lineComment" | "blockComment" | "string" | "char" | "identifier" | "number" | "operator" | "punctuation"} FormatterTokenKind
- */
-
-/**
- * Lexical token consumed by the formatter.
- * @typedef {object} FormatterToken
- * @property {string} value Exact source text represented by the token.
- * @property {FormatterTokenKind} kind Lexical category of the token.
- * @property {number} start Inclusive UTF-16 source offset.
- * @property {number} end Exclusive UTF-16 source offset.
- * @property {number} line Zero-based source line.
- * @property {number} blankLinesBefore Number of blank lines between this token and the previous token.
- */
-
-/**
- * A formatter token with exact source locations and preceding blank-line metadata.
- * @property {string} value Exact source text represented by the token.
- * @property {FormatterTokenKind} kind Lexical category.
- * @property {number} start Inclusive UTF-16 source offset.
- * @property {number} end Exclusive UTF-16 source offset.
- * @property {number} line Zero-based source line.
- * @property {number} blankLinesBefore Number of blank lines before the token.
- */
-class FormatterToken {
-	constructor({ value, kind, start, end, line, blankLinesBefore = 0 }) {
-		this.value = value;
-		this.kind = kind;
-		this.start = start;
-		this.end = end;
-		this.line = line;
-		this.blankLinesBefore = blankLinesBefore;
-	}
-}
-
-/**
- * Fully normalized, validated formatter configuration.
- * @property {"spaces"|"tabs"} indentStyle Indentation character style.
- * @property {number} indentSize Indentation width.
- * @property {"sameLine"|"nextLine"} braceStyle Opening-brace placement.
+ * @property {"spaces"|"tabs"} indentStyle Character sequence used for each indentation level.
+ * @property {number} indentSize Width of one indentation level when spaces are used.
+ * @property {"sameLine"|"nextLine"} braceStyle Placement of opening braces.
+ * @property {"control"|"always"|"never"} spaceBeforeParens Spacing before opening parentheses.
+ * @property {boolean} spaceInsideParentheses Whether non-empty parentheses receive inner padding.
+ * @property {boolean} spaceInsideBrackets Whether non-empty array brackets receive inner padding.
  * @property {boolean} spaceAroundOperators Whether operators are padded with spaces.
- * @property {boolean} insertFinalNewline Whether output ends with a newline.
+ * @property {boolean} spaceAfterComma Whether a space follows commas.
+ * @property {boolean} spaceBeforeColon Whether a space precedes ternary colons.
+ * @property {boolean} spaceAfterColon Whether a space follows ternary colons.
+ * @property {number} blankLinesBetweenFunctions Number of blank lines between top-level blocks.
+ * @property {boolean} preserveBlankLines Whether source blank lines are retained.
+ * @property {number} maxBlankLines Maximum consecutive blank lines to retain.
+ * @property {boolean} indentCaseLabels Whether `case`/`default` labels receive an extra indent.
+ * @property {boolean} keepEmptyBlocksSingleLine Whether empty blocks remain `{}`.
+ * @property {boolean} insertFinalNewline Whether formatted output ends with a newline.
  */
-class FormatterOptions {
-	constructor(values) {
-		Object.assign(this, values);
-	}
-}
 
-/**
- * State associated with one open brace while formatting nested blocks.
- * @property {boolean} isSwitch Whether the associated block is a switch body.
- * @property {boolean} caseBodyExtraIndent Whether case-body indentation is currently active.
- */
-class BraceContext {
-	constructor({ isSwitch = false, caseBodyExtraIndent = false } = {}) {
-		this.isSwitch = isSwitch;
-		this.caseBodyExtraIndent = caseBodyExtraIndent;
-	}
-}
-
-/** @type {Readonly<FormatterOptions>} */
 const DEFAULTS = Object.freeze({
 	indentStyle: "spaces",
 	indentSize: 4,
@@ -120,9 +55,9 @@ const MULTI_CHAR = ["<<=", ">>=", "==", "!=", "<=", ">=", "++", "--", "&&", "||"
 
 /**
  * Scans source text into formatter tokens while retaining comments and preprocessor lines.
- * Unlike the semantic lexer, this scanner also records line-ending gaps for blank-line preservation.
- * @param {string} text Source text to scan.
- * @returns {FormatterToken[]} Tokens in source order, including comments and preprocessor directives.
+ * Unlike the semantic lexer, this scanner records line gaps for blank-line preservation.
+ * @param {string} text Source text.
+ * @returns {Array<{value:string, kind:string, start:number, end:number, line:number, blankLinesBefore:number}>} Formatter tokens in source order.
  */
 function scanTokens(text) {
 	const tokens = [];
@@ -234,23 +169,23 @@ function scanTokens(text) {
 		const tokenText = text.slice(start, i);
 		const gap = text.slice(previousEnd, start);
 		const newlineCount = (gap.match(/\r\n|\r|\n/g) || []).length;
-		tokens.push(new FormatterToken({
+		tokens.push({
 			value: tokenText,
 			kind,
 			start,
 			end: i,
 			line: startLine,
 			blankLinesBefore: Math.max(0, newlineCount - 1)
-		}));
+		});
 		previousEnd = i;
 	}
 	return tokens;
 }
 
 /**
- * Merges user-supplied formatting options with defaults and clamps numeric and enum values.
- * @param {Partial<FormatterOptions>} [options={}] User-supplied options; omitted fields use defaults.
- * @returns {FormatterOptions} Complete, validated formatter configuration.
+ * Merges custom formatting options with defaults and validates enum/numeric values.
+ * @param {Partial<FormatterOptions>} [options={}] User overrides.
+ * @returns {FormatterOptions} Complete normalized formatter configuration.
  */
 function normalizeOptions(options = {}) {
 	const result = { ...DEFAULTS, ...options };
@@ -261,15 +196,15 @@ function normalizeOptions(options = {}) {
 	if (!["spaces", "tabs"].includes(result.indentStyle)) result.indentStyle = DEFAULTS.indentStyle;
 	if (!["sameLine", "nextLine"].includes(result.braceStyle)) result.braceStyle = DEFAULTS.braceStyle;
 	if (!["control", "always", "never"].includes(result.spaceBeforeParens)) result.spaceBeforeParens = DEFAULTS.spaceBeforeParens;
-	return new FormatterOptions(result);
+	return result;
 }
 
 /**
- * Formats LGC source text without reordering tokens or changing literal and comment contents.
- * The source's original newline convention is preserved and a final newline is optional.
- * @param {string} source LGC source text to format.
- * @param {Partial<FormatterOptions>} [rawOptions={}] Formatting overrides; unspecified values use defaults.
- * @returns {string} Formatted LGC source text.
+ * Formats LGC source without reordering tokens or changing literal/comment contents.
+ * The original newline convention is preserved; this is not a compiler or semantic refactorer.
+ * @param {string} source LGC source text.
+ * @param {Partial<FormatterOptions>} [rawOptions={}] Formatting overrides.
+ * @returns {string} Formatted source text.
  */
 function formatLgcText(source, rawOptions = {}) {
 	if (typeof source !== "string" || source.length === 0) return source;
@@ -325,15 +260,10 @@ function formatLgcText(source, rawOptions = {}) {
 	const isUnary = index => {
 		const before = tokens[index - 1];
 		if (!before) return true;
-		return before.value === "("
-			|| before.value === "["
-			|| before.value === "{"
-			|| before.value === ","
-			|| before.value === ";"
-			|| before.value === ":"
-			|| before.value === "?"
-			|| OPERATORS.has(before.value)
-			|| ["return", "case"].includes(before.value);
+		return before.value === "(" || before.value === "[" || before.value === "{" ||
+			before.value === "," || before.value === ";" || before.value === ":" ||
+			before.value === "?" || OPERATORS.has(before.value) ||
+			["return", "case"].includes(before.value);
 	};
 	const needsSpaceBetweenWords = (left, right) => isWordLike(left) && isWordLike(right);
 
@@ -393,10 +323,7 @@ function formatLgcText(source, rawOptions = {}) {
 				space();
 			}
 			write("{");
-			braceContexts.push(new BraceContext({
-				isSwitch: lastClosedParenContext === "switch",
-				caseBodyExtraIndent: false
-			}));
+			braceContexts.push({ isSwitch: lastClosedParenContext === "switch", caseBodyExtraIndent: false });
 			lastClosedParenContext = null;
 			indent++;
 			newline();
@@ -498,8 +425,7 @@ function formatLgcText(source, rawOptions = {}) {
 			if (isTernaryColon) {
 				ternaryPending--;
 				if (options.spaceAfterColon) space();
-			}
-			else {
+			} else {
 				if (caseLabelPending && caseLabelFrame) {
 					indent++;
 					if (options.indentCaseLabels) caseLabelFrame.caseBodyExtraIndent = true;
@@ -545,16 +471,14 @@ function formatLgcText(source, rawOptions = {}) {
 			if (isPointerDeclarator) {
 				if (options.spaceAroundOperators) space();
 				write(value);
-			}
-			else if (unary) {
+			} else if (unary) {
 				if (["!", "~", "++", "--"].includes(value)) {
 					if (previous && isWordLike(previous)) space();
 				} else if (previous && [")", "]"].includes(previous.value)) {
 					space();
 				}
 				write(value);
-			}
-			else {
+			} else {
 				if (options.spaceAroundOperators) space();
 				write(value);
 				if (options.spaceAroundOperators) space();
@@ -619,8 +543,5 @@ module.exports = {
 	DEFAULTS,
 	scanTokens,
 	normalizeOptions,
-	formatLgcText,
-	FormatterToken,
-	FormatterOptions,
-	BraceContext
+	formatLgcText
 };

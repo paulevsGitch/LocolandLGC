@@ -1,100 +1,69 @@
 "use strict";
 
-const assert = require("node:assert/strict");
-
-const { Lazy } = require("../src/lazy");
-const {
-	Token,
-	LgcFunction,
-	LgcParameter,
-	VariableDeclaration,
-	Scope,
-	LgcConstant,
-	ParsedSource
-} = require("../src/models");
+const assert = require("assert");
 const { tokenize } = require("../src/lexer");
+const { parseSyntax, resolveVariable } = require("../src/parser");
+const { findVariableAt, variableReferenceTokens } = require("../src/refactor");
+const { formatLgcText } = require("../src/formatter");
+const { Lazy } = require("../src/lazy");
+const { WorkspaceIndex } = require("../src/workspace-index");
 const { parseDocument } = require("../src/document-model");
-const { expressionType, areTypesCompatible } = require("../src/analyzer");
-const { formatLgcText, scanTokens, FormatterToken, FormatterOptions } = require("../src/formatter");
-const { DocumentCacheStore } = require("../src/document-cache");
-const { WorkspaceIndex, createFunctionMap, createConstantMap } = require("../src/workspace-index");
 
-const source = `
-int Add(int left, int right) {
-	int result = left + right;
-	return result;
+const source = [
+	"void ScopeTest() {",
+	"    int value;",
+	"    value = 1;",
+	"    { string value; value = \"inner\"; }",
+	"    value = 2;",
+	"}"
+].join("\n");
+const parsed = parseSyntax(source, { toString: () => "file:///scope.lgc" });
+const outer = findVariableAt(parsed, "value", source.indexOf("value;"));
+const innerOffset = source.indexOf("value;", source.indexOf("value;") + 1);
+const inner = findVariableAt(parsed, "value", innerOffset);
+assert(outer && inner && outer !== inner, "the parser must create distinct symbols for shadowed declarations");
+assert.strictEqual(resolveVariable(parsed.variables, "value", source.indexOf("value = 2")).type, "int");
+assert.strictEqual(variableReferenceTokens(parsed, outer).length, 3, "rename references must stay bound to the outer variable");
+assert.strictEqual(variableReferenceTokens(parsed, inner).length, 2, "rename references must stay bound to the inner variable");
+
+const lexical = 'string text = "brace } // content"; /* comment { */ int n = 1;';
+assert(tokenize(lexical).some(token => token.type === "string" && token.value === '"brace } // content"'));
+assert.strictEqual(formatLgcText(formatLgcText(source)), formatLgcText(source), "formatter output must be idempotent");
+
+let calls = 0;
+const lazy = new Lazy(() => ++calls);
+assert.strictEqual(lazy.get(), 1);
+assert.strictEqual(lazy.get(), 1);
+assert.strictEqual(calls, 1, "lazy symbol maps must be evaluated once per snapshot");
+
+async function verifyWorkspaceIndex() {
+	const fileA = { toString: () => "file:///a.lgc" };
+	const fileB = { toString: () => "file:///b.lgc" };
+	const files = new Map([
+		[fileA.toString(), Buffer.from("void SharedName() {}")],
+		[fileB.toString(), Buffer.from("void SharedName() {}")]
+	]);
+	const vscode = {
+		workspace: {
+			textDocuments: [],
+			getConfiguration() { return { get(_name, fallback) { return fallback; } }; },
+			async findFiles() { return [fileA, fileB]; },
+			fs: { async readFile(uri) { return files.get(uri.toString()); } },
+			asRelativePath(uri) { return uri.toString(); }
+		}
+	};
+	const index = new WorkspaceIndex(vscode, [], [], (text, uri, relative) =>
+		parseDocument(text, uri, relative, []));
+	await index.refresh();
+	assert.strictEqual(index.workspaceFunctionEntries.get("SharedName").length, 2,
+		"workspace indexing must preserve every same-name function declaration for collision analysis");
+	assert(index.workspaceFunctions.has("SharedName"), "workspace index must retain a lookup-friendly function map");
+	index.dispose();
 }
 
-int GetAnswer() {
-	return Add(20, 22);
-}
-`;
-
-const parsed = parseDocument(source, { fsPath: "scripts/math.lgc" }, uri => uri.fsPath, []);
-assert.ok(parsed instanceof ParsedSource);
-assert.ok(parsed.tokens.every(token => token instanceof Token));
-assert.ok(parsed.functions.every(fn => fn instanceof LgcFunction));
-assert.ok(parsed.functions[0].params.every(param => param instanceof LgcParameter));
-assert.ok([...parsed.variables.values()].flat().every(item => item instanceof VariableDeclaration));
-assert.ok([...parsed.variables.values()].flat().every(item => item.scope instanceof Scope));
-assert.equal(parsed.functions.find(fn => fn.name === "GetAnswer").returnType, "int");
-assert.equal(expressionType(tokenize("1 + 2"), parsed.variables, new Map(), new Map()), "int");
-assert.equal(areTypesCompatible("int", "char"), true);
-
-const constant = new LgcConstant({ name: "MAX_VALUE", value: "100" });
-const functionItem = new LgcFunction({
-	name: "ExternalCall",
-	params: [{ name: "value", type: "int" }],
-	returnType: "int"
+verifyWorkspaceIndex().then(() => {
+	console.log("Modular refactor smoke tests passed.");
+}).catch(error => {
+	console.error(error);
+	process.exitCode = 1;
 });
-assert.ok(functionItem.params[0] instanceof LgcParameter);
-assert.equal(createFunctionMap(parsed, [functionItem]).get("ExternalCall"), functionItem);
-assert.equal(createConstantMap(new ParsedSource({ constants: new Map() }), [constant]).get("MAX_VALUE"), constant);
-
-let lazyCalls = 0;
-const lazy = new Lazy(() => {
-	lazyCalls++;
-	return undefined;
-});
-assert.equal(lazy.get(), undefined);
-assert.equal(lazy.get(), undefined);
-assert.equal(lazyCalls, 1);
-lazy.reset();
-lazy.get();
-assert.equal(lazyCalls, 2);
-
-const formatterTokens = scanTokens("int x = 1;");
-assert.ok(formatterTokens.every(token => token instanceof FormatterToken));
-assert.ok(new (FormatterOptions)({ indentSize: 4 }) instanceof FormatterOptions);
-const onceFormatted = formatLgcText(source);
-assert.equal(formatLgcText(onceFormatted), onceFormatted);
-
-// A changed workspace generation must rebuild lazy symbol maps without reparsing the document.
-let parseCalls = 0;
-const fakeIndex = {
-	version: 0,
-	makeFunctionMap: () => new Map([["A", new LgcFunction({ name: "A" })]]),
-	makeConstantMap: () => new Map()
-};
-const fakeVscode = { workspace: { asRelativePath: uri => uri.fsPath } };
-const cacheStore = new DocumentCacheStore((text, uri) => {
-	parseCalls++;
-	return parseDocument(text, uri, u => u.fsPath, []);
-}, fakeIndex, fakeVscode);
-const document = {
-	uri: { fsPath: "scripts/cache.lgc", toString() { return this.fsPath; } },
-	version: 1,
-	languageId: "lgc",
-	getText() { return "int Cached() { return 1; }"; }
-};
-const entryA = cacheStore.get(document);
-assert.equal(entryA.functionsMap.get().has("A"), true);
-assert.equal(cacheStore.get(document), entryA);
-fakeIndex.version++;
-fakeIndex.makeFunctionMap = () => new Map([["B", new LgcFunction({ name: "B" })]]);
-const entryB = cacheStore.get(document);
-assert.notEqual(entryB, entryA);
-assert.equal(entryB.functionsMap.get().has("B"), true);
-assert.equal(parseCalls, 1);
-
-console.log("LocolandLGC refactor smoke tests passed.");

@@ -1,22 +1,21 @@
 "use strict";
 
 const { CONTROL_WORDS, TYPE_WORDS } = require("./language-constants");
-const { findMatching } = require("./lexer");
+const { tokenize, findMatching } = require("./lexer");
 const { splitTokenArguments, resolveVariable } = require("./parser");
 const { LgcFunction } = require("./models");
 
+/** @typedef {Map<string, import("./models").VariableDeclaration[]>} VariableMap */
+
 /**
- * Splits an expression at selected operators while ignoring operators inside nested groups.
- * @param {Token[]} tokens Expression token stream.
- * @param {Set<string>} operators Operators that act as split points at nesting depth zero.
- * @returns {Token[][]} Expression segments, or an empty array when no split operator is found.
+ * Splits an expression at selected operators, ignoring operators inside nested groups.
+ * @param {import("./models").Token[]} tokens Expression token stream.
+ * @param {Set<string>} operators Operators to split at nesting depth zero.
+ * @returns {import("./models").Token[][]} Expression segments, or `[]` when no split exists.
  */
 function splitTopLevel(tokens, operators) {
 	const parts = [];
-	let start = 0;
-	let paren = 0;
-	let bracket = 0;
-	let brace = 0;
+	let start = 0, paren = 0, bracket = 0, brace = 0;
 	for (let i = 0; i < tokens.length; i++) {
 		const value = tokens[i].value;
 		if (value === "(") paren++;
@@ -33,29 +32,82 @@ function splitTopLevel(tokens, operators) {
 	if (parts.length) parts.push(tokens.slice(start));
 	return parts;
 }
-
 /**
- * Infers the primitive type of a constant from its literal replacement text.
- * @param {LgcConstant | null | undefined} constant Constant definition to inspect.
- * @returns {LgcType} `int`, `string`, `char` or `unknown` when the value is not a simple literal.
+ * Infers the primitive type represented by a simple macro replacement value.
+ * Only quoted string/character and numeric literal replacements are classified.
+ * Compound macros remain `unknown` unless their complete expression is analysed elsewhere.
+ * @param {import("./models").LgcConstant|null|undefined} constant Constant to inspect.
+ * @returns {import("./models").LgcType} `int`, `string`, `char` or `unknown`.
  */
 function constantExpressionType(constant) {
 	if (!constant || constant.value === undefined || constant.value === "") return "unknown";
 	const value = String(constant.value).trim();
-	if (/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')$/.test(value)) {
-		return value[0] === '"' ? "string" : "char";
-	}
+	if (/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')$/.test(value)) return value[0] === '"' ? "string" : "char";
 	if (/^[+-]?(?:0[xX][0-9A-Fa-f]+|\d+(?:\.\d+)?)$/.test(value)) return "int";
 	return "unknown";
 }
 
 /**
- * Infers return types for workspace functions when every discovered return expression agrees.
- * The function objects are updated in place; uncertain or inconsistent results remain `unknown`.
- * @param {LgcFunction[]} functions Workspace functions to analyse.
- * @param {Token[]} tokens Token stream containing their bodies.
- * @param {VariableMap} variables Variables available to return expressions.
- * @param {Map<string, LgcConstant>} constants Known constants used by return expressions.
+ * Checks whether an initializer can be evaluated without reading runtime state.
+ * Literals, supported operators, brace arrays and recursively resolvable object-like
+ * macros are accepted. Variables and function calls are rejected. Unknown all-uppercase
+ * identifiers are treated as possible build-time defines to avoid false positives when
+ * the game build supplies macros that are not present in the workspace.
+ *
+ * @param {import("./models").Token[]} tokens Initializer expression.
+ * @param {Map<string, import("./models").LgcConstant>} constants Known constants/macros.
+ * @param {Set<string>} [expansionStack] Macro names currently being expanded (cycle guard).
+ * @param {VariableMap} [variables] Known variables, used to distinguish variables from defines.
+ * @returns {boolean} Whether the expression is accepted as compile-time constant.
+ */
+function isCompileTimeConstant(tokens, constants, expansionStack = new Set(), variables) {
+	if (!tokens || !tokens.length) return false;
+	let list = tokens.slice();
+	while (list.length >= 2 && list[0].value === "(" && findMatching(list, 0, "(", ")") === list.length - 1) {
+		list = list.slice(1, -1);
+	}
+	if (list.length >= 2 && list[0].value === "{" && findMatching(list, 0, "{", "}") === list.length - 1) {
+		const elements = splitTokenArguments(list, 1, list.length - 1);
+		return elements.every(element => isCompileTimeConstant(element, constants, expansionStack, variables));
+	}
+	const allowedOperators = new Set([
+		"+", "-", "*", "/", "%", "<<", ">>", "&", "|", "^", "~", "!",
+		"<", ">", "<=", ">=", "==", "!=", "&&", "||", "?", ":", "(", ")"
+	]);
+	for (let i = 0; i < list.length; i++) {
+		const token = list[i];
+		if (["number", "string", "char"].includes(token.type)) continue;
+		if (token.type === "identifier") {
+			const isTypeCast = TYPE_WORDS.has(token.value) && list[i - 1] && list[i - 1].value === "(" &&
+				list[i + 1] && list[i + 1].value === ")";
+			if (isTypeCast) continue;
+			if (variables && resolveVariable(variables, token.value, token.start)) return false;
+			if (list[i + 1] && list[i + 1].value === "(") return false;
+			const constant = constants && constants.get(token.value);
+			if (!constant && /^[A-Z_][A-Z0-9_]*$/.test(token.value)) continue;
+			if (!constant || constant.value === undefined || constant.value === "" || expansionStack.has(token.value)) return false;
+			const nextStack = new Set(expansionStack);
+			nextStack.add(token.value);
+			if (!isCompileTimeConstant(tokenize(String(constant.value)), constants, nextStack, variables)) return false;
+			continue;
+		}
+		if (["{", "}", "[", "]", ","].includes(token.value)) continue;
+		if (!allowedOperators.has(token.value)) return false;
+	}
+	return true;
+}
+
+/**
+ * Infers workspace function return types only when every observed return expression agrees.
+ * Inference is intentionally conservative: mixed, missing or unknown return expressions
+ * do not produce a guessed result. A small number of passes allows calls to functions whose
+ * return types were inferred earlier in the same document to flow into their callers.
+ *
+ * @param {import("./models").LgcFunction[]} functions Functions declared in the document.
+ * @param {import("./models").Token[]} tokens Document token stream.
+ * @param {VariableMap} variables Scope-aware variable declarations.
+ * @param {Map<string, import("./models").LgcConstant>} constants Known constants/macros.
+ * @param {Array<object>} [functionCatalog=[]] Bundled engine/helper function definitions.
  */
 function inferFunctionReturnTypes(functions, tokens, variables, constants, functionCatalog = []) {
 	const functionMap = new Map(functionCatalog.map(item => {
@@ -65,7 +117,6 @@ function inferFunctionReturnTypes(functions, tokens, variables, constants, funct
 	for (const fn of functions) {
 		if (!fn.external || !functionMap.has(fn.name)) functionMap.set(fn.name, fn);
 	}
-
 	for (let pass = 0; pass < 3; pass++) {
 		let changed = false;
 		for (const fn of functions) {
@@ -74,9 +125,7 @@ function inferFunctionReturnTypes(functions, tokens, variables, constants, funct
 			const returns = [];
 			for (let i = 0; i < tokens.length; i++) {
 				if (tokens[i].start <= fn.bodyOpenOffset || tokens[i].start >= fn.bodyCloseOffset || tokens[i].value !== "return") continue;
-				let end = i + 1;
-				let paren = 0;
-				let bracket = 0;
+				let end = i + 1, paren = 0, bracket = 0;
 				for (; end < tokens.length; end++) {
 					const value = tokens[end].value;
 					if (value === "(") paren++;
@@ -86,9 +135,7 @@ function inferFunctionReturnTypes(functions, tokens, variables, constants, funct
 					if (value === ";" && paren === 0 && bracket === 0) break;
 				}
 				const expression = tokens.slice(i + 1, end);
-				returns.push(expression.length
-					? expressionType(expression, variables, functionMap, constants, expression[0].start)
-					: "void");
+				returns.push(expression.length ? expressionType(expression, variables, functionMap, constants, expression[0].start) : "void");
 			}
 			if (!returns.length || returns.some(type => type === "unknown")) continue;
 			const inferred = returns[0];
@@ -105,32 +152,25 @@ function inferFunctionReturnTypes(functions, tokens, variables, constants, funct
 
 /**
  * Conservatively infers the primitive type of a supported LGC expression.
- * Unknown, pointer-like and otherwise unsupported expressions deliberately remain `unknown`.
- * @param {Token[]} tokens Tokens forming the expression.
+ * Literal types are exact; identifiers resolve through lexical scopes, constants or known
+ * functions; array indexing preserves the declared element type; and supported arithmetic,
+ * comparisons and string concatenation infer their common result types. Pointer-like,
+ * engine-specific or otherwise ambiguous expressions deliberately remain `unknown`.
+ *
+ * @param {import("./models").Token[]} tokens Tokens forming the expression.
  * @param {VariableMap} variables Visible variable declarations.
- * @param {Map<string, LgcFunction>} functions Known function signatures.
- * @param {Map<string, LgcConstant>} constants Known constants and macros.
- * @param {number} [offset] Source offset used when resolving identifiers; defaults to the first token.
- * @returns {LgcType} Best-known expression type.
+ * @param {Map<string, import("./models").LgcFunction>} functions Known function signatures.
+ * @param {Map<string, import("./models").LgcConstant>} constants Known constants/macros.
+ * @param {number} [offset] Offset used to resolve identifiers; defaults to the first token.
+ * @returns {import("./models").LgcType} Best-known primitive expression type.
  */
 function expressionType(tokens, variables, functions, constants, offset) {
 	if (!tokens || !tokens.length) return "unknown";
 	let list = tokens.slice();
 	const expressionOffset = offset === undefined ? list[0].start : offset;
-
-	while (list.length >= 2 && list[0].value === "(" && findMatching(list, 0, "(", ")") === list.length - 1) {
-		list = list.slice(1, -1);
-	}
-	if (!list.length) return "unknown";
-
-	if (list[0].value === "&" || list[0].value === "*") return "unknown";
-
-	// Recognize simple C-style casts without attempting general pointer analysis.
-	if (list[0].value === "(" && list[1] && TYPE_WORDS.has(list[1].value) && list[2] && list[2].value === ")" && list.length > 3) {
-		return list[1].value;
-	}
-
-	// Array indexing preserves the declared element type for primitive LGC arrays.
+	while (list.length >= 2 && list[0].value === "(" && findMatching(list, 0, "(", ")") === list.length - 1) list = list.slice(1, -1);
+	if (!list.length || list[0].value === "&" || list[0].value === "*") return "unknown";
+	if (list[0].value === "(" && list[1] && TYPE_WORDS.has(list[1].value) && list[2] && list[2].value === ")" && list.length > 3) return list[1].value;
 	if (list[0].type === "identifier" && list[1] && list[1].value === "[") {
 		const close = findMatching(list, 1, "[", "]");
 		if (close === list.length - 1) {
@@ -138,7 +178,6 @@ function expressionType(tokens, variables, functions, constants, offset) {
 			return variable ? (variable.type || "unknown") : "unknown";
 		}
 	}
-
 	if (list.length >= 2 && list[0].type === "identifier" && list[1].value === "(") {
 		const close = findMatching(list, 1, "(", ")");
 		if (close === list.length - 1) {
@@ -146,7 +185,6 @@ function expressionType(tokens, variables, functions, constants, offset) {
 			return fn ? (fn.returnType || "unknown") : "unknown";
 		}
 	}
-
 	if (list.length === 1) {
 		const token = list[0];
 		if (token.type === "string") return "string";
@@ -163,16 +201,12 @@ function expressionType(tokens, variables, functions, constants, offset) {
 		}
 		return "unknown";
 	}
-
 	if (["+", "-", "!", "~", "++", "--"].includes(list[0].value) && list.length > 1) {
 		if (list[0].value === "!" || list[0].value === "~") return "int";
 		const operandType = expressionType(list.slice(1), variables, functions, constants, list[1].start);
 		return operandType === "int" || operandType === "char" ? "int" : "unknown";
 	}
-
-	const comparisonParts = splitTopLevel(list, new Set(["==", "!=", "<", ">", "<=", ">=", "&&", "||"]));
-	if (comparisonParts.length) return "int";
-
+	if (splitTopLevel(list, new Set(["==", "!=", "<", ">", "<=", ">=", "&&", "||"])).length) return "int";
 	const plusParts = splitTopLevel(list, new Set(["+"]));
 	if (plusParts.length) {
 		const types = plusParts.map(part => expressionType(part, variables, functions, constants, part[0] ? part[0].start : expressionOffset));
@@ -180,138 +214,252 @@ function expressionType(tokens, variables, functions, constants, offset) {
 		if (types.every(type => type === "int" || type === "char")) return "int";
 		return "unknown";
 	}
-
 	const arithmeticParts = splitTopLevel(list, new Set(["-", "*", "/", "%", "<<", ">>", "&", "|", "^"]));
 	if (arithmeticParts.length) {
 		const types = arithmeticParts.map(part => expressionType(part, variables, functions, constants, part[0] ? part[0].start : expressionOffset));
 		return types.every(type => type === "int" || type === "char") ? "int" : "unknown";
 	}
-
-	if (list[0].value === "!" || list[0].value === "~" || list[0].value === "++" || list[0].value === "--" ||
-		list[list.length - 1].value === "++" || list[list.length - 1].value === "--") return "int";
-
+	if (["!", "~", "++", "--"].includes(list[0].value) || ["++", "--"].includes(list[list.length - 1].value)) return "int";
 	if (list.some(token => token.type === "string")) return "string";
-	if (list.some(token => token.type === "number")) return "unknown";
 	return "unknown";
 }
-
 /**
- * Checks compatibility between two known primitive LGC types.
- * `int` and `char` are compatible because character values use integer storage.
- * @param {LgcType} expected Required type from a declaration or function signature.
- * @param {LgcType} actual Inferred type of the supplied expression.
- * @returns {boolean} Whether the actual type can be used where the expected type is required.
+ * Applies the analyser's known primitive compatibility rule.
+ * `int` and `char` are compatible numeric types; `string` is not implicitly converted.
+ * Unknown types are handled by callers and are not passed here as a positive match.
+ * @param {import("./models").LgcType} expected Declared parameter/variable type.
+ * @param {import("./models").LgcType} actual Inferred expression type.
+ * @returns {boolean} Whether the two known types are compatible.
  */
 function areTypesCompatible(expected, actual) {
 	if (expected === actual) return true;
-	// LGC uses integer storage for character values, as in C integer promotions.
 	return (expected === "int" && actual === "char") || (expected === "char" && actual === "int");
 }
-
 /**
- * Creates a VS Code diagnostic covering the exact source range of a token.
- * @param {VSCODE.TextDocument} document Document containing the token.
- * @param {Token} token Token to underline.
- * @param {string} message Diagnostic message displayed to the user.
- * @param {VSCODE.DiagnosticSeverity} severity VS Code diagnostic severity.
- * @returns {VSCODE.Diagnostic} Diagnostic tagged with the `Locoland LGC` source label.
+ * Creates a source diagnostic from a token range and attaches the LGC diagnostic code.
+ * @param {*} VSCODE VS Code API namespace.
+ * @param {*} document VS Code text document.
+ * @param {{start:number, end?:number}} token Source offsets; `end` may be omitted for identifiers.
+ * @param {string} message User-facing diagnostic message including explanation/fix where relevant.
+ * @param {*} severity VS Code diagnostic severity.
+ * @param {string} [code] Stable diagnostic code used by Quick Fix providers.
+ * @param {*} [data] Optional diagnostic metadata.
+ * @returns {*} VS Code `Diagnostic` instance.
  */
-function diagnostic(VSCODE, document, token, message, severity) {
+function diagnostic(VSCODE, document, token, message, severity, code, data) {
 	const start = document.positionAt(token.start);
 	const end = document.positionAt(token.end);
 	const result = new VSCODE.Diagnostic(new VSCODE.Range(start, end), message, severity);
 	result.source = "Locoland LGC";
+	if (code) result.code = code;
+	if (data !== undefined) result.data = data;
 	return result;
+}
+/** Returns a stable parameter-type key used to detect unsupported overloads. */
+function functionParameterKey(fn) { return (fn.params || []).map(param => param.type || "unknown").join(","); }
+/** Returns whether a parsed function entry owns a braced implementation. */
+function hasFunctionBody(fn) { return fn.bodyOpenOffset !== null && fn.bodyOpenOffset !== undefined; }
+/** Checks whether a declaration is guarded by `#ifndef` for the same function name. */
+function isConditionalFallback(fn, name) { return (fn.preprocessorGuards || []).includes(name); }
+/**
+ * Identifies a compatible prototype/definition pair that is not a name collision.
+ * Parameter types must match; an unknown return type is accepted as incomplete metadata.
+ */
+function isCompatibleForwardDeclarationPair(left, right) {
+	const sameParameters = functionParameterKey(left) === functionParameterKey(right);
+	const leftReturn = left.returnType || "unknown";
+	const rightReturn = right.returnType || "unknown";
+	const compatibleReturns = leftReturn === "unknown" || rightReturn === "unknown" || leftReturn === rightReturn;
+	return sameParameters && compatibleReturns && (!hasFunctionBody(left) || !hasFunctionBody(right));
+}
+/**
+ * Finds why a function name is unavailable in LGC's single-name function namespace.
+ * Detects engine API collisions, duplicate definitions, parameter-list overloads,
+ * return-type conflicts and same-name definitions in other indexed workspace files.
+ * Conditional `#ifndef NAME` fallbacks and compatible prototype/definition pairs are ignored.
+ *
+ * @param {import("./models").LgcFunction} fn Function entry being checked.
+ * @param {import("./models").ParsedSource} parsed Current document parse.
+ * @param {Array<object>} [functionCatalog=[]] Bundled engine and helper function entries.
+ * @param {Map<string, import("./models").LgcFunction[]>} [workspaceFunctionEntries] All workspace declarations by name.
+ * @returns {string|null} Human-readable collision reason, or `null` when the name is available.
+ */
+function functionCollisionReason(fn, parsed, functionCatalog = [], workspaceFunctionEntries = new Map()) {
+	const engineFunction = functionCatalog.find(item => item.name === fn.name && typeof item.id === "number");
+	if (engineFunction && !fn.external) return "the Locoland engine already exports a function with this name";
+	const sameName = parsed.functions.filter(item => item.name === fn.name &&
+		(item === fn || (!isConditionalFallback(item, fn.name) && !isConditionalFallback(fn, fn.name))));
+	if (sameName.length <= 1) {
+		const otherEntries = workspaceFunctionEntries.get(fn.name) || [];
+		const other = otherEntries.find(item => item.uri && fn.uri && item.uri.toString() !== fn.uri.toString() && !item.external &&
+			!isConditionalFallback(item, fn.name) && !isConditionalFallback(fn, fn.name) && !isCompatibleForwardDeclarationPair(fn, item));
+		return other ? `another script already declares this function (${other.source || "workspace"})` : null;
+	}
+	const definitions = sameName.filter(hasFunctionBody);
+	const signatureKeys = new Set(sameName.map(functionParameterKey));
+	const returnTypes = new Set(sameName.map(item => item.returnType || "unknown").filter(type => type !== "unknown"));
+	if (signatureKeys.size > 1) return "the name is already declared with a different parameter list (function overloading is unsupported)";
+	if (returnTypes.size > 1) return "the name is already declared with a different return type";
+	if (definitions.length > 1) return "another definition with the same name already exists in this file";
+	const otherEntries = workspaceFunctionEntries.get(fn.name) || [];
+	const other = otherEntries.find(item => item.uri && fn.uri && item.uri.toString() !== fn.uri.toString() && !item.external &&
+		!isConditionalFallback(item, fn.name) && !isConditionalFallback(fn, fn.name) && !isCompatibleForwardDeclarationPair(fn, item));
+	return other ? `another script already declares this function (${other.source || "workspace"})` : null;
+}
+/**
+ * Explains the first runtime-dependent or unresolved token in a rejected initializer.
+ * The message is paired with a suggested declaration-then-assignment rewrite.
+ * @param {import("./models").VariableDeclaration} declaration Variable declaration under analysis.
+ * @param {Map<string, import("./models").LgcConstant>} constants Known constants/macros.
+ * @param {VariableMap} variables Scope-aware variable declarations.
+ * @param {Map<string, import("./models").LgcFunction>} functions Known functions.
+ * @returns {string} Concise reason suitable for a VS Code diagnostic.
+ */
+function explainNonConstantInitializer(declaration, constants, variables, functions) {
+	for (let i = 0; i < declaration.initializerTokens.length; i++) {
+		const token = declaration.initializerTokens[i];
+		if (token.type !== "identifier") continue;
+		if (resolveVariable(variables, token.value, token.start)) return `'${token.value}' is a runtime variable`;
+		if (declaration.initializerTokens[i + 1] && declaration.initializerTokens[i + 1].value === "(") {
+			return functions && functions.has(token.value)
+				? `function call '${token.value}()' is evaluated at runtime`
+				: `call expression '${token.value}()' is evaluated at runtime`;
+		}
+		if (constants && constants.has(token.value)) continue;
+		if (/^[A-Z_][A-Z0-9_]*$/.test(token.value)) continue;
+		if (!TYPE_WORDS.has(token.value)) return `'${token.value}' is not a known compile-time constant`;
+	}
+	return "the expression contains an operation or value that cannot be resolved at compile time";
+}
+/**
+ * Adds diagnostics for duplicate, overloaded and engine-reserved function names.
+ * @param {*} VSCODE VS Code API namespace.
+ * @param {*} document Analysed text document.
+ * @param {import("./models").ParsedSource} parsed Current document parse.
+ * @param {Array<*>} diagnostics Mutable diagnostic output array.
+ * @param {Array<object>} functionCatalog Bundled engine/helper function entries.
+ * @param {Map<string, import("./models").LgcFunction[]>} workspaceFunctionEntries Cross-file declarations.
+ */
+function addFunctionCollisionDiagnostics(VSCODE, document, parsed, diagnostics, functionCatalog, workspaceFunctionEntries) {
+	const visited = new Set();
+	for (const fn of parsed.functions) {
+		if (fn.external && functionCatalog.some(item => item.name === fn.name && typeof item.id === "number")) continue;
+		const key = `${fn.name}:${fn.offset}`;
+		if (visited.has(key)) continue;
+		visited.add(key);
+		const reason = functionCollisionReason(fn, parsed, functionCatalog, workspaceFunctionEntries);
+		if (!reason) continue;
+		diagnostics.push(diagnostic(VSCODE, document,
+			{ start: fn.offset, end: fn.offset + fn.name.length },
+			`Function name '${fn.name}' is already occupied. Reason: ${reason}. LGC does not support function overriding or overloading. Fix: rename this function and update its call sites.`,
+			VSCODE.DiagnosticSeverity.Error, "lgc.functionNameCollision"));
+	}
 }
 
 /**
- * Runs the configured static checks for a document and returns all detected diagnostics.
- * Checks delimiters, known function arity and argument types, and assignments to typed variables.
- * @param {VSCODE.TextDocument} document Document being analysed.
- * @param {ParsedSource} parsed Parsed tokens and semantic data for the document.
- * @param {Map<string, LgcFunction>} functions Available engine, helper and workspace functions.
- * @param {Map<string, LgcConstant>} constants Available engine and workspace constants.
- * @returns {VSCODE.Diagnostic[]} Diagnostics produced by the enabled checks.
+ * Runs configured syntax and semantic checks for one parsed LGC document.
+ * Checks delimiters, compile-time initializers, function-name collisions, known function
+ * arity, inferable argument types and assignments to explicitly typed local variables.
+ * Checks are intentionally skipped when expression types or API signatures are unknown.
+ *
+ * @param {*} VSCODE VS Code API namespace.
+ * @param {*} document Document being analysed.
+ * @param {import("./models").ParsedSource} parsed Syntax and semantic document snapshot.
+ * @param {Map<string, import("./models").LgcFunction>} functions Merged function symbol map.
+ * @param {Map<string, import("./models").LgcConstant>} constants Merged constant symbol map.
+ * @param {Map<string, import("./models").LgcFunction[]>} [workspaceFunctionEntries] All workspace declarations by name.
+ * @param {Array<object>} [functionCatalog=[]] Bundled engine/helper function catalogue.
+ * @returns {Array<*>} VS Code diagnostics for the document.
  */
-function analyzeDocument(VSCODE, document, parsed, functions, constants) {
+function analyzeDocument(VSCODE, document, parsed, functions, constants, workspaceFunctionEntries = new Map(), functionCatalog = []) {
 	const config = VSCODE.workspace.getConfiguration("lgc.analysis", document.uri);
 	if (!config.get("enabled", true)) return [];
-
 	const severityValue = config.get("severity", "Warning");
 	const severity = severityValue === "Error" ? VSCODE.DiagnosticSeverity.Error :
 		severityValue === "Information" ? VSCODE.DiagnosticSeverity.Information : VSCODE.DiagnosticSeverity.Warning;
 	const diagnostics = [];
 	const tokens = parsed.tokens;
 	const variables = parsed.variables;
-
-	const brackets = [];
 	const closingToOpening = { ")": "(", "]": "[", "}": "{" };
-	const matching = { "(": ")", "[": "]", "{": "}" };
+	const brackets = [];
 	for (const token of tokens) {
 		if (["(", "[", "{"].includes(token.value)) brackets.push(token);
 		else if (closingToOpening[token.value]) {
 			const top = brackets[brackets.length - 1];
 			if (!top || top.value !== closingToOpening[token.value]) {
 				diagnostics.push(diagnostic(VSCODE, document, token, `Unmatched closing '${token.value}'.`, VSCODE.DiagnosticSeverity.Error));
-			} else {
-				brackets.pop();
+			} else brackets.pop();
+		}
+	}
+	for (const token of brackets) diagnostics.push(diagnostic(VSCODE, document, token, `Unclosed '${token.value}'.`, VSCODE.DiagnosticSeverity.Error));
+
+	if (config.get("checkConstantInitializers", true)) {
+		for (const entries of variables.values()) {
+			for (const entry of entries) {
+				if (!entry.initializerEqualsToken || !entry.initializerTokens || !entry.initializerTokens.length) continue;
+				if (isCompileTimeConstant(entry.initializerTokens, constants, new Set(), variables)) continue;
+				const reason = explainNonConstantInitializer(entry, constants, variables, functions);
+				const data = {
+					name: entry.name,
+					equalsOffset: entry.initializerEqualsToken.start,
+					initializerStart: entry.initializerStart,
+					initializerEnd: entry.initializerEnd,
+					isLocal: entry.isLocal,
+					isArray: entry.isArray,
+					declaratorCount: entry.declaratorCount
+				};
+				diagnostics.push(diagnostic(VSCODE, document,
+					{ start: entry.initializerEqualsToken.start, end: entry.initializerEnd },
+					`Initializer for '${entry.name}' is not a compile-time constant. Reason: ${reason}. Fix: declare the variable without an initializer, then assign this expression at runtime inside a function.`,
+					VSCODE.DiagnosticSeverity.Error, "lgc.nonConstantInitializer", data));
 			}
 		}
 	}
-	for (const token of brackets) {
-		diagnostics.push(diagnostic(VSCODE, document, token, `Unclosed '${token.value}'.`, VSCODE.DiagnosticSeverity.Error));
+	if (config.get("checkFunctionNameCollisions", true)) {
+		addFunctionCollisionDiagnostics(VSCODE, document, parsed, diagnostics, functionCatalog, workspaceFunctionEntries);
 	}
 
 	const checkArity = config.get("checkFunctionArity", true);
 	const checkTypes = config.get("checkArgumentTypes", true);
 	const strictUnknown = config.get("strictUnknownFunctions", false);
 	const knownFunctionNames = new Set(functions.keys());
-
+	const sourceText = document.getText();
 	for (let i = 0; i < tokens.length - 1; i++) {
 		const token = tokens[i];
 		if (token.type !== "identifier" || tokens[i + 1].value !== "(") continue;
 		if (parsed.declarationPositions.has(token.start) || CONTROL_WORDS.has(token.value)) continue;
-
-		const lineStart = document.getText().lastIndexOf("\n", token.start - 1) + 1;
-		const prefix = document.getText().slice(lineStart, token.start);
-		if (/^\s*#\s*define\b/.test(prefix)) continue;
-
+		const lineStart = sourceText.lastIndexOf("\n", token.start - 1) + 1;
+		if (/^\s*#\s*define\b/.test(sourceText.slice(lineStart, token.start))) continue;
 		const close = findMatching(tokens, i + 1, "(", ")");
 		if (close < 0) continue;
 		const args = splitTokenArguments(tokens, i + 2, close);
 		const fn = functions.get(token.value);
-
 		if (!fn) {
 			if (strictUnknown && !knownFunctionNames.has(token.value)) {
-				diagnostics.push(diagnostic(VSCODE, document, token, `Unknown function '${token.value}'. Add its script to the workspace or declare it before using strict mode.`, severity));
+				diagnostics.push(diagnostic(VSCODE, document, token,
+					`Unknown function '${token.value}'. Add its script to the workspace or declare it before using strict mode.`, severity));
 			}
 			continue;
 		}
-
 		const required = (fn.params || []).filter(param => !param.optional).length;
 		const maximum = (fn.params || []).length;
 		if (checkArity && (args.length < required || args.length > maximum)) {
 			diagnostics.push(diagnostic(VSCODE, document, token,
-				`${token.value} expects ${required === maximum ? required : `${required}-${maximum}`} argument(s), but ${args.length} supplied.`,
-				severity));
+				`${token.value} expects ${required === maximum ? required : `${required}-${maximum}`} argument(s), but ${args.length} supplied.`, severity));
 		}
-
 		if (checkTypes && fn.params) {
 			for (let argIndex = 0; argIndex < Math.min(args.length, fn.params.length); argIndex++) {
 				const expected = fn.params[argIndex].type;
-				if (expected !== "int" && expected !== "string" && expected !== "char") continue;
+				if (!["int", "string", "char"].includes(expected)) continue;
 				const argument = args[argIndex];
 				const actual = expressionType(argument, variables, functions, constants, argument[0] ? argument[0].start : token.start);
 				if (actual !== "unknown" && !areTypesCompatible(expected, actual)) {
-					const arg = args[argIndex][0];
-					diagnostics.push(diagnostic(VSCODE, document, arg,
-						`Argument ${argIndex + 1} of ${token.value} expects ${expected}, but the expression is ${actual}.`,
-						severity));
+					diagnostics.push(diagnostic(VSCODE, document, args[argIndex][0],
+						`Argument ${argIndex + 1} of ${token.value} expects ${expected}, but the expression is ${actual}.`, severity));
 				}
 			}
 		}
 	}
-
 	if (config.get("checkAssignments", true)) {
 		for (let i = 1; i < tokens.length - 1; i++) {
 			if (tokens[i].value !== "=" || tokens[i - 1].type !== "identifier") continue;
@@ -320,37 +468,27 @@ function analyzeDocument(VSCODE, document, parsed, functions, constants) {
 			if (["=", "!", "<", ">"].includes(previous) || next === "=") continue;
 			const target = resolveVariable(variables, tokens[i - 1].value, tokens[i - 1].start);
 			if (!target || !["int", "string", "char"].includes(target.type)) continue;
-
-			let end = i + 1;
-			let nesting = 0;
+			let end = i + 1, nesting = 0;
 			for (; end < tokens.length; end++) {
-				const v = tokens[end].value;
-				if (["(", "["].includes(v)) nesting++;
-				else if ([")", "]"].includes(v)) {
-					if (nesting === 0) break;
-					nesting--;
-				}
-				if (nesting === 0 && (v === ";" || v === ",")) break;
+				const value = tokens[end].value;
+				if (["(", "["].includes(value)) nesting++;
+				else if ([")", "]"].includes(value)) { if (nesting === 0) break; nesting--; }
+				if (nesting === 0 && (value === ";" || value === ",")) break;
 			}
 			const rhsTokens = tokens.slice(i + 1, end);
 			const actual = expressionType(rhsTokens, variables, functions, constants, rhsTokens[0] ? rhsTokens[0].start : tokens[i].start);
 			if (actual !== "unknown" && !areTypesCompatible(target.type, actual)) {
 				diagnostics.push(diagnostic(VSCODE, document, tokens[i - 1],
-					`Cannot assign ${actual} to ${target.type} variable '${tokens[i - 1].value}'.`,
-					severity));
+					`Cannot assign ${actual} to ${target.type} variable '${tokens[i - 1].value}'.`, severity));
 			}
 		}
 	}
-
 	return diagnostics;
 }
 
 module.exports = {
-	splitTopLevel,
-	constantExpressionType,
-	inferFunctionReturnTypes,
-	expressionType,
-	areTypesCompatible,
-	diagnostic,
-	analyzeDocument
+	splitTopLevel, constantExpressionType, isCompileTimeConstant, inferFunctionReturnTypes,
+	expressionType, areTypesCompatible, diagnostic, functionParameterKey,
+	isCompatibleForwardDeclarationPair, functionCollisionReason, explainNonConstantInitializer,
+	addFunctionCollisionDiagnostics, analyzeDocument
 };

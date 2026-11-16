@@ -1,41 +1,52 @@
 const assert = require("assert");
-const MODULE = require("module");
+const Module = require("module");
 
 const vscodeMock = {
+	EndOfLine: { LF: 1, CRLF: 2 },
+	CodeActionKind: { QuickFix: "quickfix" },
 	DiagnosticSeverity: { Error: 0, Warning: 1, Information: 2 },
 	Position: class Position { constructor(line, character) { this.line = line; this.character = character; } },
 	Range: class Range { constructor(start, end) { this.start = start; this.end = end; } },
 	Diagnostic: class Diagnostic { constructor(range, message, severity) { this.range = range; this.message = message; this.severity = severity; } },
+	CodeAction: class CodeAction { constructor(title, kind) { this.title = title; this.kind = kind; } },
+	WorkspaceEdit: class WorkspaceEdit {
+		constructor() { this.entries = []; }
+		replace(uri, range, text) { this.entries.push({ type: "replace", uri, range, text }); }
+		insert(uri, position, text) { this.entries.push({ type: "insert", uri, position, text }); }
+	},
 	workspace: {
 		getConfiguration() {
-			return {
-				get(key, fallback) {
-					const values = {
-						enabled: true,
-						severity: "Warning",
-						checkFunctionArity: true,
-						checkArgumentTypes: true,
-						checkAssignments: true,
-						strictUnknownFunctions: false
-					};
-					return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : fallback;
-				}
-			};
+			return { get(key, fallback) {
+				const values = {
+					enabled: true,
+					severity: "Warning",
+					checkFunctionArity: true,
+					checkArgumentTypes: true,
+					checkAssignments: true,
+					strictUnknownFunctions: false
+				};
+				return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : fallback;
+			}};
 		},
 		asRelativePath(uri) { return String(uri); }
 	}
 };
 
-const originalLoad = MODULE._load;
-MODULE._load = function (request, parent, isMain) {
+const originalLoad = Module._load;
+Module._load = function(request, parent, isMain) {
 	if (request === "vscode") return vscodeMock;
 	return originalLoad.call(this, request, parent, isMain);
 };
 
 const extension = require("../src/extension.js");
-MODULE._load = originalLoad;
+Module._load = originalLoad;
 
-const { parseSource, makeFunctionMap, makeConstantMap, analyzeDocument, resolveVariable, expressionType, formatLgcText } = extension.__test;
+const {
+	parseSource, makeFunctionMap, makeConstantMap, analyzeDocument, resolveVariable,
+	expressionType, formatLgcText, isCompileTimeConstant, findVariableAt,
+	variableReferenceTokens, renameVariableEdits, codeActionsForDiagnostics,
+	setWorkspaceFunctionEntriesForTests
+} = extension.__test;
 
 const source = [
 	"int counter = 0;",
@@ -56,7 +67,7 @@ assert(parsed.functions.some(fn => fn.name === "LocalHelper"), "workspace functi
 const externalSource = "extern AddCommand(int unit, int action, int x, int y, int z) 1;";
 const externalParsed = parseSource(externalSource, null);
 assert(externalParsed.functions.some(fn => fn.name === "AddCommand" && fn.external), "engine prototypes should be identified as external declarations");
-const bundledAddCommand = makeFunctionMap(externalParsed).get("AddCommand");
+const bundledAddCommand = makeFunctionMap(null, externalParsed).get("AddCommand");
 assert(bundledAddCommand && bundledAddCommand.source === "export.lgc", "external engine prototypes must not replace bundled API documentation");
 assert(parsed.variables.has("counter"), "typed variables should be indexed");
 assert(parsed.variables.has("label"), "string variables should be indexed");
@@ -73,7 +84,7 @@ const document = {
 	}
 };
 
-const functions = makeFunctionMap(parsed);
+const functions = makeFunctionMap(document, parsed);
 const constants = makeConstantMap(parsed);
 const diagnostics = analyzeDocument(document, parsed, functions, constants);
 assert(diagnostics.some(item => item.message.includes("expects int, but the expression is string")),
@@ -141,7 +152,7 @@ const scopedDocument = {
 		return new vscodeMock.Position(line, offset - lastNewline - 1);
 	}
 };
-const scopedFunctions = makeFunctionMap(scopedParsed);
+const scopedFunctions = makeFunctionMap(scopedDocument, scopedParsed);
 const scopedDiagnostics = analyzeDocument(scopedDocument, scopedParsed, scopedFunctions, makeConstantMap(scopedParsed));
 assert(scopedDiagnostics.some(item => item.message.includes("Cannot assign int to string variable 's'")),
 	"assignments to string locals must be checked using the local declaration type");
@@ -149,6 +160,203 @@ assert(scopedDiagnostics.some(item => item.message.includes("Cannot assign strin
 	"assignments to int locals must be checked using the local declaration type");
 assert(scopedDiagnostics.some(item => item.message.includes("Cannot assign string to int variable 'copy'")),
 	"function parameter types must participate in assignment checks");
+
+function makeDocumentForText(text) {
+	return {
+		uri,
+		languageId: "lgc",
+		eol: vscodeMock.EndOfLine.LF,
+		getText(range) {
+			if (!range) return text;
+			const start = this.offsetAt(range.start);
+			const end = this.offsetAt(range.end);
+			return text.slice(start, end);
+		},
+		positionAt(offset) {
+			const before = text.slice(0, offset);
+			const line = before.split("\n").length - 1;
+			const lastNewline = before.lastIndexOf("\n");
+			return new vscodeMock.Position(line, offset - lastNewline - 1);
+		},
+		offsetAt(position) {
+			const lines = text.split("\n");
+			let offset = 0;
+			for (let line = 0; line < position.line; line++) offset += lines[line].length + 1;
+			return offset + position.character;
+		},
+		getWordRangeAtPosition(position, regex) {
+			const lines = text.split("\n");
+			const line = lines[position.line] || "";
+			const character = position.character;
+			const pattern = regex || /[A-Za-z_]\w*/;
+			let match;
+			const matcher = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+			while ((match = matcher.exec(line)) !== null) {
+				if (character >= match.index && character <= match.index + match[0].length) {
+					return new vscodeMock.Range(
+						new vscodeMock.Position(position.line, match.index),
+						new vscodeMock.Position(position.line, match.index + match[0].length)
+					);
+				}
+			}
+			return null;
+		},
+		lineAt(line) {
+			return { text: text.split("\n")[line] || "" };
+		}
+	};
+}
+
+// Non-constant initializers must be reported while literals, macros and constant arrays remain valid.
+const initializerSource = [
+	"#define BASE_VALUE 3",
+	"int globalValue = BASE_VALUE + 2;",
+	"int values[] = {0, BASE_VALUE, -2};",
+	"int buildFlagValue = FLY_COUNT1;",
+	"int GLOBAL_RUNTIME_VALUE = 0;",
+	"int copiedGlobalRuntimeValue = GLOBAL_RUNTIME_VALUE;",
+	'string caption = "literal";',
+	"void Initialize(int runtimeValue) {",
+	"    int constantValue = 2 + 3;",
+	"    int dynamicValue = runtimeValue - globalValue;",
+	"    int callValue = GetMoney(0);",
+	"}"
+].join("\n");
+const initializerParsed = parseSource(initializerSource, uri);
+const initializerDocument = makeDocumentForText(initializerSource);
+const initializerDiagnostics = analyzeDocument(initializerDocument, initializerParsed,
+	makeFunctionMap(initializerDocument, initializerParsed), makeConstantMap(initializerParsed));
+const initializerErrors = initializerDiagnostics.filter(item => item.code === "lgc.nonConstantInitializer");
+assert.strictEqual(initializerErrors.length, 3,
+	"runtime-variable and function-call initializers should be rejected, while literals, macros and arrays are accepted");
+assert(initializerErrors.every(item => item.severity === vscodeMock.DiagnosticSeverity.Error),
+	"non-constant initializers must be marked as errors");
+assert(initializerErrors.some(item => item.message.includes("'runtimeValue' is a runtime variable") && item.message.includes("Fix:")),
+	"initializer diagnostics must explain the runtime-value cause and provide a fix");
+assert(initializerErrors.some(item => item.message.includes("GLOBAL_RUNTIME_VALUE") && item.message.includes("runtime variable")),
+	"uppercase variables declared in the file must not be mistaken for build-time macros");
+assert(isCompileTimeConstant(parseSource("int x;", null).tokens.slice(0, 0), new Map()) === false,
+	"an empty expression cannot be treated as a compile-time constant");
+
+// Regression for the exact state-change pattern reported from a tutorial map.
+const stateChangeSource = [
+	"#define STATE_OBJECTIVE_NONE 0",
+	"#define STATE_OBJECTIVE_MONEY 1",
+	"int map_state_old = STATE_OBJECTIVE_NONE;",
+	"int map_state = STATE_OBJECTIVE_MONEY;",
+	"StateWasChanged() {",
+	"    int result = map_state - map_state_old;",
+	"    map_state_old = map_state;",
+	"    return result != 0;",
+	"}"
+].join("\n");
+const stateChangeParsed = parseSource(stateChangeSource, uri);
+const stateChangeDocument = makeDocumentForText(stateChangeSource);
+const stateChangeDiagnostics = analyzeDocument(stateChangeDocument, stateChangeParsed,
+	makeFunctionMap(stateChangeDocument, stateChangeParsed), makeConstantMap(stateChangeParsed));
+const stateInitializerError = stateChangeDiagnostics.find(item => item.code === "lgc.nonConstantInitializer");
+assert(stateInitializerError && stateInitializerError.message.includes("'map_state' is a runtime variable"),
+	"the reported map_state initializer must be diagnosed as a runtime expression");
+assert(stateInitializerError.message.includes("declare the variable without an initializer") &&
+	stateInitializerError.message.includes("assign this expression at runtime"),
+	"the initializer diagnostic must explain the reason and the recommended fix");
+
+// The code action can safely split one local declaration into a declaration and a runtime assignment.
+const fixSource = "void Initialize() {\n    int value = GetMoney(0);\n    static int cached = GetMoney(0);\n}";
+const fixDocument = makeDocumentForText(fixSource);
+const fixParsed = parseSource(fixSource, uri);
+const fixDiagnostics = analyzeDocument(fixDocument, fixParsed,
+	makeFunctionMap(fixDocument, fixParsed), makeConstantMap(fixParsed));
+const fixActions = codeActionsForDiagnostics(fixDocument, { diagnostics: fixDiagnostics.map(item => ({
+	code: item.code,
+	range: item.range,
+	message: item.message
+})) });
+assert.strictEqual(fixActions.length, 1, "a simple non-static local initializer should offer a quick fix without custom diagnostic metadata");
+assert(fixActions[0].title.includes("runtime assignment"), "the quick fix should describe the declaration split");
+assert(fixActions[0].edit.entries.some(edit => edit.type === "insert" && edit.text.includes("value = GetMoney(0);")),
+	"the quick fix should insert the runtime assignment after the declaration");
+
+// F2 rename binding must stay inside the declaration's lexical scope.
+const renameSource = [
+	"#define value 99",
+	"void RenameScope() {",
+	"    int value;",
+	"    value = 1;",
+	"    {",
+	"        string value;",
+	'        value = "nested";',
+	"    }",
+	"    value = 2;",
+	"}"
+].join("\n");
+const renameParsed = parseSource(renameSource, uri);
+const outerDeclaration = findVariableAt(renameParsed, "value", renameSource.indexOf("value;"));
+const innerDeclaration = findVariableAt(renameParsed, "value", renameSource.indexOf("value;", renameSource.indexOf("value;") + 1));
+assert(outerDeclaration && innerDeclaration && outerDeclaration !== innerDeclaration,
+	"same-named declarations in nested blocks must resolve to separate symbols");
+assert.strictEqual(variableReferenceTokens(renameParsed, outerDeclaration).length, 3,
+	"renaming the outer variable should include its declaration and both outer references only");
+assert.strictEqual(variableReferenceTokens(renameParsed, innerDeclaration).length, 2,
+	"renaming the inner variable should include only its declaration and inner reference");
+const renameDocument = makeDocumentForText(renameSource);
+const renamePosition = renameDocument.positionAt(renameSource.indexOf("value = 2"));
+const renameEdit = renameVariableEdits(renameDocument, renameParsed, renamePosition, "score");
+assert.strictEqual(renameEdit.entries.length, 3,
+	"F2 rename edits must change only the declaration and references bound to the selected scope");
+
+// A function name cannot be reused for an overload, duplicate definition or engine API replacement.
+const collisionSource = [
+	"void LocalName(int value) {}",
+	"void LocalName(string value) {}",
+	"int AddCommand() {}",
+	"void Duplicate() {}",
+	"void Duplicate() {}",
+	"extern AddCommand(int unit, int action, int x, int y, int z) 82;"
+].join("\n");
+const collisionParsed = parseSource(collisionSource, uri);
+const collisionDocument = makeDocumentForText(collisionSource);
+const collisionDiagnostics = analyzeDocument(collisionDocument, collisionParsed,
+	makeFunctionMap(collisionDocument, collisionParsed), makeConstantMap(collisionParsed));
+const collisions = collisionDiagnostics.filter(item => item.code === "lgc.functionNameCollision");
+assert(collisions.some(item => item.message.includes("LocalName") && item.message.includes("overloading is unsupported")),
+	"overloaded functions must produce a collision diagnostic");
+assert(collisions.some(item => item.message.includes("AddCommand") && item.message.includes("engine already exports")),
+	"user functions must not replace names from the engine API");
+assert(collisions.some(item => item.message.includes("Duplicate") && item.message.includes("another definition")),
+	"duplicate definitions must produce a collision diagnostic");
+assert(collisions.every(item => item.severity === vscodeMock.DiagnosticSeverity.Error),
+	"function name collisions must be marked as errors");
+assert(!collisions.some(item => item.message.includes("extern AddCommand")),
+	"an extern declaration of a bundled engine API must remain valid");
+
+const guardedFallbackSource = [
+	"#ifndef EventHook",
+	"EventHook(int value) { DefaultHook(value); }",
+	"#endif",
+	"EventHook(int value) { CustomHook(value); }"
+].join("\n");
+const guardedParsed = parseSource(guardedFallbackSource, uri);
+assert(guardedParsed.functions.find(fn => fn.name === "EventHook" && fn.preprocessorGuards.includes("EventHook")),
+	"function declarations under #ifndef NAME must retain their preprocessor guard");
+const guardedDocument = makeDocumentForText(guardedFallbackSource);
+const guardedDiagnostics = analyzeDocument(guardedDocument, guardedParsed,
+	makeFunctionMap(guardedDocument, guardedParsed), makeConstantMap(guardedParsed));
+assert(!guardedDiagnostics.some(item => item.code === "lgc.functionNameCollision"),
+	"a same-name #ifndef fallback should not be reported as a duplicate definition");
+
+const workspaceCollisionUri = { toString: () => "file:///another-script.lgc" };
+const workspaceCollisionFunction = parseSource("void WorkspaceHelper() {}", workspaceCollisionUri).functions[0];
+setWorkspaceFunctionEntriesForTests(new Map([["WorkspaceHelper", [workspaceCollisionFunction]]]));
+const currentCollisionSource = "void WorkspaceHelper() {}";
+const currentCollisionDocument = makeDocumentForText(currentCollisionSource);
+const currentCollisionParsed = parseSource(currentCollisionSource, uri);
+const workspaceCollisionDiagnostics = analyzeDocument(currentCollisionDocument, currentCollisionParsed,
+	makeFunctionMap(currentCollisionDocument, currentCollisionParsed), makeConstantMap(currentCollisionParsed));
+assert(workspaceCollisionDiagnostics.some(item => item.code === "lgc.functionNameCollision" &&
+	item.message.includes("another script already declares")),
+	"a function name already used by another workspace script must be reported");
+setWorkspaceFunctionEntriesForTests(new Map());
 
 const returnTypeSource = [
 	'string MakeString() { return "text"; }',
@@ -168,7 +376,7 @@ const returnTypeDocument = {
 	}
 };
 const returnTypeDiagnostics = analyzeDocument(returnTypeDocument, returnTypeParsed,
-	makeFunctionMap(returnTypeParsed), makeConstantMap(returnTypeParsed));
+	makeFunctionMap(returnTypeDocument, returnTypeParsed), makeConstantMap(returnTypeParsed));
 assert(returnTypeDiagnostics.some(item => item.message.includes("expects string, but the expression is int")),
 	"known function return types must be checked when passed as arguments");
 
@@ -198,7 +406,7 @@ const inferredReturnDocument = {
 	}
 };
 const inferredReturnDiagnostics = analyzeDocument(inferredReturnDocument, inferredReturnParsed,
-	makeFunctionMap(inferredReturnParsed), makeConstantMap(inferredReturnParsed));
+	makeFunctionMap(inferredReturnDocument, inferredReturnParsed), makeConstantMap(inferredReturnParsed));
 assert(inferredReturnDiagnostics.some(item => item.message.includes("expects string, but the expression is int")),
 	"inferred helper return types should be used for function argument validation");
 

@@ -3,13 +3,14 @@
 const { DocumentCache } = require("./models");
 
 /**
- * Stores one parsed snapshot per open document URI and document version.
- * Symbol maps are created lazily by the associated workspace index.
+ * Stores one parsed snapshot per open document URI and version.
+ * The parsed syntax is reused when only the workspace index changes; merged function and
+ * constant maps are created lazily against the current index generation.
  */
 class DocumentCacheStore {
 	/**
-	 * @param {(text: string, uri: *, getRelativePath: Function) => import("./models").ParsedSource} parseDocumentFn
-	 * @param {*} workspaceIndex Workspace index exposing symbol-map factories.
+	 * @param {(text: string, uri: *, getRelativePath: Function) => import("./models").ParsedSource} parseDocumentFn Parser pipeline.
+	 * @param {*} workspaceIndex Workspace index exposing symbol-map factories and a generation counter.
 	 * @param {*} vscode VS Code API namespace.
 	 */
 	constructor(parseDocumentFn, workspaceIndex, vscode) {
@@ -20,26 +21,20 @@ class DocumentCacheStore {
 	}
 
 	/**
-	 * Returns the cached snapshot for the current document version, parsing on a cache miss.
+	 * Returns the cache entry for the current document and workspace versions.
 	 * @param {*} document VS Code text document.
-	 * @returns {DocumentCache}
+	 * @returns {import("./models").DocumentCache} Current parsed snapshot and lazy symbol maps.
 	 */
 	get(document) {
 		const key = document.uri.toString();
 		const cached = this.entries.get(key);
-		if (cached && cached.version === document.version &&
-			cached.workspaceVersion === this.workspaceIndex.version) {
+		if (cached && cached.version === document.version && cached.workspaceVersion === this.workspaceIndex.version) {
 			return cached;
 		}
-
-		// A workspace-index refresh only invalidates symbol maps, not the document parse.
 		const parsed = cached && cached.version === document.version
 			? cached.parsedSource
-			: this.parseDocument(
-				document.getText(),
-				document.uri,
-				uri => this.vscode.workspace.asRelativePath(uri, false)
-			);
+			: this.parseDocument(document.getText(), document.uri,
+				uri => this.vscode.workspace.asRelativePath(uri, false));
 		const entry = new DocumentCache(
 			document.version,
 			this.workspaceIndex.version,
@@ -51,15 +46,10 @@ class DocumentCacheStore {
 		return entry;
 	}
 
-	/** Invalidates one document cache entry. */
-	delete(uri) {
-		this.entries.delete(typeof uri === "string" ? uri : uri.toString());
-	}
-
-	/** Clears every cached document. */
-	clear() {
-		this.entries.clear();
-	}
+	/** Invalidates one document by URI or URI string. */
+	delete(uri) { this.entries.delete(typeof uri === "string" ? uri : uri.toString()); }
+	/** Invalidates every cached document. */
+	clear() { this.entries.clear(); }
 }
 
 module.exports = { DocumentCacheStore };
