@@ -9,7 +9,7 @@ Language support for Locoland `.lgc` scripts.
 - Completion and hover data for commonly used helpers from the supplied script set (`basefunctions.lgc`, `ai_functions.lgc`, capture, environment, weather and reinforcement scripts).
 - Workspace indexing of `.lgc` files for user-defined functions and `#define` constants.
 - Signature help, navigation to workspace function declarations and workspace symbol search.
-- Static diagnostics for unmatched delimiters, known function arity, inferable `int`/`string`/`char` argument mismatches, assignments to explicitly typed variables and non-constant variable initializers. Initializer diagnostics explain why the expression is runtime-dependent and how to rewrite it; a quick fix is available for simple local declarations.
+- Static diagnostics for unmatched delimiters, known function arity, inferable `int`/`string`/`char` argument mismatches, assignments to explicitly typed variables, non-constant variable initializers, unsupported `int` declarations in `for` headers and likely missing statement semicolons.
 - Function-name collision diagnostics for duplicate definitions, unsupported overloads and user functions that reuse engine API names. The checker recognizes `#ifndef FunctionName` fallback declarations used by the supplied script library.
 - Scope-aware variable renaming with **F2** and the editor context menu. Only references bound to the selected declaration are renamed, so same-named variables in nested blocks remain untouched.
 - Snippets for functions, control flow, unit iteration, train iteration and common `Action()` patterns.
@@ -59,7 +59,7 @@ Formatting options are available under **Locoland Logic Script**:
 | `lgc.format.spaceBeforeColon` / `spaceAfterColon` | `true` | Control ternary-expression colon spacing. |
 | `lgc.format.blankLinesBetweenFunctions` | `1` | Blank lines between top-level braced declarations. |
 | `lgc.format.preserveBlankLines` | `true` | Retain blank lines found in the source. |
-| `lgc.format.maxBlankLines` | `1` | Maximum consecutive blank lines preserved. |
+| `lgc.format.maxBlankLines` | `1` | Maximum number of consecutive blank lines preserved. |
 | `lgc.format.indentCaseLabels` | `false` | Indent `case` and `default` labels inside `switch` blocks. |
 | `lgc.format.keepEmptyBlocksSingleLine` | `true` | Keep empty blocks as `{}`. |
 | `lgc.format.insertFinalNewline` | `true` | Ensure the formatted file ends with a newline. |
@@ -90,6 +90,8 @@ The following settings are available under **Locoland Logic Script**:
 | `lgc.analysis.checkArgumentTypes` | `true` | Check known `int`, `string` and `char` parameter types when the expression type is clear. |
 | `lgc.analysis.checkAssignments` | `true` | Check assignments to explicitly typed variables when both sides have known types. |
 | `lgc.analysis.checkConstantInitializers` | `true` | Report initializers that depend on runtime variables or function calls. Literal values, known `#define` values and constant array initializers are accepted. Unknown all-uppercase identifiers are treated as possible build-time defines. |
+| `lgc.analysis.checkForLoopIntDeclarations` | `true` | Report `for (int i = ...)`; declare `int i;` before the loop and assign `i` in the initializer. |
+| `lgc.analysis.checkSemicolons` | `true` | Report statement lines missing a terminating semicolon. Preprocessor directives and their backslash continuations are ignored. |
 | `lgc.analysis.checkFunctionNameCollisions` | `true` | Report duplicate definitions, overload attempts, collisions with engine API names and same-name declarations in other indexed workspace scripts. |
 | `lgc.analysis.strictUnknownFunctions` | `false` | Warn about calls not found in the bundled catalog or workspace scripts. |
 | `lgc.analysis.severity` | `Warning` | Default severity for static-analysis findings. |
@@ -121,6 +123,31 @@ StateWasChanged() {
 
 For a simple, non-static local variable declaration, the diagnostic offers **Split declaration and runtime assignment** as a Quick Fix. The checker also accepts literals, recursively resolvable `#define` values, and arrays whose elements are compile-time constants. Unresolved all-uppercase names are assumed to be conditional build defines (for example, defines supplied by the game build) to avoid false positives; a variable declared in the current file is still treated as a runtime value.
 
+### `for` loop variables
+
+LGC does not support declaring an `int` variable in a `for` initializer. This form is diagnosed:
+
+```c
+for (int i = 0; i < count; i++) {
+    // ...
+}
+```
+
+Declare the variable before the loop instead:
+
+```c
+int i;
+for (i = 0; i < count; i++) {
+    // ...
+}
+```
+
+The diagnostic explains that the declaration is interpreted as an assignment to a constant. This check can be disabled with `lgc.analysis.checkForLoopIntDeclarations`.
+
+### Statement semicolons
+
+Completed declarations, assignments, calls, `return` statements and similar statements must end with `;`. The checker skips preprocessor directives (including `\`-continued directives), blank lines, comments, control-flow/function headers, block braces and lines that appear to continue an expression onto the next line. Since LGC has no formal grammar in the supplied materials, the check is deliberately heuristic; disable it with `lgc.analysis.checkSemicolons` if a project-specific construct is reported incorrectly.
+
 ### Rename variables
 
 Place the cursor on a variable name and press **F2**, or choose **LGC: Rename Variable** from the editor context menu. The rename provider follows lexical bindings, including function parameters and nested-block shadowing. It does not rename function names, constants or unrelated variables with the same spelling.
@@ -149,7 +176,6 @@ LGC resembles a small C-like language, but it is not treated as standard C. The 
 ## License
 
 MIT. This extension is an independent fan-made development aid and is not affiliated with Gromada, ESDigital Games or the OpenLocoland project.
-
 
 ## Architecture compatibility
 

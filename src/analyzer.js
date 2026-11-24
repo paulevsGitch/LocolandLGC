@@ -32,6 +32,7 @@ function splitTopLevel(tokens, operators) {
 	if (parts.length) parts.push(tokens.slice(start));
 	return parts;
 }
+
 /**
  * Infers the primitive type represented by a simple macro replacement value.
  * Only quoted string/character and numeric literal replacements are classified.
@@ -223,6 +224,7 @@ function expressionType(tokens, variables, functions, constants, offset) {
 	if (list.some(token => token.type === "string")) return "string";
 	return "unknown";
 }
+
 /**
  * Applies the analyser's known primitive compatibility rule.
  * `int` and `char` are compatible numeric types; `string` is not implicitly converted.
@@ -235,6 +237,7 @@ function areTypesCompatible(expected, actual) {
 	if (expected === actual) return true;
 	return (expected === "int" && actual === "char") || (expected === "char" && actual === "int");
 }
+
 /**
  * Creates a source diagnostic from a token range and attaches the LGC diagnostic code.
  * @param {*} VSCODE VS Code API namespace.
@@ -255,6 +258,7 @@ function diagnostic(VSCODE, document, token, message, severity, code, data) {
 	if (data !== undefined) result.data = data;
 	return result;
 }
+
 /** Returns a stable parameter-type key used to detect unsupported overloads. */
 function functionParameterKey(fn) { return (fn.params || []).map(param => param.type || "unknown").join(","); }
 /** Returns whether a parsed function entry owns a braced implementation. */
@@ -272,6 +276,7 @@ function isCompatibleForwardDeclarationPair(left, right) {
 	const compatibleReturns = leftReturn === "unknown" || rightReturn === "unknown" || leftReturn === rightReturn;
 	return sameParameters && compatibleReturns && (!hasFunctionBody(left) || !hasFunctionBody(right));
 }
+
 /**
  * Finds why a function name is unavailable in LGC's single-name function namespace.
  * Detects engine API collisions, duplicate definitions, parameter-list overloads,
@@ -306,6 +311,7 @@ function functionCollisionReason(fn, parsed, functionCatalog = [], workspaceFunc
 		!isConditionalFallback(item, fn.name) && !isConditionalFallback(fn, fn.name) && !isCompatibleForwardDeclarationPair(fn, item));
 	return other ? `another script already declares this function (${other.source || "workspace"})` : null;
 }
+
 /**
  * Explains the first runtime-dependent or unresolved token in a rejected initializer.
  * The message is paired with a suggested declaration-then-assignment rewrite.
@@ -331,6 +337,180 @@ function explainNonConstantInitializer(declaration, constants, variables, functi
 	}
 	return "the expression contains an operation or value that cannot be resolved at compile time";
 }
+
+/**
+ * Returns physical lines occupied by preprocessor directives, including backslash continuations.
+ * Token data is used so a hash inside a block comment is not mistaken for a directive.
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Complete source text.
+ * @returns {Set<number>} Zero-based lines to exclude from statement checks.
+ */
+function preprocessorLines(tokens, sourceText) {
+	const lines = sourceText.split(/\r?\n/);
+	const tokensByLine = Array.from({ length: lines.length }, () => []);
+	for (const token of tokens || []) {
+		if (Number.isInteger(token.line) && tokensByLine[token.line]) tokensByLine[token.line].push(token);
+	}
+	const ignored = new Set();
+	let continuation = false;
+	for (let line = 0; line < lines.length; line++) {
+		const firstToken = tokensByLine[line][0];
+		const startsDirective = firstToken && firstToken.value === "#" && /^\s*#/.test(lines[line]);
+		if (!continuation && !startsDirective) continue;
+		ignored.add(line);
+		continuation = /\\\s*$/.test(lines[line]);
+	}
+	return ignored;
+}
+
+/**
+ * Finds `int` declarations placed directly in a `for` initializer.
+ * LGC does not support this declaration form; the loop variable must be declared
+ * before the loop and assigned in its initializer instead.
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Source text used to skip preprocessor lines.
+ * @returns {Array<{typeToken: import("./models").Token, nameToken: import("./models").Token}>}
+ */
+function findForLoopIntDeclarations(tokens, sourceText = "") {
+	const declarations = [];
+	const ignoredLines = sourceText ? preprocessorLines(tokens, sourceText) : new Set();
+	for (let i = 0; i < tokens.length - 3; i++) {
+		if (ignoredLines.has(tokens[i].line)) continue;
+		if (tokens[i].value !== "for" || tokens[i + 1].value !== "(" || tokens[i + 2].value !== "int") continue;
+		const nameToken = tokens[i + 3];
+		if (!nameToken || nameToken.type !== "identifier") continue;
+		declarations.push({ typeToken: tokens[i + 2], nameToken });
+	}
+	return declarations;
+}
+
+const SEMICOLON_CONTINUATION_TOKENS = new Set([
+	",", ".", "=", "+", "-", "*", "/", "%", "&", "|", "^", "!", "~",
+	"<", ">", "<=", ">=", "==", "!=", "&&", "||", "?", "(", "[", "->"
+]);
+
+/**
+ * Finds likely completed statements that lack a terminating semicolon.
+ * The check uses lexer tokens rather than raw line text, ignores preprocessor directives,
+ * and avoids reporting multiline expressions, control-flow headers and block braces.
+ * It is intentionally a conservative editor diagnostic, not a full grammar check.
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Complete source text.
+ * @param {import("./models").ParsedSource} parsed Parsed document metadata.
+ * @returns {import("./models").Token[]} Last tokens on lines that appear to be missing `;`.
+ */
+function findMissingSemicolonTokens(tokens, sourceText, parsed = {}) {
+	if (!tokens || !tokens.length || !sourceText) return [];
+	const lines = sourceText.split(/\r?\n/);
+	const ignoredPreprocessorLines = preprocessorLines(tokens, sourceText);
+	const tokensByLine = Array.from({ length: lines.length }, () => []);
+	const tokenIndices = new Map();
+	for (let i = 0; i < tokens.length; i++) {
+		const token = tokens[i];
+		const line = Number.isInteger(token.line) ? token.line : 0;
+		if (line >= 0 && line < tokensByLine.length) tokensByLine[line].push({ token, index: i });
+		tokenIndices.set(token.start, i);
+	}
+
+	const matchingOpenByClose = new Map();
+	const initializerCloseTokens = new Set();
+	const functionHeaderCloseTokens = new Set();
+	const delimiterStacks = { "(": [], "[": [], "{": [] };
+	const openForClose = { ")": "(", "]": "[", "}": "{" };
+	for (let i = 0; i < tokens.length; i++) {
+		if (ignoredPreprocessorLines.has(tokens[i].line)) continue;
+		const value = tokens[i].value;
+		if (value === "(" || value === "[") {
+			delimiterStacks[value].push(i);
+			continue;
+		}
+		if (value === "{") {
+			const previous = tokens[i - 1] ? tokens[i - 1].value : "";
+			const parentInitializer = delimiterStacks["{"].length > 0 && delimiterStacks["{"].at(-1).isInitializer;
+			const isInitializer = parentInitializer || previous === "=" || previous === ",";
+			delimiterStacks["{"].push({ index: i, isInitializer });
+			continue;
+		}
+		const opening = openForClose[value];
+		if (!opening) continue;
+		const stack = delimiterStacks[opening];
+		if (!stack.length) continue;
+		const openEntry = stack.pop();
+		const openIndex = typeof openEntry === "number" ? openEntry : openEntry.index;
+		matchingOpenByClose.set(i, openIndex);
+		if (opening === "{" && openEntry.isInitializer && !stack.some(entry => typeof entry === "object" && entry.isInitializer)) initializerCloseTokens.add(i);
+	}
+
+	// A function declaration may place its opening brace on the next physical line.
+	for (const fn of parsed.functions || []) {
+		if (fn.bodyOpenOffset === null || fn.bodyOpenOffset === undefined) continue;
+		const nameIndex = tokenIndices.get(fn.offset);
+		if (nameIndex === undefined || tokens[nameIndex + 1]?.value !== "(") continue;
+		let depth = 0;
+		for (let i = nameIndex + 1; i < tokens.length; i++) {
+			if (tokens[i].value === "(") depth++;
+			else if (tokens[i].value === ")") {
+				depth--;
+				if (depth === 0) {
+					functionHeaderCloseTokens.add(i);
+					break;
+				}
+			}
+		}
+	}
+
+	const missing = [];
+	const parens = [];
+	const brackets = [];
+	const braces = [];
+	for (let line = 0; line < lines.length; line++) {
+		const entries = tokensByLine[line];
+		if (!entries.length || ignoredPreprocessorLines.has(line)) continue;
+		for (const entry of entries) {
+			const value = entry.token.value;
+			if (value === "(") parens.push(entry.index);
+			else if (value === "[") brackets.push(entry.index);
+			else if (value === "{") {
+				const previous = tokens[entry.index - 1] ? tokens[entry.index - 1].value : "";
+				const parentInitializer = braces.length > 0 && braces[braces.length - 1].isInitializer;
+				braces.push({ index: entry.index, isInitializer: parentInitializer || previous === "=" || previous === "," });
+			} else if (value === ")" && parens.length) parens.pop();
+			else if (value === "]" && brackets.length) brackets.pop();
+			else if (value === "}" && braces.length) braces.pop();
+		}
+
+		const lastEntry = entries[entries.length - 1];
+		const last = lastEntry.token;
+		const lastIndex = lastEntry.index;
+		const value = last.value;
+		if (value === ";" || value === "{" || value === ":") continue;
+		if (value === "else" || value === "do") continue;
+		if (SEMICOLON_CONTINUATION_TOKENS.has(value)) continue;
+		const insideInitializer = braces.some(item => item.isInitializer);
+		if (parens.length || brackets.length || insideInitializer) continue;
+		if (value === "}") {
+			if (initializerCloseTokens.has(lastIndex)) missing.push(last);
+			continue;
+		}
+		if (value === ")") {
+			const openIndex = matchingOpenByClose.get(lastIndex);
+			if (openIndex !== undefined) {
+				const controlWord = tokens[openIndex - 1]?.value;
+				const doWhileTail = controlWord === "while" && tokens[openIndex - 2]?.value === "}";
+				if (CONTROL_WORDS.has(controlWord) && !doWhileTail) continue;
+			}
+			if (functionHeaderCloseTokens.has(lastIndex)) continue;
+		}
+		const nextEntry = tokens[lastIndex + 1];
+		if (nextEntry && nextEntry.line > line &&
+			["(", "[", ".", "->", "+", "-", "*", "/", "%", "&&", "||", "==", "!=", "<", ">", "<=", ">=", "?", ":", ","].includes(nextEntry.value)) {
+			continue;
+		}
+		missing.push(last);
+	}
+	return missing;
+}
+
 /**
  * Adds diagnostics for duplicate, overloaded and engine-reserved function names.
  * @param {*} VSCODE VS Code API namespace.
@@ -359,7 +539,7 @@ function addFunctionCollisionDiagnostics(VSCODE, document, parsed, diagnostics, 
 /**
  * Runs configured syntax and semantic checks for one parsed LGC document.
  * Checks delimiters, compile-time initializers, function-name collisions, known function
- * arity, inferable argument types and assignments to explicitly typed local variables.
+ * arity, inferable argument types, assignments and the configured syntax checks.
  * Checks are intentionally skipped when expression types or API signatures are unknown.
  *
  * @param {*} VSCODE VS Code API namespace.
@@ -380,6 +560,26 @@ function analyzeDocument(VSCODE, document, parsed, functions, constants, workspa
 	const diagnostics = [];
 	const tokens = parsed.tokens;
 	const variables = parsed.variables;
+	const sourceText = document.getText();
+
+	const forLoopDeclarations = config.get("checkForLoopIntDeclarations", true)
+		? findForLoopIntDeclarations(tokens, sourceText) : [];
+	const forLoopVariableOffsets = new Set();
+	for (const declaration of forLoopDeclarations) {
+		forLoopVariableOffsets.add(declaration.nameToken.start);
+		const name = declaration.nameToken.value;
+		diagnostics.push(diagnostic(VSCODE, document, declaration.typeToken,
+			`Declaring 'int ${name}' inside a for-loop initializer is not supported by LGC and is treated as an assignment to a constant. Fix: declare 'int ${name};' before the loop, then use 'for (${name} = ...; ...; ...)'.`,
+			VSCODE.DiagnosticSeverity.Error, "lgc.forLoopIntDeclaration"));
+	}
+	if (config.get("checkSemicolons", true)) {
+		for (const token of findMissingSemicolonTokens(tokens, sourceText, parsed)) {
+			diagnostics.push(diagnostic(VSCODE, document, token,
+				"Missing ';' at the end of this statement. Add a semicolon before the line break.",
+				VSCODE.DiagnosticSeverity.Error, "lgc.missingSemicolon"));
+		}
+	}
+
 	const closingToOpening = { ")": "(", "]": "[", "}": "{" };
 	const brackets = [];
 	for (const token of tokens) {
@@ -392,11 +592,11 @@ function analyzeDocument(VSCODE, document, parsed, functions, constants, workspa
 		}
 	}
 	for (const token of brackets) diagnostics.push(diagnostic(VSCODE, document, token, `Unclosed '${token.value}'.`, VSCODE.DiagnosticSeverity.Error));
-
 	if (config.get("checkConstantInitializers", true)) {
 		for (const entries of variables.values()) {
 			for (const entry of entries) {
 				if (!entry.initializerEqualsToken || !entry.initializerTokens || !entry.initializerTokens.length) continue;
+				if (entry.token && forLoopVariableOffsets.has(entry.token.start)) continue;
 				if (isCompileTimeConstant(entry.initializerTokens, constants, new Set(), variables)) continue;
 				const reason = explainNonConstantInitializer(entry, constants, variables, functions);
 				const data = {
@@ -418,12 +618,10 @@ function analyzeDocument(VSCODE, document, parsed, functions, constants, workspa
 	if (config.get("checkFunctionNameCollisions", true)) {
 		addFunctionCollisionDiagnostics(VSCODE, document, parsed, diagnostics, functionCatalog, workspaceFunctionEntries);
 	}
-
 	const checkArity = config.get("checkFunctionArity", true);
 	const checkTypes = config.get("checkArgumentTypes", true);
 	const strictUnknown = config.get("strictUnknownFunctions", false);
 	const knownFunctionNames = new Set(functions.keys());
-	const sourceText = document.getText();
 	for (let i = 0; i < tokens.length - 1; i++) {
 		const token = tokens[i];
 		if (token.type !== "identifier" || tokens[i + 1].value !== "(") continue;
@@ -490,5 +688,6 @@ module.exports = {
 	splitTopLevel, constantExpressionType, isCompileTimeConstant, inferFunctionReturnTypes,
 	expressionType, areTypesCompatible, diagnostic, functionParameterKey,
 	isCompatibleForwardDeclarationPair, functionCollisionReason, explainNonConstantInitializer,
-	addFunctionCollisionDiagnostics, analyzeDocument
+	addFunctionCollisionDiagnostics, preprocessorLines, findForLoopIntDeclarations,
+	findMissingSemicolonTokens, analyzeDocument
 };

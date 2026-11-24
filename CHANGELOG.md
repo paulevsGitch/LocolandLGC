@@ -1,10 +1,15 @@
 # Changelog
 
+## 0.1.5
+
+- Added diagnostics for unsupported `int` declarations in `for` initializers and likely missing statement semicolons; preprocessor directives and backslash-continued directives are excluded from the semicolon check.
+- Added an icon.
+
 ## 0.1.4
 
 - Expanded `docs/LANGUAGE_NOTES.md` with primitive type rules, expression inference, numeric `int`/`char` compatibility, scoped declarations, return-type inference and compile-time initializer behavior.
 - Added JSDoc type contracts and module/API documentation across the parser, analyser, semantic models, providers, refactoring, workspace index, formatter and extension lifecycle.
-- Added `.editorconfig` to preserve the repository's tab-based JavaScript and Json style.
+- Added `.editorconfig` to preserve the repository's tab-based JavaScript and JSON style.
 - Added workspace-wide declaration indexing so duplicate function names across separate scripts are diagnosed.
 - Integrated compile-time initializer diagnostics into the modular analyzer, including reason text and a safe Quick Fix for simple local declarations.
 - Added scope-aware variable rename through the VS Code Rename Provider, F2 and the editor context-menu command.

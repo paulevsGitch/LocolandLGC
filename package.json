@@ -2,7 +2,8 @@
 	"name": "locoland-lgc",
 	"displayName": "Locoland Logic Script",
 	"description": "Language support, IntelliSense and static checks for Locoland .lgc logic scripts.",
-	"version": "0.1.4",
+	"icon": "icon.png",
+	"version": "0.1.5",
 	"publisher": "community",
 	"license": "MIT",
 	"repository": "https://github.com/paulevsGitch/LocolandLGC/tree/main/src",
@@ -87,11 +88,7 @@
 			"properties": {
 				"lgc.format.indentStyle": {
 					"type": "string",
-					"enum": [
-						"editor",
-						"spaces",
-						"tabs"
-					],
+					"enum": ["editor", "spaces", "tabs"],
 					"default": "editor",
 					"description": "Use the active editor indentation settings, spaces, or tab characters."
 				},
@@ -104,20 +101,13 @@
 				},
 				"lgc.format.braceStyle": {
 					"type": "string",
-					"enum": [
-						"sameLine",
-						"nextLine"
-					],
+					"enum": ["sameLine", "nextLine"],
 					"default": "sameLine",
 					"description": "Place opening braces on the same line as the declaration or control statement, or on the following line."
 				},
 				"lgc.format.spaceBeforeParens": {
 					"type": "string",
-					"enum": [
-						"control",
-						"always",
-						"never"
-					],
+					"enum": ["control", "always", "never"],
 					"default": "control",
 					"description": "Spacing before parentheses: only control keywords, every parenthesis, or none."
 				},
@@ -210,6 +200,16 @@
 					"default": true,
 					"description": "Report variable initializers that are not compile-time constant expressions."
 				},
+				"lgc.analysis.checkForLoopIntDeclarations": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report int declarations in for-loop initializers; declare the loop variable before the loop."
+				},
+				"lgc.analysis.checkSemicolons": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report statement lines that appear to be missing a terminating semicolon, excluding preprocessor directives."
+				},
 				"lgc.analysis.checkFunctionNameCollisions": {
 					"type": "boolean",
 					"default": true,
@@ -222,11 +222,7 @@
 				},
 				"lgc.analysis.severity": {
 					"type": "string",
-					"enum": [
-						"Error",
-						"Warning",
-						"Information"
-					],
+					"enum": ["Error", "Warning", "Information"],
 					"default": "Warning",
 					"description": "Default severity used by static-analysis diagnostics."
 				},

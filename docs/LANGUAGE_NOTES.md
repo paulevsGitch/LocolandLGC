@@ -34,21 +34,40 @@ Most script-defined helper functions also omit an explicit return type. Workspac
 
 ## Iteration patterns
 
-Common iterator pairs include:
+LGC does not support declaring an `int` variable in a `for` initializer. The form `for (int unit = ...; ...)` is treated by the compiler as an assignment to a constant and causes an error. Declare the iterator before the loop, then use the existing variable in the initializer:
 
 ```c
-for (int unit = FirstUnit(U_UNIT); unit; unit = NextUnit())
+int unit;
+for (unit = FirstUnit(U_UNIT); unit; unit = NextUnit())
 {
     // Process the current unit.
 }
 
-for (int train = FirstTrain(army); train; train = NextTrain())
+int train;
+for (train = FirstTrain(army); train; train = NextTrain())
 {
     // Process the current train.
 }
 ```
 
 The iteration state is maintained by the engine, so nested calls using the same iterator family may affect the active iteration.
+
+## Statement terminators
+
+Completed variable declarations, assignments, function calls, `return` statements and other simple statements end with a semicolon (`;`). For example:
+
+```c
+int counter = 0;
+
+UpdateCounter()
+{
+    counter = counter + 1;
+    Action(counter);
+    return counter;
+}
+```
+
+A semicolon is not required after a function or control-flow block's closing brace, a function/control-flow header, a `case`/`default` label or a preprocessor directive. The analyzer ignores preprocessor directives and their backslash continuations. It also skips blank/comment-only lines, multiline expressions and control-flow/function headers. This is a heuristic statement-boundary check rather than a complete grammar; project-specific syntax may require disabling `lgc.analysis.checkSemicolons`.
 
 ## Actions and train commands
 
