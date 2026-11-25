@@ -1,0 +1,1451 @@
+[
+  {
+    "name": "time_game_total",
+    "type": "int",
+    "isArray": false,
+    "source": "header.lgc",
+    "description": "Total in-game elapsed time, initialized by the standard game header."
+  },
+  {
+    "name": "nuke_time",
+    "type": "int",
+    "isArray": false,
+    "source": "header.lgc",
+    "description": "Game-state timer used by the standard game scripts."
+  },
+  {
+    "name": "end",
+    "type": "int",
+    "isArray": false,
+    "source": "header.lgc",
+    "description": "Global game-end state shared by all level scripts."
+  },
+  {
+    "name": "we_are_win",
+    "type": "int",
+    "isArray": false,
+    "source": "header.lgc",
+    "description": "Global flag indicating that the player has won."
+  },
+  {
+    "name": "temp_array",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared temporary integer array used by train tactics scripts."
+  },
+  {
+    "name": "ai_trains",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared array of AI train unit identifiers."
+  },
+  {
+    "name": "ai_trains_task2",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared array storing secondary AI train tasks."
+  },
+  {
+    "name": "ai_trains_task",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared array storing primary AI train tasks."
+  },
+  {
+    "name": "ai_trains_type",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared array storing AI train composition types."
+  },
+  {
+    "name": "ai_trains_target",
+    "type": "int",
+    "isArray": true,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared array storing target identifiers for AI trains."
+  },
+  {
+    "name": "stgbeh",
+    "type": "int",
+    "isArray": false,
+    "source": "trainstactdeclares.lgc",
+    "description": "Shared integer state for stage/train behaviour."
+  },
+  {
+    "name": "F505unit_z",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "F545_x",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "F545_y",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "F545_z",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "flies_killed",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "vulcan_time",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "vulcan_timer",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_default_event.lgc",
+    "description": "Global int declared in standard header include ai_default_event.lgc and shared with level scripts."
+  },
+  {
+    "name": "depo_com",
+    "type": "string",
+    "isArray": false,
+    "source": "ai_default_event_inherit.lgc",
+    "description": "Global string declared in standard header include ai_default_event_inherit.lgc and shared with level scripts."
+  },
+  {
+    "name": "depo_time_create",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_events.lgc",
+    "description": "Global int declared in standard header include ai_events.lgc and shared with level scripts."
+  },
+  {
+    "name": "GetLongestTrain_unit",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_functions.lgc",
+    "description": "Global int declared in standard header include ai_functions.lgc and shared with level scripts."
+  },
+  {
+    "name": "IsTrainAtWeaponRadiusEx_unit",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_functions.lgc",
+    "description": "Global int declared in standard header include ai_functions.lgc and shared with level scripts."
+  },
+  {
+    "name": "TrainHasUnitVid_unit",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_functions.lgc",
+    "description": "Global int declared in standard header include ai_functions.lgc and shared with level scripts."
+  },
+  {
+    "name": "WeightX",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_functions.lgc",
+    "description": "Global int declared in standard header include ai_functions.lgc and shared with level scripts."
+  },
+  {
+    "name": "WeightY",
+    "type": "int",
+    "isArray": false,
+    "source": "ai_functions.lgc",
+    "description": "Global int declared in standard header include ai_functions.lgc and shared with level scripts."
+  },
+  {
+    "name": "option_cheats",
+    "type": "int",
+    "isArray": false,
+    "source": "cheats.lgc",
+    "description": "Global int declared in standard header include cheats.lgc and shared with level scripts."
+  },
+  {
+    "name": "civil_train_type",
+    "type": "int",
+    "isArray": true,
+    "source": "civil.lgc",
+    "description": "Global int array declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "civil_train_x",
+    "type": "int",
+    "isArray": true,
+    "source": "civil.lgc",
+    "description": "Global int array declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "civil_train_y",
+    "type": "int",
+    "isArray": true,
+    "source": "civil.lgc",
+    "description": "Global int array declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "CivilPatrolCount",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "CivilPatrolEngine",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "CivilPatrolEngineAction",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "CivilPatrolNum",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "CivilPatrolTime",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "Tornado_time",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "Tornado_unit",
+    "type": "int",
+    "isArray": false,
+    "source": "civil.lgc",
+    "description": "Global int declared in standard header include civil.lgc and shared with level scripts."
+  },
+  {
+    "name": "ARMY0_NVID_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "ARMY1_NVID_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "back_pict",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "defle",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "defpl",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "DIFF_NVID_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "enemy_depo",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_brief_head",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_brief_text",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_pict",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_state",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "RANG_SCORES",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "SCORE_NVID_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "SCORE_NVID_WEIGHT_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "this_depo_capture",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "WATER_Z_ARRAY",
+    "type": "int",
+    "isArray": true,
+    "source": "constants.lgc",
+    "description": "Global int array declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "X",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "Y",
+    "type": "int",
+    "isArray": false,
+    "source": "constants.lgc",
+    "description": "Global int declared in standard header include constants.lgc and shared with level scripts."
+  },
+  {
+    "name": "GammaIntensive_text",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Gammas",
+    "type": "int",
+    "isArray": true,
+    "source": "daynight.lgc",
+    "description": "Global int array declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Rain_mode",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Rain_nuke_time",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Rain_oldgamma",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Rain_time",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "RainGammas",
+    "type": "int",
+    "isArray": true,
+    "source": "daynight.lgc",
+    "description": "Global int array declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "s507enabled",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "SetDayNightGamma_changegamma",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "SetDayNightGamma_mode",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "SetDayNightGamma_oldgamma",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "SetDayNightGamma_time",
+    "type": "int",
+    "isArray": false,
+    "source": "daynight.lgc",
+    "description": "Global int declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "Times",
+    "type": "int",
+    "isArray": true,
+    "source": "daynight.lgc",
+    "description": "Global int array declared in standard header include daynight.lgc and shared with level scripts."
+  },
+  {
+    "name": "ai_log_debugmode",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "aidebug_mode",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildModeText1",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildModeText2",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildModeText3",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildModeText4",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildModeText5",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildTime",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildUnit",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "PrintDebug_alltext",
+    "type": "string",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global string declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "PrintDebug_oldtext",
+    "type": "string",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global string declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "PrintDebug_strnum",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "PrintDebug_text",
+    "type": "int",
+    "isArray": false,
+    "source": "DoKeys.lgc",
+    "description": "Global int declared in standard header include DoKeys.lgc and shared with level scripts."
+  },
+  {
+    "name": "endt",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "m_rain_act",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "Quake_end",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "Quake_noquake",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "Quake_noquake_period",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "Quake_sound",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "Quake_start",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "startt",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "wind_dir",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "wind_speed",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "wind_time",
+    "type": "int",
+    "isArray": false,
+    "source": "EnvironmentTact.lgc",
+    "description": "Global int declared in standard header include EnvironmentTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "FlyCountDiffArr",
+    "type": "int",
+    "isArray": true,
+    "source": "fly.lgc",
+    "description": "Global int array declared in standard header include fly.lgc and shared with level scripts."
+  },
+  {
+    "name": "FlyCountLast",
+    "type": "int",
+    "isArray": false,
+    "source": "fly.lgc",
+    "description": "Global int declared in standard header include fly.lgc and shared with level scripts."
+  },
+  {
+    "name": "MusicFileNumber",
+    "type": "int",
+    "isArray": false,
+    "source": "InitDefault.lgc",
+    "description": "Global int declared in standard header include InitDefault.lgc and shared with level scripts."
+  },
+  {
+    "name": "map_enabled",
+    "type": "int",
+    "isArray": true,
+    "source": "maps_enabled.lgc",
+    "description": "Global int array declared in standard header include maps_enabled.lgc and shared with level scripts."
+  },
+  {
+    "name": "alpha_appear",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "End_gamma",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "FinalScores",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "GivenRang",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "GivenScores",
+    "type": "string",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global string declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiLevel",
+    "type": "int",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global int array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiName",
+    "type": "string",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global string array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiNameEnd",
+    "type": "string",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global string array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiRank",
+    "type": "int",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global int array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiScores",
+    "type": "int",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global int array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "hiscores_text",
+    "type": "string",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global string declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "hiscores_text2",
+    "type": "string",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global string declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "HiScoresEnd",
+    "type": "int",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global int array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "MENU_STATE_END",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "MenuEndGameTimeMSec",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "MenuEndTime",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "ScoresByArmy",
+    "type": "int",
+    "isArray": true,
+    "source": "Menuend.lgc",
+    "description": "Global int array declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "TotalScores",
+    "type": "int",
+    "isArray": false,
+    "source": "Menuend.lgc",
+    "description": "Global int declared in standard header include Menuend.lgc and shared with level scripts."
+  },
+  {
+    "name": "active_map",
+    "type": "string",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global string declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "BuildMode",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "creditsmenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "curr_page",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "curr_player",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "exitmenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "h_pl_diff",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "h_pl_name",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "helpmenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "keypressed",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "levelmenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "load_list",
+    "type": "string",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global string declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mbars",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mclick",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mdir",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_hold",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_how",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_lamp",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_text",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_w",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_x",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_editor_y",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_loading_time",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_next",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_prev",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_start",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_start_text",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "MENU_STATE",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_temp_gamma",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "menu_time_sec",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mouse_over_vid",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mouse_swap",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mtext",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "music_volume",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "mvid",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "optionsmenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "pause_mx",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "pause_my",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "reading",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "readnametext",
+    "type": "string",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global string declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "readNUM",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "readX",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "readY",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "SCRX",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "SCRY",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "sound_volume",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "start",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "time_pause",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "time_pause2",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "user_delete",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "user_diff",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "user_exists",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "user_play",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "user_text",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "usermenu_created",
+    "type": "int",
+    "isArray": false,
+    "source": "MenuTact.lgc",
+    "description": "Global int declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "users",
+    "type": "string",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global string array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "xmaps",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "ymaps",
+    "type": "int",
+    "isArray": true,
+    "source": "MenuTact.lgc",
+    "description": "Global int array declared in standard header include MenuTact.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_editor",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_editor_max",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_editor_name",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_editor_value",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_interface",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_interface_max",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_interface_name",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_interface_value",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_minimap",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_minimap_name",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_minimap_value",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_text",
+    "type": "string",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global string declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_text_z",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_x",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_y",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "opt_z",
+    "type": "int",
+    "isArray": false,
+    "source": "optfields.lgc",
+    "description": "Global int declared in standard header include optfields.lgc and shared with level scripts."
+  },
+  {
+    "name": "ai_reinforcement_no",
+    "type": "int",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global int declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "player_commands",
+    "type": "string",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global string declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "player_reinforcement_no",
+    "type": "int",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global int declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "player_x",
+    "type": "int",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global int declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "player_y",
+    "type": "int",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global int declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "player_z",
+    "type": "int",
+    "isArray": false,
+    "source": "reinforcement.lgc",
+    "description": "Global int declared in standard header include reinforcement.lgc and shared with level scripts."
+  },
+  {
+    "name": "ai_train_create_help_time",
+    "type": "int",
+    "isArray": false,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "ai_trains_print",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "level_queue_task",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "level_queue_times",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "level_queue_trains",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains_random_task",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains_renew",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains_task",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains_x",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "start_trains_y",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "this_train_null",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "UniqueNum_arr",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  },
+  {
+    "name": "UniqueNum_arr_count",
+    "type": "int",
+    "isArray": true,
+    "source": "TrainsTactFunctions.lgc",
+    "description": "Global int array declared in standard header include TrainsTactFunctions.lgc and shared with level scripts."
+  }
+]

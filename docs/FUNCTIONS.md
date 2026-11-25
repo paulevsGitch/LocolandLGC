@@ -1,1821 +1,626 @@
-# Functions Reference
-
-## Contents
-
-- [AI and railway](#ai-and-railway) (18)
-  - [`AddUnitLimit`](#addunitlimit)
-  - [`BreakTrain`](#breaktrain)
-  - [`CalcStatistics`](#calcstatistics)
-  - [`CanAttackEngine`](#canattackengine)
-  - [`CanMoveEngineTo`](#canmoveengineto)
-  - [`FirstTrain`](#firsttrain)
-  - [`GetMoney`](#getmoney)
-  - [`GetStatistics`](#getstatistics)
-  - [`NextTrain`](#nexttrain)
-  - [`PatrolEngine`](#patrolengine)
-  - [`PatrolEngineToPoints`](#patrolenginetopoints)
-  - [`SetAutoReBirth`](#setautorebirth)
-  - [`SetCleverEnemyAttack`](#setcleverenemyattack)
-  - [`SetEnemyCanAttackNeutralTrains`](#setenemycanattackneutraltrains)
-  - [`SetMoney`](#setmoney)
-  - [`SetPushLine`](#setpushline)
-  - [`SetSemaphore`](#setsemaphore)
-  - [`TrainProperty`](#trainproperty)
-- [Audio, video and effects](#audio-video-and-effects) (19)
-  - [`CountGamma`](#countgamma)
-  - [`Effect`](#effect)
-  - [`GetEffectState`](#geteffectstate)
-  - [`GetGamma`](#getgamma)
-  - [`IsPlayMovie`](#isplaymovie)
-  - [`IsPlayMusic`](#isplaymusic)
-  - [`PlayMovie`](#playmovie)
-  - [`PlayMusicFile`](#playmusicfile)
-  - [`PlaySFX`](#playsfx)
-  - [`PlaySFXFromCoor`](#playsfxfromcoor)
-  - [`SetEnvironment`](#setenvironment)
-  - [`SetGamma`](#setgamma)
-  - [`SetGraphDetail`](#setgraphdetail)
-  - [`SetMusicVolume`](#setmusicvolume)
-  - [`SetSoundVolume`](#setsoundvolume)
-  - [`SetWind`](#setwind)
-  - [`StopMovie`](#stopmovie)
-  - [`StopMusic`](#stopmusic)
-  - [`StopSFX`](#stopsfx)
-- [Compatibility and text helpers](#compatibility-and-text-helpers) (17)
-  - [`Create`](#create)
-  - [`CreateEx`](#createex)
-  - [`CreateText`](#createtext)
-  - [`CreateTextFromFile`](#createtextfromfile)
-  - [`GetDir`](#getdir)
-  - [`MenuDir`](#menudir)
-  - [`MenuSelectVid`](#menuselectvid)
-  - [`MenuVid`](#menuvid)
-  - [`Message`](#message)
-  - [`PlayWAV`](#playwav)
-  - [`PrintFile`](#printfile)
-  - [`PrintText`](#printtext)
-  - [`ScrollLock`](#scrolllock)
-  - [`SetAutoScroll`](#setautoscroll)
-  - [`SetHpCoeff`](#sethpcoeff)
-  - [`SetMusic`](#setmusic)
-  - [`SetSound`](#setsound)
-- [Engine API](#engine-api) (31)
-  - [`AskPlace`](#askplace)
-  - [`ChangeZUnit`](#changezunit)
-  - [`charat`](#charat)
-  - [`Cos`](#cos)
-  - [`CreateSprite`](#createsprite)
-  - [`Destroy`](#destroy)
-  - [`Exit`](#exit)
-  - [`Flagman`](#flagman)
-  - [`Genocide`](#genocide)
-  - [`GetGroundZ`](#getgroundz)
-  - [`GetScreenInputX`](#getscreeninputx)
-  - [`GetScreenInputY`](#getscreeninputy)
-  - [`GetString`](#getstring)
-  - [`GetTime`](#gettime)
-  - [`GetVidData`](#getviddata)
-  - [`itoa`](#itoa)
-  - [`Load`](#load)
-  - [`MapSizeX`](#mapsizex)
-  - [`MapSizeY`](#mapsizey)
-  - [`MessageText`](#messagetext)
-  - [`Pause`](#pause)
-  - [`Printf`](#printf)
-  - [`Random`](#random)
-  - [`ReloadVid`](#reloadvid)
-  - [`ReplaceUnit`](#replaceunit)
-  - [`Save`](#save)
-  - [`SaveDemo`](#savedemo)
-  - [`SetFlagman`](#setflagman)
-  - [`SetVidData`](#setviddata)
-  - [`Sin`](#sin)
-  - [`strlen`](#strlen)
-- [Files, registry and logging](#files-registry-and-logging) (12)
-  - [`DelReg`](#delreg)
-  - [`Exec`](#exec)
-  - [`FClose`](#fclose)
-  - [`FCreate`](#fcreate)
-  - [`FEof`](#feof)
-  - [`FOpen`](#fopen)
-  - [`FRead`](#fread)
-  - [`FWrite`](#fwrite)
-  - [`GetDefaultRegPath`](#getdefaultregpath)
-  - [`GetReg`](#getreg)
-  - [`Log`](#log)
-  - [`SetReg`](#setreg)
-- [Legacy aliases and helper macros](#legacy-aliases-and-helper-macros) (5)
-  - [`GETSPRITE_ARMY`](#getspritearmy)
-  - [`GETSPRITE_TYPE`](#getspritetype)
-  - [`GetVid`](#getvid)
-  - [`SetVid`](#setvid)
-  - [`sprintf`](#sprintf)
-- [Networking](#networking) (6)
-  - [`GetNetInfo`](#getnetinfo)
-  - [`GetNetInputState`](#getnetinputstate)
-  - [`GetNetKey`](#getnetkey)
-  - [`Receive`](#receive)
-  - [`Send`](#send)
-  - [`SetNet`](#setnet)
-- [Script library helper](#script-library-helper) (69)
-  - [`AddReinforcement`](#addreinforcement)
-  - [`ArmyWeightCenter`](#armyweightcenter)
-  - [`BuildTrain`](#buildtrain)
-  - [`ChangeFonarState`](#changefonarstate)
-  - [`CivilPatrol`](#civilpatrol)
-  - [`Clouds`](#clouds)
-  - [`CountArmyUnit`](#countarmyunit)
-  - [`CreateFly`](#createfly)
-  - [`DeactiveTrain`](#deactivetrain)
-  - [`EndQuake`](#endquake)
-  - [`EnvironmentTact`](#environmenttact)
-  - [`FortCaptured`](#fortcaptured)
-  - [`FReadText`](#freadtext)
-  - [`GammaIntensive_print`](#gammaintensiveprint)
-  - [`GetDifficulty`](#getdifficulty)
-  - [`GetGammaIntensive`](#getgammaintensive)
-  - [`GetHoursByMSec`](#gethoursbymsec)
-  - [`GetLongestTrain`](#getlongesttrain)
-  - [`GetMinutesByMSec`](#getminutesbymsec)
-  - [`GetRegDefaultPlayer`](#getregdefaultplayer)
-  - [`GetRegStateBar`](#getregstatebar)
-  - [`GetSecondsByMSec`](#getsecondsbymsec)
-  - [`IsTrainAtWeaponRadius`](#istrainatweaponradius)
-  - [`IsTrainAtWeaponRadiusEx`](#istrainatweaponradiusex)
-  - [`LDepoCapture`](#ldepocapture)
-  - [`LMasterCapture`](#lmastercapture)
-  - [`Meteorites`](#meteorites)
-  - [`MoveTrain`](#movetrain)
-  - [`MoveZ`](#movez)
-  - [`Muxi`](#muxi)
-  - [`MyPatrolTrain`](#mypatroltrain)
-  - [`NearTrain`](#neartrain)
-  - [`NoArmyUnits`](#noarmyunits)
-  - [`OneTimeIn5Second`](#onetimein5second)
-  - [`OneTimeInHalfSecond`](#onetimeinhalfsecond)
-  - [`OneTimeInNSecond1`](#onetimeinnsecond1)
-  - [`OneTimeInNSecond2`](#onetimeinnsecond2)
-  - [`OneTimeInNSecond3`](#onetimeinnsecond3)
-  - [`OneTimeInQuarterSecond`](#onetimeinquartersecond)
-  - [`OneTimeInSecond`](#onetimeinsecond)
-  - [`PatrolEngineZ`](#patrolenginez)
-  - [`PatrolTrain`](#patroltrain)
-  - [`PrintObjectives`](#printobjectives)
-  - [`PrintTextAtCenter`](#printtextatcenter)
-  - [`PrintTextAtCenter5x5`](#printtextatcenter5x5)
-  - [`Quake`](#quake)
-  - [`Rain`](#rain)
-  - [`RandomTrain`](#randomtrain)
-  - [`ReinforcementInit`](#reinforcementinit)
-  - [`ResendCivilPatrolEngine`](#resendcivilpatrolengine)
-  - [`SendCivilPatrolEngine`](#sendcivilpatrolengine)
-  - [`SetArmyGamma`](#setarmygamma)
-  - [`SetArmyVid`](#setarmyvid)
-  - [`SetDayNightGamma`](#setdaynightgamma)
-  - [`SetPositionCenter`](#setpositioncenter)
-  - [`SetRegStateBar`](#setregstatebar)
-  - [`SetWindEx`](#setwindex)
-  - [`SizeBetween`](#sizebetween)
-  - [`SizeToZ`](#sizetoz)
-  - [`StartRain`](#startrain)
-  - [`StopRain`](#stoprain)
-  - [`Time1In100`](#time1in100)
-  - [`Time1In50`](#time1in50)
-  - [`Tornado`](#tornado)
-  - [`TrainHasUnitVid`](#trainhasunitvid)
-  - [`TrainHasWoundedRepair`](#trainhaswoundedrepair)
-  - [`TrainHasWoundedUnit`](#trainhaswoundedunit)
-  - [`UnitCountInTrain`](#unitcountintrain)
-  - [`UnitInTrain`](#unitintrain)
-- [Sprite iteration and lookup](#sprite-iteration-and-lookup) (9)
-  - [`FindNearestSprite`](#findnearestsprite)
-  - [`FirstInBox`](#firstinbox)
-  - [`FirstSprite`](#firstsprite)
-  - [`FirstUnit`](#firstunit)
-  - [`GetSprite`](#getsprite)
-  - [`GetSpriteScr`](#getspritescr)
-  - [`NextInBox`](#nextinbox)
-  - [`NextSprite`](#nextsprite)
-  - [`NextUnit`](#nextunit)
-- [UI and input](#ui-and-input) (24)
-  - [`GetInputState`](#getinputstate)
-  - [`GetInputX`](#getinputx)
-  - [`GetInputY`](#getinputy)
-  - [`GetKey`](#getkey)
-  - [`GetScrollType`](#getscrolltype)
-  - [`MenuAction`](#menuaction)
-  - [`MenuCreate`](#menucreate)
-  - [`MenuFind`](#menufind)
-  - [`MenuLClick`](#menulclick)
-  - [`MenuLoad`](#menuload)
-  - [`MenuNDirUnderCursor`](#menundirundercursor)
-  - [`MenuNVidUnderCursor`](#menunvidundercursor)
-  - [`MenuRClick`](#menurclick)
-  - [`MenuRelease`](#menurelease)
-  - [`ScreenX`](#screenx)
-  - [`ScreenY`](#screeny)
-  - [`SetCursor`](#setcursor)
-  - [`SetMouseClick`](#setmouseclick)
-  - [`SetPosition`](#setposition)
-  - [`SetScrollType`](#setscrolltype)
-  - [`SetSelectUnit`](#setselectunit)
-  - [`SetStateBar`](#setstatebar)
-  - [`ToScreenX`](#toscreenx)
-  - [`ToScreenY`](#toscreeny)
-- [Unit and action API](#unit-and-action-api) (13)
-  - [`Action`](#action)
-  - [`AddCommand`](#addcommand)
-  - [`DirectionTo`](#directionto)
-  - [`GetAnimation`](#getanimation)
-  - [`GetCommands`](#getcommands)
-  - [`GetDirection`](#getdirection)
-  - [`GetUnitVid`](#getunitvid)
-  - [`GetX`](#getx)
-  - [`GetY`](#gety)
-  - [`GetZ`](#getz)
-  - [`ReCalcGridZ`](#recalcgridz)
-  - [`SetCommands`](#setcommands)
-  - [`SizeTo`](#sizeto)
-
-## AI and railway
-
-### AddUnitLimit
-
-**Signature:** `AddUnitLimit(int army, int engine_nvid, int value)`  
-**Return type:** `void`  
-**Description:** Adds a unit limit for an army and VID. Use 255 as a wildcard; pass -1 as value to remove a matching limit.  
-**Source:** `export.lgc` · **ID:** `249`
-
-### BreakTrain
-
-**Signature:** `BreakTrain(int unit, int x, int y)`  
-**Return type:** `void`  
-**Description:** Splits a train at the supplied map coordinates, using the given unit as the reference.  
-**Source:** `export.lgc` · **ID:** `239`
-
-### CalcStatistics
-
-**Signature:** `CalcStatistics(int begx, int begy, int endx, int endy, int stat)`  
-**Return type:** `int`  
-**Description:** Calculates a statistic for the rectangular map region. The statistic is selected by a STAT_* constant.  
-**Source:** `export.lgc` · **ID:** `211`
-
-### CanAttackEngine
-
-**Signature:** `CanAttackEngine(int engine, int enemy)`  
-**Return type:** `int`  
-**Description:** Checks whether a locomotive can reach a position from which it can attack the specified enemy.  
-**Source:** `export.lgc` · **ID:** `254`
-
-### CanMoveEngineTo
-
-**Signature:** `CanMoveEngineTo(int engine, int x, int y)`  
-**Return type:** `int`  
-**Description:** Checks whether a locomotive can reach the supplied world-coordinate point.  
-**Source:** `export.lgc` · **ID:** `253`
-
-### FirstTrain
-
-**Signature:** `FirstTrain(int army)`  
-**Return type:** `int`  
-**Description:** Starts iteration over trains belonging to the specified army. Pair with NextTrain().  
-**Source:** `export.lgc` · **ID:** `240`
-
-### GetMoney
-
-**Signature:** `GetMoney(int army)`  
-**Return type:** `int`  
-**Description:** Returns the current money balance of the selected army.  
-**Source:** `export.lgc` · **ID:** `252`
-
-### GetStatistics
-
-**Signature:** `GetStatistics(int narmy, int stat)`  
-**Return type:** `int`  
-**Description:** Returns an AI/game statistic for the selected army. See STAT_* constants.  
-**Source:** `export.lgc` · **ID:** `210`
-
-### NextTrain
-
-**Signature:** `NextTrain()`  
-**Return type:** `int`  
-**Description:** Advances the active train iterator and returns the next train handle.  
-**Source:** `export.lgc` · **ID:** `241`
-
-### PatrolEngine
-
-**Signature:** `PatrolEngine(int train, int x, int y)`  
-**Return type:** `void`  
-**Description:** Orders a train to patrol toward the supplied world-coordinate point.  
-**Source:** `export.lgc` · **ID:** `242`
-
-### PatrolEngineToPoints
-
-**Signature:** `PatrolEngineToPoints(int train, int x, int y, int x2, int y2)`  
-**Return type:** `unknown`  
-**Description:** Orders a train to patrol between two world-coordinate points.  
-**Source:** `export.lgc` · **ID:** `248`
-
-### SetAutoReBirth
-
-**Signature:** `SetAutoReBirth(int newval)`  
-**Return type:** `void`  
-**Description:** Enables or disables automatic rebuilding of destroyed buildings.  
-**Source:** `export.lgc` · **ID:** `247`
-
-### SetCleverEnemyAttack
-
-**Signature:** `SetCleverEnemyAttack(int newval)`  
-**Return type:** `void`  
-**Description:** Enables or disables the enemy's smarter attack behavior.  
-**Source:** `export.lgc` · **ID:** `246`
-
-### SetEnemyCanAttackNeutralTrains
-
-**Signature:** `SetEnemyCanAttackNeutralTrains(int newval)`  
-**Return type:** `void`  
-**Description:** Controls whether enemy units may attack neutral trains on the map.  
-**Source:** `export.lgc` · **ID:** `250`
-
-### SetMoney
-
-**Signature:** `SetMoney(int army, int money)`  
-**Return type:** `void`  
-**Description:** Sets the money balance of the selected army.  
-**Source:** `export.lgc` · **ID:** `251`
-
-### SetPushLine
-
-**Signature:** `SetPushLine(int begin_x, int begin_y, int end_x, int end_y, int push_flag)`  
-**Return type:** `void`  
-**Description:** Defines a one-way train route between two screen-coordinate points. The original export file places a legacy comment about IsMovingToRepair beside this declaration.  
-**Source:** `export.lgc` · **ID:** `243`
-
-### SetSemaphore
-
-**Signature:** `SetSemaphore(int x, int y, int newsemaphore, int army)`  
-**Return type:** `void`  
-**Description:** Changes the semaphore on a rail tile for the specified army. The semaphore value controls permitted travel directions.  
-**Source:** `export.lgc` · **ID:** `231`
-
-### TrainProperty
-
-**Signature:** `TrainProperty(int train, int property)`  
-**Return type:** `int`  
-**Description:** Returns a train property selected by a PROP_* constant.  
-**Source:** `export.lgc` · **ID:** `212`
-
-## Audio, video and effects
-
-### CountGamma
-
-**Signature:** `CountGamma(int g1, int g2, int time)`  
-**Return type:** `unknown`  
-**Description:** Interpolates between two gamma values using a time value from 0 to 255.  
-**Source:** `export.lgc` · **ID:** `146`
-
-### Effect
-
-**Signature:** `Effect(int effect, int var1, int var2 = 0, int duration = 0)`  
-**Return type:** `void`  
-**Description:** Starts a screen or palette effect. The effect identifier and parameters are defined by EFF_* constants.  
-**Source:** `export.lgc` · **ID:** `137`
-
-### GetEffectState
-
-**Signature:** `GetEffectState(int eff)`  
-**Return type:** `int`  
-**Description:** Returns effect progress as a percentage (0-100), or -1 when the effect is not running.  
-**Source:** `export.lgc` · **ID:** `148`
-
-### GetGamma
-
-**Signature:** `GetGamma()`  
-**Return type:** `int`  
-**Description:** Returns the currently selected gamma value.  
-**Source:** `export.lgc` · **ID:** `147`
-
-### IsPlayMovie
-
-**Signature:** `IsPlayMovie()`  
-**Return type:** `int`  
-**Description:** Returns non-zero while a movie is playing.  
-**Source:** `export.lgc` · **ID:** `143`
-
-### IsPlayMusic
-
-**Signature:** `IsPlayMusic()`  
-**Return type:** `int`  
-**Description:** Returns non-zero while music playback is active.  
-**Source:** `export.lgc` · **ID:** `145`
-
-### PlayMovie
-
-**Signature:** `PlayMovie(string filename)`  
-**Return type:** `void`  
-**Description:** Starts playback of a movie file.  
-**Source:** `export.lgc` · **ID:** `142`
-
-### PlayMusicFile
-
-**Signature:** `PlayMusicFile(string file, int loop = 1)`  
-**Return type:** `void`  
-**Description:** Plays a music file. The optional loop flag defaults to one (looping enabled).  
-**Source:** `export.lgc` · **ID:** `136`
-
-### PlaySFX
-
-**Signature:** `PlaySFX(int nsfx)`  
-**Return type:** `void`  
-**Description:** Plays a sound effect by its sound-effect index.  
-**Source:** `export.lgc` · **ID:** `132`
-
-### PlaySFXFromCoor
-
-**Signature:** `PlaySFXFromCoor(int nsfx, int x, int y)`  
-**Return type:** `void`  
-**Description:** Plays a sound effect at world coordinates so that its position is spatialized.  
-**Source:** `export.lgc` · **ID:** `135`
-
-### SetEnvironment
-
-**Signature:** `SetEnvironment(int env)`  
-**Return type:** `void`  
-**Description:** Sets environment effects using ENV_* flags.  
-**Source:** `export.lgc` · **ID:** `138`
-
-### SetGamma
-
-**Signature:** `SetGamma(int gammaindex)`  
-**Return type:** `void`  
-**Description:** Selects a game palette/gamma table.  
-**Source:** `export.lgc` · **ID:** `140`
-
-### SetGraphDetail
-
-**Signature:** `SetGraphDetail(int detail)`  
-**Return type:** `void`  
-**Description:** Sets graphics detail: zero for low detail, one for high detail.  
-**Source:** `export.lgc` · **ID:** `139`
-
-### SetMusicVolume
-
-**Signature:** `SetMusicVolume(int volume)`  
-**Return type:** `void`  
-**Description:** Sets the music volume (0-100).  
-**Source:** `export.lgc` · **ID:** `131`
-
-### SetSoundVolume
-
-**Signature:** `SetSoundVolume(int volume)`  
-**Return type:** `void`  
-**Description:** Sets the sound-effects volume (0-100).  
-**Source:** `export.lgc` · **ID:** `130`
-
-### SetWind
-
-**Signature:** `SetWind(int wind, int direct)`  
-**Return type:** `void`  
-**Description:** Sets wind strength and direction.  
-**Source:** `export.lgc` · **ID:** `141`
-
-### StopMovie
-
-**Signature:** `StopMovie()`  
-**Return type:** `void`  
-**Description:** Stops movie playback.  
-**Source:** `export.lgc` · **ID:** `144`
-
-### StopMusic
-
-**Signature:** `StopMusic()`  
-**Return type:** `void`  
-**Description:** Stops currently playing music.  
-**Source:** `export.lgc` · **ID:** `134`
-
-### StopSFX
-
-**Signature:** `StopSFX(int nsfx)`  
-**Return type:** `void`  
-**Description:** Stops the selected sound effect. Pass -1 to stop all sound effects.  
-**Source:** `export.lgc` · **ID:** `133`
-
-## Compatibility and text helpers
-
-### Create
-
-**Signature:** `Create(int nvid, int x, int y, int z)`  
-**Return type:** `int`  
-**Description:** Legacy alias for CreateSprite(nvid, x, y, z).  
-**Source:** `obsolete.lgc`
-
-### CreateEx
-
-**Signature:** `CreateEx(int nvid, int x, int y, int z, int dir)`  
-**Return type:** `int`  
-**Description:** Legacy alias for CreateSprite with an explicit direction.  
-**Source:** `obsolete.lgc`
-
-### CreateText
-
-**Signature:** `CreateText(int font_vid, int x, int y, int z, string text, int behave = 0)`  
-**Return type:** `int`  
-**Description:** Creates a B_TEXT sprite and assigns it the supplied text. The optional behavior flags control alignment and text loading.  
-**Source:** `export.lgc`
-
-### CreateTextFromFile
-
-**Signature:** `CreateTextFromFile(int font_vid, int x, int y, int z, string filename, int behave = 0)`  
-**Return type:** `int`  
-**Description:** Creates a B_TEXT sprite and loads its text from a file. The font VID must use the B_TEXT sprite class.  
-**Source:** `export.lgc`
-
-### GetDir
-
-**Signature:** `GetDir(int unit)`  
-**Return type:** `int`  
-**Description:** Legacy alias for GetDirection(unit).  
-**Source:** `obsolete.lgc`
-
-### MenuDir
-
-**Signature:** `MenuDir()`  
-**Return type:** `int`  
-**Description:** Returns the direction value of the menu item under the cursor.  
-**Source:** `obsolete.lgc`
-
-### MenuSelectVid
-
-**Signature:** `MenuSelectVid()`  
-**Return type:** `int`  
-**Description:** Returns the VID of the menu item currently under the cursor.  
-**Source:** `obsolete.lgc`
-
-### MenuVid
-
-**Signature:** `MenuVid()`  
-**Return type:** `int`  
-**Description:** Returns the VID of the menu item clicked with the left mouse button, or zero when no menu item was clicked.  
-**Source:** `obsolete.lgc`
-
-### Message
-
-**Signature:** `Message(string text, int x, int y)`  
-**Return type:** `void`  
-**Description:** Displays a localized message by combining its MessagePrefixes and Messages strings.ini entries.  
-**Source:** `obsolete.lgc`
-
-### PlayWAV
-
-**Signature:** `PlayWAV(string filename)`  
-**Return type:** `void`  
-**Description:** Legacy helper that plays a music/audio file through PlayMusicFile().  
-**Source:** `obsolete.lgc`
-
-### PrintFile
-
-**Signature:** `PrintFile(int x, int y, int z, string filename, int font)`  
-**Return type:** `int`  
-**Description:** Creates a text sprite whose content is read from a file and returns its sprite handle.  
-**Source:** `obsolete.lgc`
-
-### PrintText
-
-**Signature:** `PrintText(int x, int y, int z, string text, int font, int behave = 0)`  
-**Return type:** `int`  
-**Description:** Creates a text sprite at the supplied world coordinates and returns its sprite handle. The optional behavior flags control text alignment and loading mode.  
-**Source:** `obsolete.lgc`
-
-### ScrollLock
-
-**Signature:** `ScrollLock(int flag)`  
-**Return type:** `void`  
-**Description:** Legacy helper that disables or enables edge and arrow-key scrolling while preserving other scroll flags.  
-**Source:** `obsolete.lgc`
-
-### SetAutoScroll
-
-**Signature:** `SetAutoScroll(int flag)`  
-**Return type:** `void`  
-**Description:** Enables or disables automatic scrolling toward the flagman while preserving other scroll flags.  
-**Source:** `obsolete.lgc`
-
-### SetHpCoeff
-
-**Signature:** `SetHpCoeff(int nvid, int narmy, int hp_percent)`  
-**Return type:** `void`  
-**Description:** Sets a per-army hit-point coefficient for a VID by writing the matching VID_HP_COEFF* property.  
-**Source:** `obsolete.lgc`
-
-### SetMusic
-
-**Signature:** `SetMusic(int volume)`  
-**Return type:** `void`  
-**Description:** Legacy alias for SetMusicVolume(volume).  
-**Source:** `obsolete.lgc`
-
-### SetSound
-
-**Signature:** `SetSound(int volume)`  
-**Return type:** `void`  
-**Description:** Legacy alias for SetSoundVolume(volume).  
-**Source:** `obsolete.lgc`
-
-## Engine API
-
-### AskPlace
-
-**Signature:** `AskPlace(int vid, int x, int y, int z)`  
-**Return type:** `int`  
-**Description:** Checks whether an object with the supplied VID can be placed at the coordinates. Returns the blocking unit handle, or zero when placement is possible.  
-**Source:** `export.lgc` · **ID:** `161`
-
-### ChangeZUnit
-
-**Signature:** `ChangeZUnit(int vid, int z)`  
-**Return type:** `void`  
-**Description:** Changes the Z coordinate for all instances of the supplied VID.  
-**Source:** `export.lgc` · **ID:** `156`
-
-### charat
-
-**Signature:** `charat(string str, int index)`  
-**Return type:** `string`  
-**Description:** Returns the character at the requested zero-based string index.  
-**Source:** `export.lgc` · **ID:** `153`
-
-### Cos
-
-**Signature:** `Cos(int angle)`  
-**Return type:** `int`  
-**Description:** Returns cosine(angle) multiplied by 1024. The angle uses the game's 0-255 direction scale.  
-**Source:** `export.lgc` · **ID:** `166`
-
-### CreateSprite
-
-**Signature:** `CreateSprite(int nvid, int x, int y, int z, int dir = 0, int parent = 0)`  
-**Return type:** `int`  
-**Description:** Creates a sprite instance from a game object VID at world coordinates. Returns the new sprite handle. Optional direction and parent handle default to zero.  
-**Source:** `export.lgc` · **ID:** `65`
-
-### Destroy
-
-**Signature:** `Destroy(int unit)`  
-**Return type:** `void`  
-**Description:** Destroys the sprite identified by its handle.  
-**Source:** `export.lgc` · **ID:** `84`
-
-### Exit
-
-**Signature:** `Exit(string next_program = "")`  
-**Return type:** `void`  
-**Description:** Exits to Windows. An optional program name can be supplied to launch another program after the game closes.  
-**Source:** `export.lgc` · **ID:** `124`
-
-### Flagman
-
-**Signature:** `Flagman(int army)`  
-**Return type:** `int`  
-**Description:** Returns the currently controlled unit for the requested army.  
-**Source:** `export.lgc` · **ID:** `66`
-
-### Genocide
-
-**Signature:** `Genocide(int nvid)`  
-**Return type:** `void`  
-**Description:** Destroys every instance of the supplied VID on the map.  
-**Source:** `export.lgc` · **ID:** `169`
-
-### GetGroundZ
-
-**Signature:** `GetGroundZ(int x, int y)`  
-**Return type:** `int`  
-**Description:** Returns the ground height at the supplied world coordinates.  
-**Source:** `export.lgc` · **ID:** `158`
-
-### GetScreenInputX
-
-**Signature:** `GetScreenInputX()`  
-**Return type:** `unknown`  
-**Description:** Returns the mouse X coordinate in screen coordinates.  
-**Source:** `export.lgc` · **ID:** `244`
-
-### GetScreenInputY
-
-**Signature:** `GetScreenInputY()`  
-**Return type:** `unknown`  
-**Description:** Returns the mouse Y coordinate in screen coordinates.  
-**Source:** `export.lgc` · **ID:** `245`
-
-### GetString
-
-**Signature:** `GetString(string section, string keyword)`  
-**Return type:** `string`  
-**Description:** Reads a localized string from the [strings] section of strings.ini.  
-**Source:** `export.lgc` · **ID:** `123`
-
-### GetTime
-
-**Signature:** `GetTime()`  
-**Return type:** `int`  
-**Description:** Returns the current game timer in milliseconds.  
-**Source:** `export.lgc` · **ID:** `157`
-
-### GetVidData
-
-**Signature:** `GetVidData(int nvid, int type)`  
-**Return type:** `int`  
-**Description:** Reads a property of a game object definition. The property selector is a VID_* constant.  
-**Source:** `export.lgc` · **ID:** `162`
-
-### itoa
-
-**Signature:** `itoa(int val)`  
-**Return type:** `string`  
-**Description:** Converts an integer to its decimal string representation.  
-**Source:** `export.lgc` · **ID:** `164`
-
-### Load
-
-**Signature:** `Load(string filename)`  
-**Return type:** `void`  
-**Description:** Loads a map from the supplied file name.  
-**Source:** `export.lgc` · **ID:** `98`
-
-### MapSizeX
-
-**Signature:** `MapSizeX()`  
-**Return type:** `int`  
-**Description:** Returns the map width in world units.  
-**Source:** `export.lgc` · **ID:** `167`
-
-### MapSizeY
-
-**Signature:** `MapSizeY()`  
-**Return type:** `int`  
-**Description:** Returns the map height in world units.  
-**Source:** `export.lgc` · **ID:** `168`
-
-### MessageText
-
-**Signature:** `MessageText(string text, int x, int y)`  
-**Return type:** `void`  
-**Description:** Displays a message in the game's message/state bar at the supplied coordinates.  
-**Source:** `export.lgc` · **ID:** `114`
-
-### Pause
-
-**Signature:** `Pause(int flag)`  
-**Return type:** `void`  
-**Description:** Pauses or resumes the game according to the supplied flag.  
-**Source:** `export.lgc` · **ID:** `112`
-
-### Printf
-
-**Signature:** `Printf(string format, unknown int_or_string)`  
-**Return type:** `unknown`  
-**Description:** Formats a string using a format template and one integer-or-string argument.  
-**Source:** `export.lgc` · **ID:** `172`
-
-### Random
-
-**Signature:** `Random(int max)`  
-**Return type:** `int`  
-**Description:** Returns a pseudo-random integer from zero through the supplied maximum.  
-**Source:** `export.lgc` · **ID:** `155`
-
-### ReloadVid
-
-**Signature:** `ReloadVid()`  
-**Return type:** `void`  
-**Description:** Reloads the game object's VID parameters.  
-**Source:** `export.lgc` · **ID:** `173`
-
-### ReplaceUnit
-
-**Signature:** `ReplaceUnit(int nvid1, int nvid2)`  
-**Return type:** `void`  
-**Description:** Replaces every instance of one VID on the map with another VID.  
-**Source:** `export.lgc` · **ID:** `170`
-
-### Save
-
-**Signature:** `Save(string filename)`  
-**Return type:** `void`  
-**Description:** Saves the current map to the supplied file name.  
-**Source:** `export.lgc` · **ID:** `99`
-
-### SaveDemo
-
-**Signature:** `SaveDemo(string filename)`  
-**Return type:** `void`  
-**Description:** Records the next loaded file as a demo under the supplied file name.  
-**Source:** `export.lgc` · **ID:** `100`
-
-### SetFlagman
-
-**Signature:** `SetFlagman(int narmy, int unit)`  
-**Return type:** `void`  
-**Description:** Sets a unit as the flagman (controlled unit) for the specified army.  
-**Source:** `export.lgc` · **ID:** `160`
-
-### SetVidData
-
-**Signature:** `SetVidData(int nvid, int type, int var)`  
-**Return type:** `void`  
-**Description:** Changes a property of a game object definition. The property selector is a VID_* constant.  
-**Source:** `export.lgc` · **ID:** `163`
-
-### Sin
-
-**Signature:** `Sin(int angle)`  
-**Return type:** `int`  
-**Description:** Returns sine(angle) multiplied by 1024. The angle uses the game's 0-255 direction scale.  
-**Source:** `export.lgc` · **ID:** `165`
-
-### strlen
-
-**Signature:** `strlen(string str)`  
-**Return type:** `int`  
-**Description:** Returns the number of characters in a string.  
-**Source:** `export.lgc` · **ID:** `159`
-
-## Files, registry and logging
-
-### DelReg
-
-**Signature:** `DelReg(string path, string name)`  
-**Return type:** `void`  
-**Description:** Deletes a named value from the Windows registry.  
-**Source:** `export.lgc` · **ID:** `184`
-
-### Exec
-
-**Signature:** `Exec(string command)`  
-**Return type:** `void`  
-**Description:** Starts an external Windows executable or command.  
-**Source:** `export.lgc` · **ID:** `152`
-
-### FClose
-
-**Signature:** `FClose(int file)`  
-**Return type:** `void`  
-**Description:** Closes an opened script file handle.  
-**Source:** `export.lgc` · **ID:** `177`
-
-### FCreate
-
-**Signature:** `FCreate(string filename)`  
-**Return type:** `int`  
-**Description:** Creates a file for script I/O and returns its file handle.  
-**Source:** `export.lgc` · **ID:** `178`
-
-### FEof
-
-**Signature:** `FEof(int file)`  
-**Return type:** `int`  
-**Description:** Returns non-zero when the file handle has reached end-of-file.  
-**Source:** `export.lgc` · **ID:** `179`
-
-### FOpen
-
-**Signature:** `FOpen(string filename)`  
-**Return type:** `int`  
-**Description:** Opens a file for script I/O and returns its file handle.  
-**Source:** `export.lgc` · **ID:** `176`
-
-### FRead
-
-**Signature:** `FRead(int file)`  
-**Return type:** `unknown`  
-**Description:** Reads the next variable value from an opened game script file.  
-**Source:** `export.lgc` · **ID:** `175`
-
-### FWrite
-
-**Signature:** `FWrite(int file, unknown variable)`  
-**Return type:** `void`  
-**Description:** Writes a variable value to an opened game script file.  
-**Source:** `export.lgc` · **ID:** `174`
-
-### GetDefaultRegPath
-
-**Signature:** `GetDefaultRegPath()`  
-**Return type:** `string`  
-**Description:** Returns the registry path configured in game.cfg.  
-**Source:** `export.lgc` · **ID:** `185`
-
-### GetReg
-
-**Signature:** `GetReg(string path, string name, unknown def_value)`  
-**Return type:** `unknown`  
-**Description:** Reads a string value from the Windows registry, returning the supplied default when the value is absent.  
-**Source:** `export.lgc` · **ID:** `182`
-
-### Log
-
-**Signature:** `Log(string str)`  
-**Return type:** `void`  
-**Description:** Writes a message to the game's logic log.  
-**Source:** `export.lgc` · **ID:** `154`
-
-### SetReg
-
-**Signature:** `SetReg(string path, string name, unknown value)`  
-**Return type:** `void`  
-**Description:** Writes a string value to the Windows registry.  
-**Source:** `export.lgc` · **ID:** `183`
-
-## Legacy aliases and helper macros
-
-### GETSPRITE_ARMY
-
-**Signature:** `GETSPRITE_ARMY(int army)`  
-**Return type:** `int`  
-**Description:** Builds the GETSPRITE_ARMY* bit mask for the supplied army index.  
-**Source:** `export.lgc`
-
-### GETSPRITE_TYPE
-
-**Signature:** `GETSPRITE_TYPE(int type)`  
-**Return type:** `int`  
-**Description:** Builds a sprite-type filter mask for GetSprite() and FindNearestSprite().  
-**Source:** `export.lgc`
-
-### GetVid
-
-**Signature:** `GetVid(int nvid, int type)`  
-**Return type:** `int`  
-**Description:** Legacy macro alias for GetVidData(nvid, type).  
-**Source:** `obsolete.lgc`
-
-### SetVid
-
-**Signature:** `SetVid(int nvid, int type, int var)`  
-**Return type:** `void`  
-**Description:** Legacy macro alias for SetVidData(nvid, type, var).  
-**Source:** `obsolete.lgc`
-
-### sprintf
-
-**Signature:** `sprintf(string format, unknown int_or_string)`  
-**Return type:** `int`  
-**Description:** Legacy macro alias for Printf(format, int_or_string). The format accepts one value argument.  
-**Source:** `obsolete.lgc`
-
-## Networking
-
-### GetNetInfo
-
-**Signature:** `GetNetInfo(int type)`  
-**Return type:** `int`  
-**Description:** Returns a network-game property selected by a NET_* constant.  
-**Source:** `export.lgc` · **ID:** `192`
-
-### GetNetInputState
-
-**Signature:** `GetNetInputState(int nplayer)`  
-**Return type:** `int`  
-**Description:** Returns the input-state bit mask reported by the specified network player.  
-**Source:** `export.lgc` · **ID:** `197`
-
-### GetNetKey
-
-**Signature:** `GetNetKey(int nplayer)`  
-**Return type:** `int`  
-**Description:** Returns the key code reported by the specified network player.  
-**Source:** `export.lgc` · **ID:** `196`
-
-### Receive
-
-**Signature:** `Receive()`  
-**Return type:** `int`  
-**Description:** Receives the next integer data value from the network peer.  
-**Source:** `export.lgc` · **ID:** `194`
-
-### Send
+# LGC Functions Reference
+
+Functions declared by the engine API and implemented in the transitive standard `header.lgc` include tree.
+
+**Entries:** 452. Types remain `unknown` only when the supplied sources do not establish a reliable type.
+
+## `ai_default_event.lgc`
+
+99 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `AddDengu` | `void` | `AddDengu()` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `bear` | `void` | `bear(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `BuildingCapture` | `void` | `BuildingCapture(int building)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `DepoAttacked` | `void` | `DepoAttacked(int unit, int enemy)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `engine_death` | `void` | `engine_death(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F005_15` | `void` | `F005_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F013_14` | `void` | `F013_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F020_15` | `void` | `F020_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F025_15` | `void` | `F025_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F030_15` | `void` | `F030_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F035_15` | `void` | `F035_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F050_15` | `void` | `F050_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F055_15` | `void` | `F055_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F057_14` | `void` | `F057_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F060_15` | `void` | `F060_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F062_15` | `void` | `F062_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F070_0` | `void` | `F070_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F070_2` | `void` | `F070_2(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F075_15` | `void` | `F075_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F080_15` | `void` | `F080_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F082_15` | `void` | `F082_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F084_15` | `void` | `F084_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F084_3` | `void` | `F084_3(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F085_15` | `void` | `F085_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F086_0` | `void` | `F086_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F086_14` | `void` | `F086_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F086_15` | `void` | `F086_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F086_DESTROY` | `void` | `F086_DESTROY(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F090_15` | `void` | `F090_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F094_14` | `void` | `F094_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F095_15` | `void` | `F095_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F102_14` | `void` | `F102_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F102_15` | `void` | `F102_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F104_14` | `void` | `F104_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F104_15` | `void` | `F104_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F157_9` | `void` | `F157_9(int fonar)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F158_9` | `void` | `F158_9(int fonar)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F162_0` | `void` | `F162_0(int building)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F165_0` | `void` | `F165_0(int building)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F165_1` | `void` | `F165_1(int building)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F169_8` | `void` | `F169_8(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F201_15` | `void` | `F201_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F202_15` | `void` | `F202_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F203_15` | `void` | `F203_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F256_15` | `void` | `F256_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F262_15` | `void` | `F262_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F263_15` | `void` | `F263_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F268_9` | `void` | `F268_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F273_14` | `void` | `F273_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F290_0` | `void` | `F290_0(int vulcan)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F290_14` | `void` | `F290_14(int vulcan)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F340_0` | `void` | `F340_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F342_15` | `void` | `F342_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F345_15` | `void` | `F345_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F409_15` | `void` | `F409_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F409_7` | `void` | `F409_7(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F416_9` | `void` | `F416_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F422_9` | `void` | `F422_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F431_15` | `void` | `F431_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F505_0` | `void` | `F505_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F506_14` | `void` | `F506_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F507_0` | `void` | `F507_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F507_2` | `void` | `F507_2(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F511_0` | `void` | `F511_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F511_9` | `void` | `F511_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F512_0` | `void` | `F512_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F512_9` | `void` | `F512_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F513_0` | `void` | `F513_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F513_9` | `void` | `F513_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F514_0` | `void` | `F514_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F514_9` | `void` | `F514_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F517_2` | `void` | `F517_2(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F518_0` | `void` | `F518_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F518_2` | `void` | `F518_2(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F518_9` | `void` | `F518_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F519_0` | `void` | `F519_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F519_2` | `void` | `F519_2(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F519_9` | `void` | `F519_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F521_0` | `void` | `F521_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F523_0` | `void` | `F523_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F533_0` | `void` | `F533_0(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F545_14` | `void` | `F545_14(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F545_15` | `void` | `F545_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F545_7` | `void` | `F545_7(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F546_15` | `void` | `F546_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F548_15` | `void` | `F548_15(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F832_9` | `void` | `F832_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `F833_9` | `void` | `F833_9(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `MasterDestroy` | `void` | `MasterDestroy(int master)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `MineBlast` | `void` | `MineBlast(int mine)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `MineRemove` | `void` | `MineRemove(int mine)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainArrive` | `void` | `TrainArrive(int train)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainAttacked` | `void` | `TrainAttacked(int train, int enemy)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainDamage` | `void` | `TrainDamage(int train)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainDestroyPower` | `void` | `TrainDestroyPower(int train)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainNotAmmo` | `void` | `TrainNotAmmo(int train)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainNotPower` | `void` | `TrainNotPower(int train)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `TrainSplit` | `void` | `TrainSplit(int train1, int train2)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+| `weels_death` | `void` | `weels_death(int unit)` | Standard-header script function implemented in `ai_default_event.lgc`. See its implementation for the game-specific behavior. |
+
+## `ai_default_event_inherit.lgc`
+
+20 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `dBuildingCapture` | `void` | `dBuildingCapture(int building)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dDepoAttacked` | `void` | `dDepoAttacked(int depo, int enemy)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dDepoBirth` | `void` | `dDepoBirth(int depo)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dDepoDestroy` | `void` | `dDepoDestroy(int depo)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dDepoFree` | `void` | `dDepoFree(int depo)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dEnemyLinked` | `void` | `dEnemyLinked(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dMasterDestroy` | `void` | `dMasterDestroy(int master)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dMineBlast` | `void` | `dMineBlast(int mine)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dMineRemove` | `void` | `dMineRemove(int mine)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainArrive` | `void` | `dTrainArrive(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainAttacked` | `void` | `dTrainAttacked(int train, int enemy)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainCreated` | `void` | `dTrainCreated(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainDamage` | `void` | `dTrainDamage(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainDestroy` | `void` | `dTrainDestroy(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainDestroyPower` | `void` | `dTrainDestroyPower(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainNotAmmo` | `void` | `dTrainNotAmmo(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainNotPower` | `void` | `dTrainNotPower(int train)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dTrainSplit` | `void` | `dTrainSplit(int train1, int train2)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dUnitCreated` | `void` | `dUnitCreated(int unit)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+| `dUnitDestroy` | `void` | `dUnitDestroy(int unit)` | Standard-header script function implemented in `ai_default_event_inherit.lgc`. See its implementation for the game-specific behavior. |
+
+## `ai_events.lgc`
+
+9 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `DepoBirth` | `void` | `DepoBirth(int depo)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `DepoDestroy` | `void` | `DepoDestroy(int depo)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `DepoFree` | `void` | `DepoFree(int depo)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `EnemyLinked` | `void` | `EnemyLinked(int train)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `TrainClash` | `void` | `TrainClash(int train1, int train2)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `TrainCreated` | `void` | `TrainCreated(int train)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `TrainDestroy` | `void` | `TrainDestroy(int train)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `UnitCreated` | `void` | `UnitCreated(int unit)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+| `UnitDestroy` | `void` | `UnitDestroy(int unit)` | Standard-header script function implemented in `ai_events.lgc`. See its implementation for the game-specific behavior. |
+
+## `ai_functions.lgc`
+
+21 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `ArmyWeightCenter` | `void` | `ArmyWeightCenter(int army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `BuildTrain` | `void` | `BuildTrain(int depo, unknown train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `CountArmyUnit` | `unknown` | `CountArmyUnit(int army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `DeactiveTrain` | `void` | `DeactiveTrain(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `FortCaptured` | `unknown` | `FortCaptured(int army)` | Int FortCaptured_unit=0; |
+| `GetLongestTrain` | `int` | `GetLongestTrain(int army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `IsTrainAtWeaponRadius` | `int` | `IsTrainAtWeaponRadius(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `IsTrainAtWeaponRadiusEx` | `int` | `IsTrainAtWeaponRadiusEx(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `MoveTrain` | `void` | `MoveTrain(int train, int x, int y, int behave)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `MyPatrolTrain` | `void` | `MyPatrolTrain(int train, int x, int y, int beh_patrol)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `NearFort` | `unknown` | `NearFort(int train, int army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `NearTrain` | `int` | `NearTrain(int train, int NearTrain_army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `PatrolTrain` | `void` | `PatrolTrain(int train, int x, int y, int beh_move, int beh_patrol)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `RandomTrain` | `unknown` | `RandomTrain(int RandomTrain_army)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `SetPositionCenter` | `void` | `SetPositionCenter(int x, int y)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `SizeBetween` | `int` | `SizeBetween(int unit1, int unit2)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `TrainHasUnitVid` | `unknown` | `TrainHasUnitVid(int train, int type)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `TrainHasWoundedRepair` | `unknown` | `TrainHasWoundedRepair(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `TrainHasWoundedUnit` | `unknown` | `TrainHasWoundedUnit(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `UnitCountInTrain` | `unknown` | `UnitCountInTrain(int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+| `UnitInTrain` | `int` | `UnitInTrain(int unit, int train)` | Standard-header script function implemented in `ai_functions.lgc`. See its implementation for the game-specific behavior. |
+
+## `basefunctions.lgc`
+
+25 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `CreateFly` | `void` | `CreateFly(int nvid, int army, int z)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `FReadText` | `string` | `FReadText(int f)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetDifficulty` | `unknown` | `GetDifficulty()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetHoursByMSec` | `int` | `GetHoursByMSec(int msec)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetMinutesByMSec` | `unknown` | `GetMinutesByMSec(int msec)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetRegDefaultPlayer` | `string` | `GetRegDefaultPlayer()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetRegStateBar` | `unknown` | `GetRegStateBar()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetSecondsByMSec` | `unknown` | `GetSecondsByMSec(int msec)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `MoveZ` | `void` | `MoveZ(int unit, int x, int y)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `NoArmyUnits` | `unknown` | `NoArmyUnits(int army)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeIn5Second` | `int` | `OneTimeIn5Second()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInHalfSecond` | `int` | `OneTimeInHalfSecond()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInNSecond1` | `int` | `OneTimeInNSecond1(int N)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInNSecond2` | `int` | `OneTimeInNSecond2(int N)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInNSecond3` | `int` | `OneTimeInNSecond3(int N)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInQuarterSecond` | `int` | `OneTimeInQuarterSecond()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `OneTimeInSecond` | `int` | `OneTimeInSecond()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `PatrolEngineZ` | `void` | `PatrolEngineZ(int unit, int x, int y)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `PrintObjectives` | `void` | `PrintObjectives()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `PrintTextAtCenter` | `int` | `PrintTextAtCenter(int x, int y, int z, string s, int font)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `PrintTextAtCenter5x5` | `int` | `PrintTextAtCenter5x5(int x, int y, int z, string s, int font)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `SetRegStateBar` | `void` | `SetRegStateBar(int state)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `SizeToZ` | `int` | `SizeToZ(int unit, int x, int y)` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `Time1In100` | `int` | `Time1In100()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+| `Time1In50` | `int` | `Time1In50()` | Standard-header script function implemented in `basefunctions.lgc`. See its implementation for the game-specific behavior. |
+
+## `Captures.lgc`
+
+2 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `LDepoCapture` | `void` | `LDepoCapture(int capture_x, int capture_y, int size_tocapture, int army_tocapture)` | Standard-header script function implemented in `Captures.lgc`. See its implementation for the game-specific behavior. |
+| `LMasterCapture` | `void` | `LMasterCapture(int capture_x, int capture_y, int size_tocapture, int army_tocapture)` | Standard-header script function implemented in `Captures.lgc`. See its implementation for the game-specific behavior. |
+
+## `civil.lgc`
+
+5 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `CivilPatrol` | `void` | `CivilPatrol()` | Standard-header script function implemented in `civil.lgc`. See its implementation for the game-specific behavior. |
+| `Muxi` | `void` | `Muxi(int nvid, int count)` | Standard-header script function implemented in `civil.lgc`. See its implementation for the game-specific behavior. |
+| `ResendCivilPatrolEngine` | `void` | `ResendCivilPatrolEngine()` | Standard-header script function implemented in `civil.lgc`. See its implementation for the game-specific behavior. |
+| `SendCivilPatrolEngine` | `void` | `SendCivilPatrolEngine()` | Standard-header script function implemented in `civil.lgc`. See its implementation for the game-specific behavior. |
+| `Tornado` | `void` | `Tornado()` | Standard-header script function implemented in `civil.lgc`. See its implementation for the game-specific behavior. |
+
+## `daynight.lgc`
+
+8 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `ChangeFonarState` | `void` | `ChangeFonarState()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `GammaIntensive_print` | `void` | `GammaIntensive_print()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `GetGammaIntensive` | `unknown` | `GetGammaIntensive(int gamma)` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `Rain` | `void` | `Rain()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `SetArmyVid` | `void` | `SetArmyVid(int nvid, int army)` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `SetDayNightGamma` | `void` | `SetDayNightGamma()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `StartRain` | `void` | `StartRain()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+| `StopRain` | `void` | `StopRain()` | Standard-header script function implemented in `daynight.lgc`. See its implementation for the game-specific behavior. |
+
+## `debug_functions.lgc`
+
+1 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `PrintTime` | `void` | `PrintTime()` | Standard-header script function implemented in `debug_functions.lgc`. See its implementation for the game-specific behavior. |
+
+## `dokeys.lgc`
+
+2 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `DoKeys` | `void` | `DoKeys()` | Processes configured keyboard shortcuts and related debug controls. |
+| `PrintDebug` | `void` | `PrintDebug(string s)` | Standard-header script function implemented in `dokeys.lgc`. See its implementation for the game-specific behavior. |
+
+## `environmenttact.lgc`
+
+6 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `Clouds` | `void` | `Clouds()` | Standard-header script function implemented in `environmenttact.lgc`. See its implementation for the game-specific behavior. |
+| `EndQuake` | `void` | `EndQuake()` | Standard-header script function implemented in `environmenttact.lgc`. See its implementation for the game-specific behavior. |
+| `EnvironmentTact` | `void` | `EnvironmentTact()` | Updates environmental effects such as weather, wind and quakes. |
+| `Meteorites` | `void` | `Meteorites()` | Standard-header script function implemented in `environmenttact.lgc`. See its implementation for the game-specific behavior. |
+| `Quake` | `void` | `Quake(int time, int sound)` | Standard-header script function implemented in `environmenttact.lgc`. See its implementation for the game-specific behavior. |
+| `SetWindEx` | `void` | `SetWindEx(int w_speed, int w_dir)` | Standard-header script function implemented in `environmenttact.lgc`. See its implementation for the game-specific behavior. |
+
+## `explode.lgc`
+
+1 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `Explode` | `void` | `Explode()` | Creates the scripted explosion effect. |
+
+## `export.lgc`
+
+136 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `Action` | `int` | `Action(int unit, int act, int var1 = 0, int var2 = 0, int var3 = 0)` | Executes an action on a unit. Optional parameters provide action-specific values. |
+| `AddCommand` | `unknown` | `AddCommand(int unit, int act, int var1 = 0, int var2 = 0, int var3 = 0)` | Engine API function declared in `export.lgc`. It performs the `AddCommand` operation. |
+| `AddUnitLimit` | `unknown` | `AddUnitLimit(int army, int engine_nvid, int value)` | Engine API function declared in `export.lgc`. It performs the `AddUnitLimit` operation. |
+| `AskPlace` | `int` | `AskPlace(int vid, int x, int y, int z)` | Engine API function declared in `export.lgc`. It performs the `AskPlace` operation. |
+| `BreakTrain` | `unknown` | `BreakTrain(int unit, int x, int y)` | Engine API function declared in `export.lgc`. It performs the `BreakTrain` operation. |
+| `CalcStatistics` | `int` | `CalcStatistics(int begx, int begy, int endx, int endy, int stat)` | Engine API function declared in `export.lgc`. It performs the `CalcStatistics` operation. |
+| `CanAttackEngine` | `int` | `CanAttackEngine(int engine, int enemy)` | Checks whether the requested game operation is currently possible. |
+| `CanMoveEngineTo` | `int` | `CanMoveEngineTo(int engine, int x, int y)` | Checks whether the requested game operation is currently possible. |
+| `ChangeZUnit` | `unknown` | `ChangeZUnit(int vid, int z)` | Engine API function declared in `export.lgc`. It performs the `ChangeZUnit` operation. |
+| `charat` | `char` | `charat(string str, int index)` | Returns the character at the requested string index. |
+| `Cos` | `int` | `Cos(int angle)` | Returns the scaled cosine of an angle (angle range 0–256). |
+| `CountGamma` | `int` | `CountGamma(int g1, int g2, int time)` | Engine API function declared in `export.lgc`. It performs the `CountGamma` operation. |
+| `CreateSprite` | `int` | `CreateSprite(int nvid, int x, int y, int z, int dir = 0, int parent = 0)` | Creates a sprite and returns its unique object identifier. |
+| `CreateText` | `int` | `CreateText(int font_vid, int x, int y, int z, string text, int behave = 0)` | Standard-header script function implemented in `export.lgc`. See its implementation for the game-specific behavior. |
+| `CreateTextFromFile` | `int` | `CreateTextFromFile(int font_vid, int x, int y, int z, string filename, int behave = 0)` | Standard-header script function implemented in `export.lgc`. See its implementation for the game-specific behavior. |
+| `DelReg` | `unknown` | `DelReg(string path, string name)` | Engine API function declared in `export.lgc`. It performs the `DelReg` operation. |
+| `Destroy` | `unknown` | `Destroy(int unit)` | Engine API function declared in `export.lgc`. It performs the `Destroy` operation. |
+| `DirectionTo` | `int` | `DirectionTo(int unit, int x, int y)` | Calculates the direction from a unit to the specified world point. |
+| `Effect` | `unknown` | `Effect(int effect, int var1, int var2 = 0, int duration = 0)` | Engine API function declared in `export.lgc`. It performs the `Effect` operation. |
+| `Exec` | `unknown` | `Exec(string command)` | Engine API function declared in `export.lgc`. It performs the `Exec` operation. |
+| `Exit` | `unknown` | `Exit(string next_program = "")` | Engine API function declared in `export.lgc`. It performs the `Exit` operation. |
+| `FClose` | `unknown` | `FClose(int file)` | Engine API function declared in `export.lgc`. It performs the `FClose` operation. |
+| `FCreate` | `int` | `FCreate(string filename)` | Engine API function declared in `export.lgc`. It performs the `FCreate` operation. |
+| `FEof` | `int` | `FEof(int file)` | Engine API function declared in `export.lgc`. It performs the `FEof` operation. |
+| `FindNearestSprite` | `int` | `FindNearestSprite(int type, int x, int y, int radius)` | Finds the nearest matching sprite within the specified world-coordinate radius. |
+| `FirstInBox` | `int` | `FirstInBox(int left, int top, int right, int bottom)` | Starts iterating objects inside the specified world-coordinate rectangle. |
+| `FirstSprite` | `int` | `FirstSprite()` | Starts iterating all sprites. This operation can be slow on large maps. |
+| `FirstTrain` | `int` | `FirstTrain(int army)` | Engine API function declared in `export.lgc`. It performs the `FirstTrain` operation. |
+| `FirstUnit` | `int` | `FirstUnit(int typeunit)` | Returns the first unit matching the specified unit type. |
+| `Flagman` | `int` | `Flagman(int army)` | Returns the unit currently controlled by the player. |
+| `FOpen` | `int` | `FOpen(string filename)` | Engine API function declared in `export.lgc`. It performs the `FOpen` operation. |
+| `FRead` | `unknown` | `FRead(int file)` | Engine API function declared in `export.lgc`. It performs the `FRead` operation. |
+| `FWrite` | `unknown` | `FWrite(int file, int variable)` | Engine API function declared in `export.lgc`. It performs the `FWrite` operation. |
+| `Genocide` | `unknown` | `Genocide(int nvid)` | Engine API function declared in `export.lgc`. It performs the `Genocide` operation. |
+| `GetAnimation` | `int` | `GetAnimation(int unit)` | Returns the unit's current animation identifier. |
+| `GetCommands` | `string` | `GetCommands(int unit)` | Returns the command string assigned to a unit. |
+| `GetDefaultRegPath` | `string` | `GetDefaultRegPath()` | Returns the registry path configured for the game. |
+| `GetDirection` | `int` | `GetDirection(int unit)` | Returns the unit's current direction. |
+| `GetEffectState` | `int` | `GetEffectState(int eff)` | Returns the current effect-state value for the requested effect. |
+| `GetGamma` | `int` | `GetGamma()` | InterpolateGamma(int g1, int g2, int time) |
+| `GetGroundZ` | `int` | `GetGroundZ(int x, int y)` | Returns the ground height (Z coordinate) at the requested map position. |
+| `GetInputState` | `int` | `GetInputState()` | Returns the current mouse/input state. |
+| `GetInputX` | `int` | `GetInputX()` | Returns the current input cursor X coordinate. |
+| `GetInputY` | `int` | `GetInputY()` | Returns the current input cursor Y coordinate. |
+| `GetKey` | `int` | `GetKey()` | Returns the code of the currently pressed key. |
+| `GetMoney` | `int` | `GetMoney(int army)` | Returns the current money balance of the specified army. |
+| `GetNetInfo` | `int` | `GetNetInfo(int type)` | Returns the requested network information value. |
+| `GetNetInputState` | `int` | `GetNetInputState(int nplayer)` | Returns the network input state for the requested player or control. |
+| `GetNetKey` | `int` | `GetNetKey(int nplayer)` | Returns the state of the requested network key. |
+| `GetReg` | `string` | `GetReg(string path, string name, string def_value)` | Reads a string value from the Windows registry. |
+| `GetScreenInputX` | `int` | `GetScreenInputX()` | Returns the input cursor X coordinate in screen space. |
+| `GetScreenInputY` | `int` | `GetScreenInputY()` | Returns the input cursor Y coordinate in screen space. |
+| `GetScrollType` | `int` | `GetScrollType()` | See #define SCROLL_XXX |
+| `GetSprite` | `int` | `GetSprite(int type, int x, int y)` | Finds a sprite at the specified world coordinates using a sprite filter. |
+| `GETSPRITE_ARMY` | `int` | `GETSPRITE_ARMY(int army)` | Standard-header script function implemented in `export.lgc`. See its implementation for the game-specific behavior. |
+| `GETSPRITE_TYPE` | `int` | `GETSPRITE_TYPE(int type)` | Standard-header script function implemented in `export.lgc`. See its implementation for the game-specific behavior. |
+| `GetSpriteScr` | `int` | `GetSpriteScr(int type, int scr_x, int scr_y)` | Finds a sprite at the specified screen coordinates using a sprite filter. |
+| `GetStatistics` | `int` | `GetStatistics(int narmy, int stat)` | Returns the statistics value from the game engine. |
+| `GetString` | `string` | `GetString(string section, string keyword)` | Reads a localized string from the specified section and key in strings.ini. |
+| `GetTime` | `int` | `GetTime()` | Returns the current game time in milliseconds. |
+| `GetUnitVid` | `int` | `GetUnitVid(int unit)` | Returns the visual identifier (VID) of the specified unit. |
+| `GetVidData` | `int` | `GetVidData(int nvid, int type)` | Returns the selected VID property for the object identified by `nvid`. |
+| `GetX` | `int` | `GetX(int unit)` | Returns the unit's world X coordinate. |
+| `GetY` | `int` | `GetY(int unit)` | Returns the unit's world Y coordinate. |
+| `GetZ` | `int` | `GetZ(int unit)` | Returns the unit's height (Z coordinate). |
+| `IsPlayMovie` | `int` | `IsPlayMovie()` | Returns whether a movie is currently playing. |
+| `IsPlayMusic` | `int` | `IsPlayMusic()` | Returns whether music is currently playing. |
+| `itoa` | `string` | `itoa(int val)` | Converts an integer value to a string. |
+| `Load` | `unknown` | `Load(string filename)` | Engine API function declared in `export.lgc`. It performs the `Load` operation. |
+| `Log` | `unknown` | `Log(string str)` | Engine API function declared in `export.lgc`. It performs the `Log` operation. |
+| `MapSizeX` | `int` | `MapSizeX()` | Engine API function declared in `export.lgc`. It performs the `MapSizeX` operation. |
+| `MapSizeY` | `int` | `MapSizeY()` | Engine API function declared in `export.lgc`. It performs the `MapSizeY` operation. |
+| `MenuAction` | `unknown` | `MenuAction(int nvid, int ndir, int action, int var1 = 0, int var2 = 0, int var3 = 0)` | Engine API function declared in `export.lgc`. It performs the `MenuAction` operation. |
+| `MenuCreate` | `int` | `MenuCreate(int nvid, int ndir, int x, int y, int z)` | Engine API function declared in `export.lgc`. It performs the `MenuCreate` operation. |
+| `MenuFind` | `int` | `MenuFind(int nvid, int ndir)` | Engine API function declared in `export.lgc`. It performs the `MenuFind` operation. |
+| `MenuLClick` | `int` | `MenuLClick()` | Engine API function declared in `export.lgc`. It performs the `MenuLClick` operation. |
+| `MenuLoad` | `unknown` | `MenuLoad(string filename)` | Engine API function declared in `export.lgc`. It performs the `MenuLoad` operation. |
+| `MenuNDirUnderCursor` | `int` | `MenuNDirUnderCursor()` | Engine API function declared in `export.lgc`. It performs the `MenuNDirUnderCursor` operation. |
+| `MenuNVidUnderCursor` | `int` | `MenuNVidUnderCursor()` | Engine API function declared in `export.lgc`. It performs the `MenuNVidUnderCursor` operation. |
+| `MenuRClick` | `int` | `MenuRClick()` | Engine API function declared in `export.lgc`. It performs the `MenuRClick` operation. |
+| `MenuRelease` | `unknown` | `MenuRelease()` | Engine API function declared in `export.lgc`. It performs the `MenuRelease` operation. |
+| `MessageText` | `unknown` | `MessageText(string text, int x, int y)` | Engine API function declared in `export.lgc`. It performs the `MessageText` operation. |
+| `NextInBox` | `int` | `NextInBox()` | Returns the next object in the current rectangle iteration. |
+| `NextSprite` | `int` | `NextSprite()` | Returns the next sprite in the global sprite iteration. |
+| `NextTrain` | `int` | `NextTrain()` | Engine API function declared in `export.lgc`. It performs the `NextTrain` operation. |
+| `NextUnit` | `int` | `NextUnit()` | Returns the next unit in the current unit iteration. |
+| `PatrolEngine` | `unknown` | `PatrolEngine(int train, int x, int y)` | Engine API function declared in `export.lgc`. It performs the `PatrolEngine` operation. |
+| `PatrolEngineToPoints` | `unknown` | `PatrolEngineToPoints(int train, int x, int y, int x2, int y2)` | Engine API function declared in `export.lgc`. It performs the `PatrolEngineToPoints` operation. |
+| `Pause` | `unknown` | `Pause(int flag)` | Engine API function declared in `export.lgc`. It performs the `Pause` operation. |
+| `PlayMovie` | `unknown` | `PlayMovie(string filename)` | Engine API function declared in `export.lgc`. It performs the `PlayMovie` operation. |
+| `PlayMusicFile` | `unknown` | `PlayMusicFile(string file, int loop = 1)` | Engine API function declared in `export.lgc`. It performs the `PlayMusicFile` operation. |
+| `PlaySFX` | `unknown` | `PlaySFX(int nsfx)` | Engine API function declared in `export.lgc`. It performs the `PlaySFX` operation. |
+| `PlaySFXFromCoor` | `unknown` | `PlaySFXFromCoor(int nsfx, int x, int y)` | Engine API function declared in `export.lgc`. It performs the `PlaySFXFromCoor` operation. |
+| `Printf` | `unknown` | `Printf(string format, int int_or_string)` | Engine API function declared in `export.lgc`. It performs the `Printf` operation. |
+| `Random` | `int` | `Random(int max)` | Random 0-max |
+| `ReCalcGridZ` | `unknown` | `ReCalcGridZ(int unit)` | Engine API function declared in `export.lgc`. It performs the `ReCalcGridZ` operation. |
+| `Receive` | `int` | `Receive()` | Engine API function declared in `export.lgc`. It performs the `Receive` operation. |
+| `ReloadVid` | `unknown` | `ReloadVid()` | Engine API function declared in `export.lgc`. It performs the `ReloadVid` operation. |
+| `ReplaceUnit` | `unknown` | `ReplaceUnit(int nvid1, int nvid2)` | Engine API function declared in `export.lgc`. It performs the `ReplaceUnit` operation. |
+| `Save` | `unknown` | `Save(string filename)` | Save map |
+| `SaveDemo` | `unknown` | `SaveDemo(string filename)` | Engine API function declared in `export.lgc`. It performs the `SaveDemo` operation. |
+| `ScreenX` | `int` | `ScreenX()` | Engine API function declared in `export.lgc`. It performs the `ScreenX` operation. |
+| `ScreenY` | `int` | `ScreenY()` | Engine API function declared in `export.lgc`. It performs the `ScreenY` operation. |
+| `Send` | `unknown` | `Send(int data)` | Engine API function declared in `export.lgc`. It performs the `Send` operation. |
+| `SetAutoReBirth` | `unknown` | `SetAutoReBirth(int newval)` | Configures automatic rebirth behavior. |
+| `SetCleverEnemyAttack` | `unknown` | `SetCleverEnemyAttack(int newval)` | Configures the intelligent enemy-attack behavior. |
+| `SetCommands` | `unknown` | `SetCommands(int unit, string com)` | Replaces the command string assigned to a unit. |
+| `SetCursor` | `unknown` | `SetCursor(int type)` | Sets the cursor value in the game engine. |
+| `SetEnemyCanAttackNeutralTrains` | `unknown` | `SetEnemyCanAttackNeutralTrains(int newval)` | Controls whether enemies may attack neutral trains. |
+| `SetEnvironment` | `unknown` | `SetEnvironment(int env)` | Sets the environment value in the game engine. |
+| `SetFlagman` | `unknown` | `SetFlagman(int narmy, int unit)` | Sets the flagman value in the game engine. |
+| `SetGamma` | `unknown` | `SetGamma(int gammaindex)` | Sets the gamma value in the game engine. |
+| `SetGraphDetail` | `unknown` | `SetGraphDetail(int detail)` | 0-low,1-high |
+| `SetMoney` | `unknown` | `SetMoney(int army, int money)` | Sets the money balance of the specified army. |
+| `SetMouseClick` | `unknown` | `SetMouseClick(int firstOrsecond, int vk_button)` | Sets the mouse-click state used by the input system. |
+| `SetMusicVolume` | `unknown` | `SetMusicVolume(int volume)` | Volume=0-100 |
+| `SetNet` | `unknown` | `SetNet(int flag)` | Sets the net value in the game engine. |
+| `SetPosition` | `unknown` | `SetPosition(int x, int y)` | Sets the position value in the game engine. |
+| `SetPushLine` | `unknown` | `SetPushLine(int begin_x, int begin_y, int end_x, int end_y, int push_flag)` | Sets the push-line property used by the game interface. |
+| `SetReg` | `unknown` | `SetReg(string path, string name, string value)` | Sets the reg value in the game engine. |
+| `SetScrollType` | `unknown` | `SetScrollType(int type)` | See #define SCROLL_XXX |
+| `SetSelectUnit` | `unknown` | `SetSelectUnit(int flag)` | Sets the unit-selection state for the interface. |
+| `SetSemaphore` | `unknown` | `SetSemaphore(int x, int y, int newsemaphore, int army)` | Sets the semaphore value in the game engine. |
+| `SetSoundVolume` | `unknown` | `SetSoundVolume(int volume)` | Sets the sound volume for the requested channel or group. |
+| `SetStateBar` | `unknown` | `SetStateBar(int flag)` | Updates the state/progress bar displayed by the interface. |
+| `SetVidData` | `unknown` | `SetVidData(int nvid, int type, int var)` | Sets the selected VID property for the object identified by `nvid`. |
+| `SetWind` | `unknown` | `SetWind(int wind, int direct)` | Sets the wind value in the game engine. |
+| `Sin` | `int` | `Sin(int angle)` | Returns the scaled sine of an angle (angle range 0–256). |
+| `SizeTo` | `int` | `SizeTo(int unit, int x, int y)` | Engine API function declared in `export.lgc`. It performs the `SizeTo` operation. |
+| `StopMovie` | `unknown` | `StopMovie()` | Engine API function declared in `export.lgc`. It performs the `StopMovie` operation. |
+| `StopMusic` | `unknown` | `StopMusic()` | Engine API function declared in `export.lgc`. It performs the `StopMusic` operation. |
+| `StopSFX` | `unknown` | `StopSFX(int nsfx)` | If nsfx==-1 then stop all sfx |
+| `strlen` | `int` | `strlen(string str)` | Returns the length of a string. |
+| `ToScreenX` | `int` | `ToScreenX(int x)` | Engine API function declared in `export.lgc`. It performs the `ToScreenX` operation. |
+| `ToScreenY` | `int` | `ToScreenY(int y, int z = 0)` | Engine API function declared in `export.lgc`. It performs the `ToScreenY` operation. |
+| `TrainProperty` | `int` | `TrainProperty(int train, int property)` | Engine API function declared in `export.lgc`. It performs the `TrainProperty` operation. |
+
+## `fly.lgc`
+
+2 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `FlyTact` | `void` | `FlyTact()` | Standard-header script function implemented in `fly.lgc`. See its implementation for the game-specific behavior. |
+| `GetFlyCountLast` | `unknown` | `GetFlyCountLast()` | Standard-header script function implemented in `fly.lgc`. See its implementation for the game-specific behavior. |
+
+## `gametact.lgc`
+
+1 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `GameTact` | `void` | `GameTact()` | Runs the main game-tactics update routine. |
+
+## `initdefault.lgc`
+
+1 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `InitDefault` | `unknown` | `InitDefault()` | Initializes standard game state and default script variables. |
+
+## `menuend.lgc`
+
+18 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `DisableButtonsEnd` | `void` | `DisableButtonsEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `EnableButtonsEnd` | `void` | `EnableButtonsEnd(int i)` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `ImmediateWin` | `void` | `ImmediateWin()` | Completes the current match immediately and updates the victory record. |
+| `InstantWin` | `void` | `InstantWin()` | Completes the current match immediately and updates the level progression. |
+| `IsNoDepo` | `int` | `IsNoDepo()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `Loose` | `void` | `Loose()` | Marks the current match as lost and starts the defeat sequence. |
+| `MenuEnd` | `int` | `MenuEnd()` | Updates and displays the end-of-match menu. |
+| `MenuLoadingEnd` | `void` | `MenuLoadingEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `MenuWorkingEnd` | `void` | `MenuWorkingEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `ReadScores` | `void` | `ReadScores()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `ReadScoresEnd` | `void` | `ReadScoresEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `SetBackEnd` | `void` | `SetBackEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `SetMenuStateEnd` | `void` | `SetMenuStateEnd(int num)` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `ShiftScores` | `void` | `ShiftScores(int SSscore, string SSname, int SSlevel, int SSrank)` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `ShiftScoresEnd` | `void` | `ShiftScoresEnd(int SSscore, string SSname)` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `StoreScores` | `void` | `StoreScores()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `StoreScoresEnd` | `void` | `StoreScoresEnd()` | Standard-header script function implemented in `menuend.lgc`. See its implementation for the game-specific behavior. |
+| `Win` | `void` | `Win()` | Marks the current match as won and starts the victory sequence. |
+
+## `menutact.lgc`
+
+34 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `CreateCreditsMenu` | `void` | `CreateCreditsMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `CreateExitMenu` | `void` | `CreateExitMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `CreateHelpMenu` | `void` | `CreateHelpMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `CreateLevelMenu` | `void` | `CreateLevelMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `CreateOptionsMenu` | `void` | `CreateOptionsMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `DeletePlayer` | `void` | `DeletePlayer(int num)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `DisableButtons` | `void` | `DisableButtons()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `DownDiffPlayer` | `void` | `DownDiffPlayer(int num)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `EditorRowClicked` | `unknown` | `EditorRowClicked()` | A click on the row (the lamp or its text) |
+| `EditorRowCreate` | `void` | `EditorRowCreate(int x, int y, string back)` | The row with the lamp at x,y from the page's middle (X, Y set) |
+| `EditorRowLines` | `unknown` | `EditorRowLines(string page)` | The lines a page of the briefing takes: the file's lines, a long one as more |
+| `EditorRowOnBriefing` | `void` | `EditorRowOnBriefing(string page, string head)` | The briefing's row: under a short page's text; else beside a title that leaves room; else at the bottom |
+| `EditorRowText` | `string` | `EditorRowText()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `EnableButtons` | `void` | `EnableButtons(int i)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `GetCountFromList` | `unknown` | `GetCountFromList(string filename)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `GetFileFromList` | `string` | `GetFileFromList(string filename)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `GetPlayerScores` | `unknown` | `GetPlayerScores(int pl)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `GetRCX` | `void` | `GetRCX(int xxx)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `GetRCY` | `void` | `GetRCY(int yyy)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillCreditsMenu` | `void` | `KillCreditsMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillEditorRow` | `void` | `KillEditorRow()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillExitMenu` | `void` | `KillExitMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillHelpMenu` | `void` | `KillHelpMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillLevelMenu` | `void` | `KillLevelMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `KillOptionsMenu` | `void` | `KillOptionsMenu()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `MenuLoading` | `void` | `MenuLoading()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `MenuLoadingF1` | `void` | `MenuLoadingF1()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `MenuTact` | `int` | `MenuTact()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `MenuUnloading` | `void` | `MenuUnloading()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `MenuWorking` | `void` | `MenuWorking()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `PrintCurrPlayer` | `void` | `PrintCurrPlayer()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `SetBack` | `void` | `SetBack()` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `SetMenuState` | `void` | `SetMenuState(int num)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+| `UpDiffPlayer` | `void` | `UpDiffPlayer(int num)` | Standard-header script function implemented in `menutact.lgc`. See its implementation for the game-specific behavior. |
+
+## `obsolete.lgc`
+
+18 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `Create` | `int` | `Create(int nvid, int x, int y, int z)` | #define GetUnitVid GetVid |
+| `CreateEx` | `int` | `CreateEx(int nvid, int x, int y, int z, int dir)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `GetDir` | `int` | `GetDir(int unit)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `GetVid` | `int` | `GetVid(int nvid, int type)` | Compatibility function alias for `GetVidData()` provided by `#define GetVid GetVidData` in `obsolete.lgc`. |
+| `MenuDir` | `int` | `MenuDir()` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `MenuSelectVid` | `int` | `MenuSelectVid()` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `MenuVid` | `int` | `MenuVid()` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `Message` | `void` | `Message(string text, int x, int y)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `PlayWAV` | `void` | `PlayWAV(string filename)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `PrintFile` | `int` | `PrintFile(int x, int y, int z, string filename, int font)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `PrintText` | `int` | `PrintText(int x, int y, int z, string text, int font, int behave = 0)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `ScrollLock` | `void` | `ScrollLock(int flag)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `SetAutoScroll` | `void` | `SetAutoScroll(int flag)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `SetHpCoeff` | `void` | `SetHpCoeff(int nvid, int narmy, int hp_percent)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `SetMusic` | `void` | `SetMusic(int volume)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `SetSound` | `void` | `SetSound(int volume)` | Standard-header script function implemented in `obsolete.lgc`. See its implementation for the game-specific behavior. |
+| `SetVid` | `unknown` | `SetVid(int nvid, int type, int var)` | Compatibility function alias for `SetVidData()` provided by `#define SetVid SetVidData` in `obsolete.lgc`. |
+| `sprintf` | `unknown` | `sprintf(string format, int int_or_string)` | Compatibility function alias for `Printf()` provided by `#define sprintf Printf` in `obsolete.lgc`. |
+
+## `optfields.lgc`
+
+11 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `OptEditorValue` | `void` | `OptEditorValue()` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptFieldsClick` | `void` | `OptFieldsClick(int clicked)` | The menu item clicked (MenuVid()) while the page is open. |
+| `OptFieldsCreate` | `void` | `OptFieldsCreate(int at_x, int at_y, int depth, int text_depth)` | After the page's own rows: X, Y as CreateOptionsMenu has them (GetRCX/GetRCY), the depth of its arrows and of its texts (the main menu: 20 and 300, the Esc menu: 2220 and 2300). The names of the parameters and globals here are used by no other script: a script that includes this file does not compile when one of them is a global there (mvid of menutact.lgc did that). |
+| `OptFieldsKill` | `void` | `OptFieldsKill()` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptInterfaceSizeText` | `unknown` | `OptInterfaceSizeText(int size, int max)` | The size shown: the chosen one as far as the window takes it (the game uses no more). |
+| `OptInterfaceValue` | `void` | `OptInterfaceValue()` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptInterfaceY` | `unknown` | `OptInterfaceY(int editor)` | The rows' Y: the interface's (editor 0) and the editor's interface's (1). |
+| `OptMinimapSizeText` | `unknown` | `OptMinimapSizeText()` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptMinimapValue` | `void` | `OptMinimapValue()` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptRowY` | `unknown` | `OptRowY(int n)` | Standard-header script function implemented in `optfields.lgc`. See its implementation for the game-specific behavior. |
+| `OptString` | `unknown` | `OptString(string key, string english)` | A text of the pack's strings.ini, or `english` when it has none: the game's own strings.ini (an edition's language without a pack of ours, Portuguese) lacks our keys - as menu.lgc's custom maps header falls back to CUSTOM MAPS. |
+
+## `reinforcement.lgc`
+
+3 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `AddReinforcement` | `void` | `AddReinforcement()` | Standard-header script function implemented in `reinforcement.lgc`. See its implementation for the game-specific behavior. |
+| `PirateEngineKept` | `int` | `PirateEngineKept(int i)` | Standard-header script function implemented in `reinforcement.lgc`. See its implementation for the game-specific behavior. |
+| `ReinforcementInit` | `void` | `ReinforcementInit()` | Standard-header script function implemented in `reinforcement.lgc`. See its implementation for the game-specific behavior. |
+
+## `setarmygamma.lgc`
+
+1 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `SetArmyGamma` | `void` | `SetArmyGamma()` | Applies the configured gamma settings for an army. |
+
+## `trainstact.lgc`
+
+4 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `BehaveBattleRadius` | `void` | `BehaveBattleRadius(int i, int enemy_train)` | Standard-header script function implemented in `trainstact.lgc`. See its implementation for the game-specific behavior. |
+| `ConnectExistsTrain` | `void` | `ConnectExistsTrain(int train)` | Standard-header script function implemented in `trainstact.lgc`. See its implementation for the game-specific behavior. |
+| `SetMine` | `void` | `SetMine(int unit, int x, int y)` | Standard-header script function implemented in `trainstact.lgc`. See its implementation for the game-specific behavior. |
+| `TrainsTact` | `void` | `TrainsTact()` | Runs the train-tactics update routine. |
+
+## `trainstactfunctions.lgc`
+
+24 function(s).
+
+| Function | Return | Signature | Description |
+|---|---|---|---|
+| `ai_change_task` | `void` | `ai_change_task(int train, int new_task, int options)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `ai_train_check` | `void` | `ai_train_check()` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `ai_train_check_type` | `int` | `ai_train_check_type(int num)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `ai_train_create_help` | `void` | `ai_train_create_help()` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `ai_train_need_help` | `unknown` | `ai_train_need_help()` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `arr_cpp` | `void` | `arr_cpp(unknown a1, unknown a2)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `arr_gettype` | `void` | `arr_gettype(unknown train, int traintype)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `BuildLinker` | `int` | `BuildLinker(int depo, int i, int k, int type)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `BuildRebuldTrain` | `void` | `BuildRebuldTrain(int depo, int i)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `BuildThisTrain` | `void` | `BuildThisTrain(int depo, int traintype)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `CheckEnemyInTrain` | `int` | `CheckEnemyInTrain(int train)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `CountNVidInTrain` | `unknown` | `CountNVidInTrain(int train, int nvid)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `DepoPrint` | `void` | `DepoPrint()` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `find_num` | `unknown` | `find_num()` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `FindTrain` | `int` | `FindTrain(int unit)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `FindTrain2` | `int` | `FindTrain2(int unit)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetFreeFlyers` | `unknown` | `GetFreeFlyers(int army, int flyer_vid)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `GetFreeFlyerWagonInTrain` | `unknown` | `GetFreeFlyerWagonInTrain(int train, int flyer_wagon_vid)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `initArrays` | `void` | `initArrays()` | ---------------------------------------------------------------------------- |
+| `MoveAway` | `void` | `MoveAway(int train, int enemy, int range)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `StartCreateTrain` | `unknown` | `StartCreateTrain(unknown train, int x, int y, int army)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `train_print` | `void` | `train_print(int train)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `TrainWeaponRadius` | `int` | `TrainWeaponRadius(int train)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
+| `UniqueNum` | `void` | `UniqueNum(unknown arr)` | Standard-header script function implemented in `trainstactfunctions.lgc`. See its implementation for the game-specific behavior. |
 
-**Signature:** `Send(int data)`  
-**Return type:** `void`  
-**Description:** Sends an integer data value to the network peer.  
-**Source:** `export.lgc` · **ID:** `193`
-
-### SetNet
-
-**Signature:** `SetNet(int flag)`  
-**Return type:** `void`  
-**Description:** Enables or disables network-game mode.  
-**Source:** `export.lgc` · **ID:** `195`
-
-## Script library helper
-
-### AddReinforcement
-
-**Signature:** `AddReinforcement()`  
-**Return type:** `unknown`  
-**Description:** Adds a reinforcement wave according to the configured player/AI schedule.  
-**Source:** `reinforcement.lgc`
-
-### ArmyWeightCenter
-
-**Signature:** `ArmyWeightCenter(int army)`  
-**Return type:** `unknown`  
-**Description:** Calculates the hit-point-weighted center of an army and stores the result in WeightX and WeightY.  
-**Source:** `ai_functions.lgc`
-
-### BuildTrain
-
-**Signature:** `BuildTrain(int depo, int *train)`  
-**Return type:** `unknown`  
-**Description:** Queues the unit VIDs from an integer array as build commands for a depot. The helper may swap the first two entries before building.  
-**Source:** `ai_functions.lgc`
-
-### ChangeFonarState
-
-**Signature:** `ChangeFonarState()`  
-**Return type:** `unknown`  
-**Description:** Changes the state of a light/lantern effect for the day/night cycle.  
-**Source:** `daynight.lgc`
-
-### CivilPatrol
-
-**Signature:** `CivilPatrol()`  
-**Return type:** `unknown`  
-**Description:** Updates civilian patrol behavior for the current logic tick.  
-**Source:** `civil.lgc`
-
-### Clouds
-
-**Signature:** `Clouds()`  
-**Return type:** `unknown`  
-**Description:** Updates the cloud layer and its movement for the environment logic.  
-**Source:** `environmenttact.lgc`
-
-### CountArmyUnit
-
-**Signature:** `CountArmyUnit(int army)`  
-**Return type:** `unknown`  
-**Description:** Counts all units belonging to the supplied army.  
-**Source:** `ai_functions.lgc`
-
-### CreateFly
-
-**Signature:** `CreateFly(int nvid, int army, int z)`  
-**Return type:** `unknown`  
-**Description:** Creates a flying unit outside the map boundary, chooses a random edge position, then assigns it to the requested army.  
-**Source:** `basefunctions.lgc`
-
-### DeactiveTrain
-
-**Signature:** `DeactiveTrain(int train)`  
-**Return type:** `unknown`  
-**Description:** Sets every engine in a train to passive behavior.  
-**Source:** `ai_functions.lgc`
-
-### EndQuake
-
-**Signature:** `EndQuake()`  
-**Return type:** `unknown`  
-**Description:** Stops the earthquake state and restores the affected environment values.  
-**Source:** `environmenttact.lgc`
-
-### EnvironmentTact
-
-**Signature:** `EnvironmentTact()`  
-**Return type:** `unknown`  
-**Description:** Main per-tick update routine for the environment effects.  
-**Source:** `environmenttact.lgc`
-
-### FortCaptured
-
-**Signature:** `FortCaptured(int army)`  
-**Return type:** `unknown`  
-**Description:** Returns the total count of captured fort structures for the selected army.  
-**Source:** `ai_functions.lgc`
-
-### FReadText
-
-**Signature:** `FReadText(int f)`  
-**Return type:** `unknown`  
-**Description:** Reads the remaining contents of an opened file into a string, appending a line break after each read item.  
-**Source:** `basefunctions.lgc`
-
-### GammaIntensive_print
-
-**Signature:** `GammaIntensive_print()`  
-**Return type:** `unknown`  
-**Description:** Debug helper that prints the current gamma/intensity values.  
-**Source:** `daynight.lgc`
-
-### GetDifficulty
-
-**Signature:** `GetDifficulty()`  
-**Return type:** `unknown`  
-**Description:** Reads the current player's difficulty setting from the Locoland registry keys.  
-**Source:** `basefunctions.lgc`
-
-### GetGammaIntensive
-
-**Signature:** `GetGammaIntensive(int gamma)`  
-**Return type:** `unknown`  
-**Description:** Calculates a gamma/intensity value used by the day/night script.  
-**Source:** `daynight.lgc`
-
-### GetHoursByMSec
-
-**Signature:** `GetHoursByMSec(int msec)`  
-**Return type:** `unknown`  
-**Description:** Converts a millisecond duration to whole hours.  
-**Source:** `basefunctions.lgc`
-
-### GetLongestTrain
-
-**Signature:** `GetLongestTrain(int army)`  
-**Return type:** `unknown`  
-**Description:** Finds the longest train for an army; the selected train handle is stored in GetLongestTrain_unit and the function returns the engine count.  
-**Source:** `ai_functions.lgc`
-
-### GetMinutesByMSec
-
-**Signature:** `GetMinutesByMSec(int msec)`  
-**Return type:** `unknown`  
-**Description:** Returns the minute component of a millisecond duration after removing whole hours.  
-**Source:** `basefunctions.lgc`
-
-### GetRegDefaultPlayer
-
-**Signature:** `GetRegDefaultPlayer()`  
-**Return type:** `unknown`  
-**Description:** Reads the selected/default player index from the Locoland player registry settings.  
-**Source:** `basefunctions.lgc`
-
-### GetRegStateBar
-
-**Signature:** `GetRegStateBar()`  
-**Return type:** `unknown`  
-**Description:** Reads the saved state-bar preference for the currently selected player; returns a fallback when no player is selected.  
-**Source:** `basefunctions.lgc`
-
-### GetSecondsByMSec
-
-**Signature:** `GetSecondsByMSec(int msec)`  
-**Return type:** `unknown`  
-**Description:** Returns the seconds component of a millisecond duration after removing whole hours and minutes.  
-**Source:** `basefunctions.lgc`
-
-### IsTrainAtWeaponRadius
-
-**Signature:** `IsTrainAtWeaponRadius(int train)`  
-**Return type:** `unknown`  
-**Description:** Checks whether a train is inside the weapon range of enemy units and returns a TRADIUS_* state.  
-**Source:** `ai_functions.lgc`
-
-### IsTrainAtWeaponRadiusEx
-
-**Signature:** `IsTrainAtWeaponRadiusEx(int train)`  
-**Return type:** `unknown`  
-**Description:** Extended weapon-radius check using action-based weapon range values. Stores the last matching enemy unit in IsTrainAtWeaponRadiusEx_unit.  
-**Source:** `ai_functions.lgc`
-
-### LDepoCapture
-
-**Signature:** `LDepoCapture(int capture_x, int capture_y, int size_tocapture, int army_tocapture)`  
-**Return type:** `unknown`  
-**Description:** Capture-script helper for assigning a depot to the requested army; see the implementation for the exact capture checks.  
-**Source:** `Captures.lgc`
-
-### LMasterCapture
-
-**Signature:** `LMasterCapture(int capture_x, int capture_y, int size_tocapture, int army_tocapture)`  
-**Return type:** `unknown`  
-**Description:** Capture-script helper for assigning a master structure to the requested army.  
-**Source:** `Captures.lgc`
-
-### Meteorites
-
-**Signature:** `Meteorites()`  
-**Return type:** `unknown`  
-**Description:** Spawns and updates meteorite events when enabled by the environment logic.  
-**Source:** `environmenttact.lgc`
-
-### MoveTrain
-
-**Signature:** `MoveTrain(int train, int x, int y, int behave)`  
-**Return type:** `unknown`  
-**Description:** Sets a train's behavior and then issues a move order to the supplied world coordinates.  
-**Source:** `ai_functions.lgc`
-
-### MoveZ
-
-**Signature:** `MoveZ(int unit, int x, int y)`  
-**Return type:** `unknown`  
-**Description:** Issues a move action after adding terrain height and the configured rail height offset to the destination Z coordinate.  
-**Source:** `basefunctions.lgc`
-
-### Muxi
-
-**Signature:** `Muxi(int nvid, int count)`  
-**Return type:** `unknown`  
-**Description:** Maintains the flying insect unit population on a map by spawning units when the count falls below the configured target.  
-**Source:** `civil.lgc`
-
-### MyPatrolTrain
-
-**Signature:** `MyPatrolTrain(int train, int x, int y, int beh_patrol)`  
-**Return type:** `unknown`  
-**Description:** Queues a train to move to its current position and then to the supplied point using the selected behavior.  
-**Source:** `ai_functions.lgc`
-
-### NearTrain
-
-**Signature:** `NearTrain(int train, int NearTrain_army)`  
-**Return type:** `unknown`  
-**Description:** Finds the nearest engine belonging to army zero from the supplied train.  
-**Source:** `ai_functions.lgc`
-
-### NoArmyUnits
-
-**Signature:** `NoArmyUnits(int army)`  
-**Return type:** `unknown`  
-**Description:** Counts units for an army using the NVID lists defined by the game scripts.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeIn5Second
-
-**Signature:** `OneTimeIn5Second()`  
-**Return type:** `unknown`  
-**Description:** Returns one approximately once every five seconds.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInHalfSecond
-
-**Signature:** `OneTimeInHalfSecond()`  
-**Return type:** `unknown`  
-**Description:** Returns one approximately once every half-second, using the game timer.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInNSecond1
-
-**Signature:** `OneTimeInNSecond1(int N)`  
-**Return type:** `unknown`  
-**Description:** Returns one once per N seconds. This is one of three independent timer slots available in the helper library.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInNSecond2
-
-**Signature:** `OneTimeInNSecond2(int N)`  
-**Return type:** `unknown`  
-**Description:** Returns one once per N seconds using the second independent timer slot.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInNSecond3
-
-**Signature:** `OneTimeInNSecond3(int N)`  
-**Return type:** `unknown`  
-**Description:** Returns one once per N seconds using the third independent timer slot.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInQuarterSecond
-
-**Signature:** `OneTimeInQuarterSecond()`  
-**Return type:** `unknown`  
-**Description:** Returns one approximately once every quarter-second, using the game timer.  
-**Source:** `basefunctions.lgc`
-
-### OneTimeInSecond
-
-**Signature:** `OneTimeInSecond()`  
-**Return type:** `unknown`  
-**Description:** Returns one on the first call in a game tick after approximately one second has elapsed; repeated calls in that tick return the same result.  
-**Source:** `basefunctions.lgc`
-
-### PatrolEngineZ
-
-**Signature:** `PatrolEngineZ(int unit, int x, int y)`  
-**Return type:** `unknown`  
-**Description:** Orders a train to patrol at the supplied point with the configured rail height offset applied.  
-**Source:** `basefunctions.lgc`
-
-### PatrolTrain
-
-**Signature:** `PatrolTrain(int train, int x, int y, int beh_move, int beh_patrol)`  
-**Return type:** `unknown`  
-**Description:** Sets the patrol behavior and sends a train toward a patrol point.  
-**Source:** `ai_functions.lgc`
-
-### PrintObjectives
-
-**Signature:** `PrintObjectives()`  
-**Return type:** `unknown`  
-**Description:** Loads and displays the current level's objectives text when the LEVEL build symbol is enabled.  
-**Source:** `basefunctions.lgc`
-
-### PrintTextAtCenter
-
-**Signature:** `PrintTextAtCenter(int x, int y, int z, string s, int font)`  
-**Return type:** `unknown`  
-**Description:** Creates a text sprite centered around the supplied coordinates using the standard text dimensions.  
-**Source:** `basefunctions.lgc`
-
-### PrintTextAtCenter5x5
-
-**Signature:** `PrintTextAtCenter5x5(int x, int y, int z, string s, int font)`  
-**Return type:** `unknown`  
-**Description:** Creates a text sprite centered around the supplied coordinates using the compact 5x5-style text height.  
-**Source:** `basefunctions.lgc`
-
-### Quake
-
-**Signature:** `Quake(int time, int sound)`  
-**Return type:** `unknown`  
-**Description:** Starts or updates the earthquake effect using the environment script's timing constants.  
-**Source:** `environmenttact.lgc`
-
-### Rain
-
-**Signature:** `Rain()`  
-**Return type:** `unknown`  
-**Description:** Updates rain timing and state for the environment logic.  
-**Source:** `daynight.lgc`
-
-### RandomTrain
-
-**Signature:** `RandomTrain(int RandomTrain_army)`  
-**Return type:** `unknown`  
-**Description:** Returns a pseudo-random train from the selected army, with a fallback to the player's captured depot where applicable.  
-**Source:** `ai_functions.lgc`
-
-### ReinforcementInit
-
-**Signature:** `ReinforcementInit()`  
-**Return type:** `unknown`  
-**Description:** Initializes the reinforcement counters and state for player and AI armies.  
-**Source:** `reinforcement.lgc`
-
-### ResendCivilPatrolEngine
-
-**Signature:** `ResendCivilPatrolEngine()`  
-**Return type:** `unknown`  
-**Description:** Restarts or redirects a civilian patrol train after its previous route is completed.  
-**Source:** `civil.lgc`
-
-### SendCivilPatrolEngine
-
-**Signature:** `SendCivilPatrolEngine()`  
-**Return type:** `unknown`  
-**Description:** Sends a neutral/civilian patrol train using the helper's configured patrol path.  
-**Source:** `civil.lgc`
-
-### SetArmyGamma
-
-**Signature:** `SetArmyGamma()`  
-**Return type:** `unknown`  
-**Description:** Applies the palette gamma settings for all configured armies.  
-**Source:** `setarmygamma.lgc`
-
-### SetArmyVid
-
-**Signature:** `SetArmyVid(int nvid, int army)`  
-**Return type:** `unknown`  
-**Description:** Applies the configured VID-related values for the selected army.  
-**Source:** `daynight.lgc`
-
-### SetDayNightGamma
-
-**Signature:** `SetDayNightGamma()`  
-**Return type:** `unknown`  
-**Description:** Updates the game palette according to the current day/night state.  
-**Source:** `daynight.lgc`
-
-### SetPositionCenter
-
-**Signature:** `SetPositionCenter(int x, int y)`  
-**Return type:** `unknown`  
-**Description:** Moves the map viewport so the supplied point is centered where possible, clamping to map boundaries.  
-**Source:** `ai_functions.lgc`
-
-### SetRegStateBar
-
-**Signature:** `SetRegStateBar(int state)`  
-**Return type:** `unknown`  
-**Description:** Saves the state-bar preference for the currently selected player when a player index is available.  
-**Source:** `basefunctions.lgc`
-
-### SetWindEx
-
-**Signature:** `SetWindEx(int w_speed, int w_dir)`  
-**Return type:** `unknown`  
-**Description:** Sets wind using the extended environment-script parameters.  
-**Source:** `environmenttact.lgc`
-
-### SizeBetween
-
-**Signature:** `SizeBetween(int unit1, int unit2)`  
-**Return type:** `unknown`  
-**Description:** Returns the distance between two units using the first unit and the second unit's world coordinates.  
-**Source:** `ai_functions.lgc`
-
-### SizeToZ
-
-**Signature:** `SizeToZ(int unit, int x, int y)`  
-**Return type:** `unknown`  
-**Description:** Calculates the size/distance to a point after adding the unit's current Z coordinate and the configured rail height offset.  
-**Source:** `basefunctions.lgc`
-
-### StartRain
-
-**Signature:** `StartRain()`  
-**Return type:** `unknown`  
-**Description:** Starts the rain environment effect.  
-**Source:** `daynight.lgc`
-
-### StopRain
-
-**Signature:** `StopRain()`  
-**Return type:** `unknown`  
-**Description:** Stops the rain environment effect.  
-**Source:** `daynight.lgc`
-
-### Time1In100
-
-**Signature:** `Time1In100()`  
-**Return type:** `unknown`  
-**Description:** Returns one at a throttled cadence of roughly one call per 128 milliseconds.  
-**Source:** `basefunctions.lgc`
-
-### Time1In50
-
-**Signature:** `Time1In50()`  
-**Return type:** `unknown`  
-**Description:** Returns one at a throttled cadence of roughly one call per 64 milliseconds.  
-**Source:** `basefunctions.lgc`
-
-### Tornado
-
-**Signature:** `Tornado()`  
-**Return type:** `unknown`  
-**Description:** Creates and updates a tornado-like environmental unit.  
-**Source:** `civil.lgc`
-
-### TrainHasUnitVid
-
-**Signature:** `TrainHasUnitVid(int train, int type)`  
-**Return type:** `unknown`  
-**Description:** Checks whether a train contains an engine of the requested VID and stores the matching unit handle in TrainHasUnitVid_unit.  
-**Source:** `ai_functions.lgc`
-
-### TrainHasWoundedRepair
-
-**Signature:** `TrainHasWoundedRepair(int train)`  
-**Return type:** `unknown`  
-**Description:** Returns the handle of a repair unit in the train when its hit points are below 50 percent, or zero when none is found.  
-**Source:** `ai_functions.lgc`
-
-### TrainHasWoundedUnit
-
-**Signature:** `TrainHasWoundedUnit(int train)`  
-**Return type:** `unknown`  
-**Description:** Counts train engines whose remaining hit points are below 50 percent.  
-**Source:** `ai_functions.lgc`
-
-### UnitCountInTrain
-
-**Signature:** `UnitCountInTrain(int train)`  
-**Return type:** `unknown`  
-**Description:** Counts the engines in a train. Factory VID 102 is treated as having no train units.  
-**Source:** `ai_functions.lgc`
-
-### UnitInTrain
-
-**Signature:** `UnitInTrain(int unit, int train)`  
-**Return type:** `unknown`  
-**Description:** Checks whether a unit belongs to a train. The helper special-cases factory VID 102.  
-**Source:** `ai_functions.lgc`
-
-## Sprite iteration and lookup
-
-### FindNearestSprite
-
-**Signature:** `FindNearestSprite(int type, int x, int y, int radius)`  
-**Return type:** `int`  
-**Description:** Finds the nearest sprite matching a GETSPRITE_* filter within the given world-space radius. Returns zero when none is found.  
-**Source:** `export.lgc` · **ID:** `72`
-
-### FirstInBox
-
-**Signature:** `FirstInBox(int left, int top, int right, int bottom)`  
-**Return type:** `int`  
-**Description:** Starts iteration over map objects inside a world-coordinate rectangle. Pair with NextInBox().  
-**Source:** `export.lgc` · **ID:** `74`
-
-### FirstSprite
-
-**Signature:** `FirstSprite()`  
-**Return type:** `int`  
-**Description:** Starts a full-map sprite iteration. This can be very slow on busy maps; prefer FirstUnit() or FirstInBox() when possible.  
-**Source:** `export.lgc` · **ID:** `76`
-
-### FirstUnit
-
-**Signature:** `FirstUnit(int typeunit)`  
-**Return type:** `int`  
-**Description:** Starts iteration over units matching the supplied sprite-type mask. Pair with NextUnit().  
-**Source:** `export.lgc` · **ID:** `68`
-
-### GetSprite
-
-**Signature:** `GetSprite(int type, int x, int y)`  
-**Return type:** `int`  
-**Description:** Finds a sprite intersecting the supplied world coordinates and matching a GETSPRITE_* filter.  
-**Source:** `export.lgc` · **ID:** `70`
-
-### GetSpriteScr
-
-**Signature:** `GetSpriteScr(int type, int scr_x, int scr_y)`  
-**Return type:** `int`  
-**Description:** Finds a sprite intersecting screen coordinates and matching a GETSPRITE_* filter.  
-**Source:** `export.lgc` · **ID:** `71`
-
-### NextInBox
-
-**Signature:** `NextInBox()`  
-**Return type:** `int`  
-**Description:** Advances the rectangle iterator and returns the next matching object handle.  
-**Source:** `export.lgc` · **ID:** `75`
-
-### NextSprite
-
-**Signature:** `NextSprite()`  
-**Return type:** `int`  
-**Description:** Advances the full-map sprite iterator started by FirstSprite().  
-**Source:** `export.lgc` · **ID:** `77`
-
-### NextUnit
-
-**Signature:** `NextUnit()`  
-**Return type:** `int`  
-**Description:** Advances the active unit iterator and returns the next matching unit handle, or zero when iteration ends.  
-**Source:** `export.lgc` · **ID:** `69`
-
-## UI and input
-
-### GetInputState
-
-**Signature:** `GetInputState()`  
-**Return type:** `int`  
-**Description:** Returns the current input-state bit mask. See INPUT_* constants.  
-**Source:** `export.lgc` · **ID:** `115`
-
-### GetInputX
-
-**Signature:** `GetInputX()`  
-**Return type:** `int`  
-**Description:** Returns the mouse X coordinate in world/map coordinates.  
-**Source:** `export.lgc` · **ID:** `109`
-
-### GetInputY
-
-**Signature:** `GetInputY()`  
-**Return type:** `int`  
-**Description:** Returns the mouse Y coordinate in world/map coordinates.  
-**Source:** `export.lgc` · **ID:** `110`
-
-### GetKey
-
-**Signature:** `GetKey()`  
-**Return type:** `int`  
-**Description:** Returns the code of the currently pressed key. See the VK_* constants.  
-**Source:** `export.lgc` · **ID:** `111`
-
-### GetScrollType
-
-**Signature:** `GetScrollType()`  
-**Return type:** `int`  
-**Description:** Returns the active map scrolling mode.  
-**Source:** `export.lgc` · **ID:** `118`
-
-### MenuAction
-
-**Signature:** `MenuAction(int nvid, int ndir, int action, int var1 = 0, int var2 = 0, int var3 = 0)`  
-**Return type:** `void`  
-**Description:** Executes an action for menu items matching the supplied VID and direction. Direction 999999 matches any direction.  
-**Source:** `export.lgc` · **ID:** `106`
-
-### MenuCreate
-
-**Signature:** `MenuCreate(int nvid, int ndir, int x, int y, int z)`  
-**Return type:** `int`  
-**Description:** Creates a menu sprite at the supplied coordinates and returns its sprite handle.  
-**Source:** `export.lgc` · **ID:** `107`
-
-### MenuFind
-
-**Signature:** `MenuFind(int nvid, int ndir)`  
-**Return type:** `int`  
-**Description:** Finds a menu item by VID and direction. A direction of 999999 matches any direction.  
-**Source:** `export.lgc` · **ID:** `101`
-
-### MenuLClick
-
-**Signature:** `MenuLClick()`  
-**Return type:** `int`  
-**Description:** Reports whether the left mouse button was pressed over a menu item.  
-**Source:** `export.lgc` · **ID:** `108`
-
-### MenuLoad
-
-**Signature:** `MenuLoad(string filename)`  
-**Return type:** `void`  
-**Description:** Loads menu definitions from a file.  
-**Source:** `export.lgc` · **ID:** `102`
-
-### MenuNDirUnderCursor
-
-**Signature:** `MenuNDirUnderCursor()`  
-**Return type:** `int`  
-**Description:** Returns the direction value of the menu item currently under the cursor.  
-**Source:** `export.lgc` · **ID:** `105`
-
-### MenuNVidUnderCursor
-
-**Signature:** `MenuNVidUnderCursor()`  
-**Return type:** `int`  
-**Description:** Returns the VID of the menu item currently under the cursor.  
-**Source:** `export.lgc` · **ID:** `104`
-
-### MenuRClick
-
-**Signature:** `MenuRClick()`  
-**Return type:** `int`  
-**Description:** Reports whether the right mouse button was pressed over a menu item.  
-**Source:** `export.lgc` · **ID:** `127`
-
-### MenuRelease
-
-**Signature:** `MenuRelease()`  
-**Return type:** `void`  
-**Description:** Removes all currently loaded menu items.  
-**Source:** `export.lgc` · **ID:** `103`
-
-### ScreenX
-
-**Signature:** `ScreenX()`  
-**Return type:** `int`  
-**Description:** Returns the width of the game viewport in pixels.  
-**Source:** `export.lgc` · **ID:** `119`
-
-### ScreenY
-
-**Signature:** `ScreenY()`  
-**Return type:** `int`  
-**Description:** Returns the height of the game viewport in pixels.  
-**Source:** `export.lgc` · **ID:** `120`
-
-### SetCursor
-
-**Signature:** `SetCursor(int type)`  
-**Return type:** `void`  
-**Description:** Changes the game cursor. See CURSOR_* constants.  
-**Source:** `export.lgc` · **ID:** `113`
-
-### SetMouseClick
-
-**Signature:** `SetMouseClick(int firstOrsecond, int vk_button)`  
-**Return type:** `void`  
-**Description:** Assigns a virtual mouse button to the first or second game mouse input slot. Commonly used with INPUT_FIRST, INPUT_SECOND and VK_* constants.  
-**Source:** `export.lgc` · **ID:** `128`
-
-### SetPosition
-
-**Signature:** `SetPosition(int x, int y)`  
-**Return type:** `void`  
-**Description:** Moves the map viewport to the supplied world coordinates.  
-**Source:** `export.lgc` · **ID:** `116`
-
-### SetScrollType
-
-**Signature:** `SetScrollType(int type)`  
-**Return type:** `void`  
-**Description:** Sets the map scrolling mode using SCROLL_* flags.  
-**Source:** `export.lgc` · **ID:** `117`
-
-### SetSelectUnit
-
-**Signature:** `SetSelectUnit(int flag)`  
-**Return type:** `void`  
-**Description:** Enables or disables selecting units for direct control. Pass zero to disable selecting new units.  
-**Source:** `export.lgc` · **ID:** `121`
-
-### SetStateBar
-
-**Signature:** `SetStateBar(int flag)`  
-**Return type:** `void`  
-**Description:** Shows or hides the game's state bar.  
-**Source:** `export.lgc` · **ID:** `122`
-
-### ToScreenX
-
-**Signature:** `ToScreenX(int x)`  
-**Return type:** `unknown`  
-**Description:** Converts a world X coordinate to a screen X coordinate.  
-**Source:** `export.lgc` · **ID:** `125`
-
-### ToScreenY
-
-**Signature:** `ToScreenY(int y, int z = 0)`  
-**Return type:** `unknown`  
-**Description:** Converts world Y and optional Z coordinates to a screen Y coordinate.  
-**Source:** `export.lgc` · **ID:** `126`
-
-## Unit and action API
-
-### Action
-
-**Signature:** `Action(int unit, int act, int var1 = 0, int var2 = 0, int var3 = 0)`  
-**Return type:** `int`  
-**Description:** Executes an ACT_* operation on a unit. The meaning of var1, var2 and var3 depends on the selected action. Returns the action-specific result.  
-**Source:** `export.lgc` · **ID:** `79`
-
-### AddCommand
-
-**Signature:** `AddCommand(int unit, int act, int var1 = 0, int var2 = 0, int var3 = 0)`  
-**Return type:** `void`  
-**Description:** Appends an action to a unit's command queue. Arguments are interpreted according to the selected ACT_* operation.  
-**Source:** `export.lgc` · **ID:** `82`
-
-### DirectionTo
-
-**Signature:** `DirectionTo(int unit, int x, int y)`  
-**Return type:** `int`  
-**Description:** Returns the direction from a unit to a world-coordinate point.  
-**Source:** `export.lgc` · **ID:** `90`
-
-### GetAnimation
-
-**Signature:** `GetAnimation(int unit)`  
-**Return type:** `int`  
-**Description:** Returns the animation index currently played by the unit.  
-**Source:** `export.lgc` · **ID:** `89`
-
-### GetCommands
-
-**Signature:** `GetCommands(int unit)`  
-**Return type:** `string`  
-**Description:** Returns the serialized command string of a vehicle.  
-**Source:** `export.lgc` · **ID:** `96`
-
-### GetDirection
-
-**Signature:** `GetDirection(int unit)`  
-**Return type:** `int`  
-**Description:** Returns a unit's current direction index.  
-**Source:** `export.lgc` · **ID:** `88`
-
-### GetUnitVid
-
-**Signature:** `GetUnitVid(int unit)`  
-**Return type:** `int`  
-**Description:** Returns the game object VID associated with a sprite handle.  
-**Source:** `export.lgc` · **ID:** `83`
-
-### GetX
-
-**Signature:** `GetX(int unit)`  
-**Return type:** `int`  
-**Description:** Returns a unit's world X coordinate.  
-**Source:** `export.lgc` · **ID:** `85`
-
-### GetY
-
-**Signature:** `GetY(int unit)`  
-**Return type:** `int`  
-**Description:** Returns a unit's world Y coordinate.  
-**Source:** `export.lgc` · **ID:** `86`
-
-### GetZ
-
-**Signature:** `GetZ(int unit)`  
-**Return type:** `int`  
-**Description:** Returns a unit's world Z coordinate.  
-**Source:** `export.lgc` · **ID:** `87`
-
-### ReCalcGridZ
-
-**Signature:** `ReCalcGridZ(int unit)`  
-**Return type:** `void`  
-**Description:** Recalculates the unit's Z grid using its current dimensions.  
-**Source:** `export.lgc` · **ID:** `81`
-
-### SetCommands
-
-**Signature:** `SetCommands(int unit, string com)`  
-**Return type:** `void`  
-**Description:** Replaces a vehicle's command list from a serialized command string.  
-**Source:** `export.lgc` · **ID:** `97`
-
-### SizeTo
-
-**Signature:** `SizeTo(int unit, int x, int y)`  
-**Return type:** `int`  
-**Description:** Returns the distance from a unit to a world-coordinate point.  
-**Source:** `export.lgc` · **ID:** `80`

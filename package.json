@@ -3,7 +3,7 @@
 	"displayName": "Locoland Logic Script",
 	"description": "Language support, IntelliSense and static checks for Locoland .lgc logic scripts.",
 	"icon": "icon.png",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"publisher": "community",
 	"license": "MIT",
 	"repository": "https://github.com/paulevsGitch/LocolandLGC/tree/main/src",
@@ -88,7 +88,11 @@
 			"properties": {
 				"lgc.format.indentStyle": {
 					"type": "string",
-					"enum": ["editor", "spaces", "tabs"],
+					"enum": [
+						"editor",
+						"spaces",
+						"tabs"
+					],
 					"default": "editor",
 					"description": "Use the active editor indentation settings, spaces, or tab characters."
 				},
@@ -101,13 +105,20 @@
 				},
 				"lgc.format.braceStyle": {
 					"type": "string",
-					"enum": ["sameLine", "nextLine"],
+					"enum": [
+						"sameLine",
+						"nextLine"
+					],
 					"default": "sameLine",
 					"description": "Place opening braces on the same line as the declaration or control statement, or on the following line."
 				},
 				"lgc.format.spaceBeforeParens": {
 					"type": "string",
-					"enum": ["control", "always", "never"],
+					"enum": [
+						"control",
+						"always",
+						"never"
+					],
 					"default": "control",
 					"description": "Spacing before parentheses: only control keywords, every parenthesis, or none."
 				},
@@ -217,12 +228,16 @@
 				},
 				"lgc.analysis.strictUnknownFunctions": {
 					"type": "boolean",
-					"default": false,
-					"description": "Report function calls that are not found in the engine API, bundled helper catalog or workspace scripts."
+					"default": true,
+					"description": "Report function calls not found in the engine API, current file or scripts included before the call. Function names are case-sensitive."
 				},
 				"lgc.analysis.severity": {
 					"type": "string",
-					"enum": ["Error", "Warning", "Information"],
+					"enum": [
+						"Error",
+						"Warning",
+						"Information"
+					],
 					"default": "Warning",
 					"description": "Default severity used by static-analysis diagnostics."
 				},
@@ -232,12 +247,43 @@
 					"minimum": 50,
 					"maximum": 5000,
 					"description": "Maximum number of .lgc files indexed from the current workspace."
+				},
+				"lgc.analysis.checkFunctionDeclarationOrder": {
+					"type": "boolean",
+					"default": true,
+					"description": "Require user-defined functions to be declared before calls; declarations from preceding #include directives are visible."
+				},
+				"lgc.analysis.checkUnknownVariables": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report undeclared identifiers used as variable/value expressions, including function arguments."
+				},
+				"lgc.analysis.checkUnknownTypes": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report variable declarations that use unsupported or unknown types such as bool."
+				},
+				"lgc.analysis.checkRepeatedDeclarationTypes": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report repeated type names in comma-separated variable declarations; use int a, b;."
+				},
+				"lgc.analysis.checkStringAdditionTypes": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report string/integer addition and recommend itoa(value) for explicit integer-to-string conversion."
+				},
+				"lgc.analysis.checkDefineSyntax": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report '=' or ';' inside #define directives; use '#define NAME value'."
 				}
 			}
 		}
 	},
 	"scripts": {
-		"check": "node --check src/extension.js && node --check src/analyzer.js && node --check src/document-model.js && node --check src/document-cache.js && node --check src/workspace-index.js && node --check src/providers.js && node --check src/refactor.js && node --check src/lexer.js && node --check src/parser.js && node --check src/models.js && node --check src/formatter.js",
-		"test": "npm run check && node test/smoke.js && node test/refactor-smoke.js"
+		"check": "node --check src/extension.js && node --check src/analyzer.js && node --check src/document-model.js && node --check src/document-cache.js && node --check src/workspace-index.js && node --check src/providers.js && node --check src/refactor.js && node --check src/lexer.js && node --check src/parser.js && node --check src/models.js && node --check src/formatter.js && node --check src/header-symbols.js && node --check src/define-highlighting.js && node --check test/header-and-global-symbols-regression.js && node --check test/game-scripts.js && node --check test/catalogue-header-source-smoke.js",
+		"test": "npm run check && node test/smoke.js && node test/refactor-smoke.js && node test/semantic-0.1.6-smoke.js && node test/catalogue-0.1.6-smoke.js && node test/header-and-global-symbols-regression.js && node test/catalogue-header-source-smoke.js",
+		"test:game": "node test/game-scripts.js"
 	}
 }

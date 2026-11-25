@@ -1,5 +1,4 @@
 "use strict";
-
 const VSCODE = require("vscode");
 const FUNCTION_CATALOG = require("../data/functions.json");
 const CONSTANT_CATALOG = require("../data/constants.json");
@@ -19,15 +18,43 @@ const {
 } = require("./parser");
 const { formatLgcText } = require("./formatter");
 const { findVariableAt, variableReferenceTokens, renameVariableEdits, codeActionsForDiagnostics } = require("./refactor");
-
+const { collectDefinedNames, findDefinedIdentifierRanges } = require("./define-highlighting");
 let activeState;
 let workspaceFunctionEntriesForTests = new Map();
+let workspaceVariableEntriesForTests = new Map();
 
 /** Refreshes static-analysis diagnostics for every currently open LGC document. */
 function refreshOpenDiagnostics(state) {
 	for (const document of VSCODE.workspace.textDocuments) {
 		if (document.languageId === "lgc") updateDiagnostics(state, document);
 	}
+	refreshVisibleDefineHighlights(state);
+}
+
+/**
+ * Applies the standard blue, bold decoration to names known as #define or engine constants.
+ * @param {*} state Active extension state.
+ * @param {*} editor VS Code text editor.
+ */
+function updateDefineHighlights(state, editor) {
+	if (!state || !state.defineDecoration || !editor) return;
+	const document = editor.document;
+	if (document.languageId !== "lgc") {
+		editor.setDecorations(state.defineDecoration, []);
+		return;
+	}
+	const text = document.getText();
+	const names = collectDefinedNames(text, CONSTANT_CATALOG, state.workspaceIndex.workspaceConstants);
+	const ranges = findDefinedIdentifierRanges(tokenize(text), names).map(range =>
+		new VSCODE.Range(document.positionAt(range.start), document.positionAt(range.end))
+	);
+	editor.setDecorations(state.defineDecoration, ranges);
+}
+
+/** Refreshes define highlighting in all currently visible text editors. */
+function refreshVisibleDefineHighlights(state) {
+	if (!state) return;
+	for (const editor of VSCODE.window.visibleTextEditors) updateDefineHighlights(state, editor);
 }
 
 /** Runs semantic analysis and publishes diagnostics for one open LGC document. */
@@ -41,7 +68,8 @@ function updateDiagnostics(state, document) {
 		cachedDocument.functionsMap.get(),
 		cachedDocument.constantsMap.get(),
 		state.workspaceIndex.workspaceFunctionEntries,
-		FUNCTION_CATALOG
+		FUNCTION_CATALOG,
+		state.workspaceIndex.workspaceVariableEntries
 	);
 	state.diagnosticCollection.set(document.uri, diagnostics);
 }
@@ -58,10 +86,10 @@ function activate(context) {
 	const workspaceIndex = new WorkspaceIndex(VSCODE, FUNCTION_CATALOG, CONSTANT_CATALOG, parseForWorkspace);
 	const documentCache = new DocumentCacheStore(parseForWorkspace, workspaceIndex, VSCODE);
 	const diagnosticCollection = VSCODE.languages.createDiagnosticCollection("lgc");
+	const defineDecoration = VSCODE.window.createTextEditorDecorationType({ fontWeight: "bold", color: "#569CD6" });
 	const diagnosticTimers = new Map();
-
-	activeState = { workspaceIndex, documentCache, diagnosticCollection, diagnosticTimers };
-	context.subscriptions.push(diagnosticCollection);
+	activeState = { workspaceIndex, documentCache, diagnosticCollection, diagnosticTimers, defineDecoration };
+	context.subscriptions.push(diagnosticCollection, defineDecoration);
 	const selector = { language: "lgc", scheme: "file" };
 	context.subscriptions.push(
 		VSCODE.languages.registerDocumentFormattingEditProvider(selector, new FormattingProvider(VSCODE)),
@@ -77,10 +105,10 @@ function activate(context) {
 			{ providedCodeActionKinds: [VSCODE.CodeActionKind.QuickFix] }
 		)
 	);
-
 	context.subscriptions.push(VSCODE.workspace.onDidOpenTextDocument(document => {
 		if (document.languageId !== "lgc") return;
 		updateDiagnostics(activeState, document);
+		refreshVisibleDefineHighlights(activeState);
 		workspaceIndex.scheduleRefresh(() => refreshOpenDiagnostics(activeState));
 	}));
 	context.subscriptions.push(VSCODE.workspace.onDidChangeTextDocument(event => {
@@ -94,10 +122,14 @@ function activate(context) {
 			updateDiagnostics(activeState, document);
 		}, 200);
 		diagnosticTimers.set(key, timer);
+		for (const editor of VSCODE.window.visibleTextEditors) {
+			if (editor.document.uri.toString() === key) updateDefineHighlights(activeState, editor);
+		}
 	}));
 	context.subscriptions.push(VSCODE.workspace.onDidSaveTextDocument(document => {
 		if (document.languageId !== "lgc") return;
 		updateDiagnostics(activeState, document);
+		refreshVisibleDefineHighlights(activeState);
 		workspaceIndex.scheduleRefresh(() => refreshOpenDiagnostics(activeState));
 	}));
 	context.subscriptions.push(VSCODE.workspace.onDidCloseTextDocument(document => {
@@ -109,7 +141,9 @@ function activate(context) {
 		documentCache.delete(document.uri);
 		diagnosticCollection.delete(document.uri);
 	}));
-
+	context.subscriptions.push(VSCODE.window.onDidChangeActiveTextEditor(editor => {
+		if (editor) updateDefineHighlights(activeState, editor);
+	}));
 	const fileWatcher = VSCODE.workspace.createFileSystemWatcher("**/*.lgc");
 	context.subscriptions.push(
 		fileWatcher,
@@ -117,7 +151,6 @@ function activate(context) {
 		fileWatcher.onDidChange(() => workspaceIndex.scheduleRefresh(() => refreshOpenDiagnostics(activeState))),
 		fileWatcher.onDidDelete(() => workspaceIndex.scheduleRefresh(() => refreshOpenDiagnostics(activeState)))
 	);
-
 	context.subscriptions.push(VSCODE.commands.registerCommand("lgc.formatDocument", () => {
 		const editor = VSCODE.window.activeTextEditor;
 		if (!editor || editor.document.languageId !== "lgc") {
@@ -144,7 +177,6 @@ function activate(context) {
 		}
 		return VSCODE.commands.executeCommand("editor.action.rename");
 	}));
-
 	workspaceIndex.refresh().then(() => refreshOpenDiagnostics(activeState)).catch(() => undefined);
 	refreshOpenDiagnostics(activeState);
 }
@@ -163,23 +195,30 @@ function deactivate() {
 function parseSource(text, uri) {
 	return parseDocument(text, uri, value => value && value.fsPath ? value.fsPath : String(value), FUNCTION_CATALOG);
 }
+
 /** Test helper for creating the merged engine/workspace/current-document function map. */
 function makeFunctionMap(_document, parsed) {
 	const workspaceFunctions = activeState ? activeState.workspaceIndex.workspaceFunctions : new Map();
 	return createFunctionMap(parsed, FUNCTION_CATALOG, workspaceFunctions);
 }
+
 /** Test helper for creating the merged constant map. */
 function makeConstantMap(parsed) {
 	const workspaceConstants = activeState ? activeState.workspaceIndex.workspaceConstants : new Map();
 	return createConstantMap(parsed, CONSTANT_CATALOG, workspaceConstants);
 }
+
 /** Test adapter that runs diagnostics without requiring an activated VS Code extension host. */
 function analyzeForTests(document, parsed, functions, constants) {
 	const entries = activeState ? activeState.workspaceIndex.workspaceFunctionEntries : workspaceFunctionEntriesForTests;
-	return analyzeDocument(VSCODE, document, parsed, functions, constants, entries, FUNCTION_CATALOG);
+	const variableEntries = activeState ? activeState.workspaceIndex.workspaceVariableEntries : workspaceVariableEntriesForTests;
+	return analyzeDocument(VSCODE, document, parsed, functions, constants, entries, FUNCTION_CATALOG, variableEntries);
 }
-/** Injects a workspace declaration index for cross-file collision regression tests. */
+
+/** Injects workspace function declarations for regression tests. */
 function setWorkspaceFunctionEntriesForTests(entries) { workspaceFunctionEntriesForTests = entries || new Map(); }
+/** Injects workspace global declarations for regression tests. */
+function setWorkspaceVariableEntriesForTests(entries) { workspaceVariableEntriesForTests = entries || new Map(); }
 /** Test adapter for the non-constant-initializer Quick Fix provider. */
 function codeActionsForTests(document, context) {
 	return codeActionsForDiagnostics(VSCODE, document, context, (text, uri) => parseSource(text, uri));
@@ -207,6 +246,8 @@ module.exports = {
 		renameVariableEdits: (document, parsed, position, newName) => renameVariableEdits(VSCODE, document, parsed, position, newName),
 		codeActionsForDiagnostics: codeActionsForTests,
 		setWorkspaceFunctionEntriesForTests,
-		updateDiagnostics: document => updateDiagnostics(activeState, document)
+		setWorkspaceVariableEntriesForTests,
+		updateDiagnostics: document => updateDiagnostics(activeState, document),
+		updateDefineHighlights: editor => updateDefineHighlights(activeState, editor)
 	}
 };

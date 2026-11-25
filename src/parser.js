@@ -6,7 +6,6 @@ const {
 	LgcParameter, LgcFunction, SourcePosition, Scope, VariableDeclaration,
 	LgcConstant, ParsedSource, FunctionDeclarationResult, ParameterRange
 } = require("./models");
-
 /**
  * Splits a token range at commas that are not nested in calls, arrays or initializer lists.
  *
@@ -38,7 +37,6 @@ function splitTokenArguments(tokens, start, end) {
 	parts.push(tokens.slice(partStart, end));
 	return parts.filter(part => part.length > 0);
 }
-
 /**
  * Parses one parameter declaration, including its declared primitive type and default value.
  * Pointer/reference-like parameters deliberately use `unknown` because the supplied LGC
@@ -64,7 +62,6 @@ function parseParameter(tokens) {
 		default: eq >= 0 ? tokens.slice(eq + 1).map(token => token.value).join(" ") : null
 	});
 }
-
 /**
  * Tracks simple conditional-preprocessor guards surrounding a source offset.
  * Only a positive `#ifndef NAME` guard is retained; `#else` clears the active
@@ -90,7 +87,6 @@ function preprocessorGuardsAt(text, offset) {
 	}
 	return stack.filter(Boolean);
 }
-
 /**
  * Extracts external prototypes and braced function definitions from a token stream.
  * It records the function-name offsets separately so call analysis can distinguish
@@ -153,7 +149,6 @@ function parseFunctionDeclarations(tokens, text, uri, getRelativePath) {
 	}
 	return new FunctionDeclarationResult(functions, declarationPositions);
 }
-
 /**
  * Builds the root scope and nested lexical scopes from matched brace pairs.
  *
@@ -225,26 +220,43 @@ function resolveVariable(variables, name, offset) {
 }
 /**
  * Determines whether a primitive type token begins a variable declaration.
- * Function parameter ranges, preprocessor lines and expression contexts are excluded.
+ * Function parameter ranges and preprocessor lines are excluded. File-scope declarations
+ * are accepted even when a preceding `#define` contributes non-declaration tokens to the
+ * flat lexer stream; block-scope declarations retain the stricter statement-boundary rule.
  * `void` is a function return marker, not a variable type in the observed scripts.
  *
  * @param {import("./models").Token[]} tokens Token stream.
  * @param {number} index Candidate type-token index.
  * @param {string} text Original source text.
  * @param {import("./models").ParameterRange[]} parameterRanges Function parameter regions.
+ * @param {import("./models").Scope[]} [scopes] Lexical scopes used to detect file scope.
  * @returns {boolean} Whether the token begins a variable declaration.
  */
-function isDeclarationTypePosition(tokens, index, text, parameterRanges) {
+function isDeclarationTypePosition(tokens, index, text, parameterRanges, scopes, constants = new Map()) {
 	const token = tokens[index];
-	if (!token || token.type !== "identifier" || !TYPE_WORDS.has(token.value) || token.value === "void") return false;
+	if (!token || token.type !== "identifier") return false;
+	const aliasValue = constants && constants.get(token.value) ? String(constants.get(token.value).value || "").trim() : "";
+	const effectiveType = TYPE_WORDS.has(token.value) ? token.value : (["int", "string", "char"].includes(aliasValue) ? aliasValue : null);
+	if (!effectiveType || effectiveType === "void") return false;
 	if (parameterRanges.some(range => token.start >= range.start && token.start <= range.end)) return false;
 	const lineStart = text.lastIndexOf("\n", token.start - 1) + 1;
 	if (/^\s*#/.test(text.slice(lineStart, token.start))) return false;
 	let previous = index - 1;
 	const qualifiers = new Set(["static", "extern", "const", "volatile", "register", "auto"]);
-	while (previous >= 0 && qualifiers.has(tokens[previous].value)) previous--;
+	while (previous >= 0) {
+		const previousLineStart = text.lastIndexOf("\n", tokens[previous].start - 1) + 1;
+		const previousLinePrefix = text.slice(previousLineStart, tokens[previous].start);
+		const previousIsPreprocessor = /^\s*#/.test(previousLinePrefix);
+		if (previousIsPreprocessor || qualifiers.has(tokens[previous].value)) {
+			previous--;
+			continue;
+		}
+		break;
+	}
 	const boundary = previous < 0 ? null : tokens[previous].value;
-	if (boundary !== null && ![";", "{", "}", "(", ":", "else", "do"].includes(boundary)) return false;
+	const scope = scopes && scopes.length ? innermostScopeAt(scopes, token.start) : null;
+	const isFileScope = Boolean(scope && scope.depth === 0);
+	if (!isFileScope && boundary !== null && ![";", "{", "}", "(", ":", "else", "do"].includes(boundary)) return false;
 	let nameIndex = index + 1;
 	while (tokens[nameIndex] && ["*", "&"].includes(tokens[nameIndex].value)) nameIndex++;
 	if (!tokens[nameIndex] || tokens[nameIndex].type !== "identifier") return false;
@@ -271,7 +283,6 @@ function declarationEnd(tokens, start) {
 	}
 	return tokens.length;
 }
-
 /**
  * Parses one declarator from a comma-separated declaration.
  * Initializer tokens and precise offsets are retained for compile-time-constant diagnostics
@@ -337,7 +348,7 @@ function parseVariableDeclarator(part, type, scope, visibleFrom, declarationOffs
  * @param {import("./models").LgcFunction[]} functions Parsed functions and prototypes.
  * @returns {Map<string, import("./models").VariableDeclaration[]>} Declarations by name.
  */
-function parseVariables(tokens, text, functions) {
+function parseVariables(tokens, text, functions, constants = new Map()) {
 	const variables = new Map();
 	const scopes = buildLexicalScopes(tokens, text);
 	const parameterRanges = [];
@@ -359,8 +370,9 @@ function parseVariables(tokens, text, functions) {
 		}
 	}
 	for (let i = 0; i < tokens.length; i++) {
-		if (!isDeclarationTypePosition(tokens, i, text, parameterRanges)) continue;
-		const type = tokens[i].value;
+		if (!isDeclarationTypePosition(tokens, i, text, parameterRanges, scopes, constants)) continue;
+		const aliasValue = constants && constants.get(tokens[i].value) ? String(constants.get(tokens[i].value).value || "").trim() : "";
+		const type = TYPE_WORDS.has(tokens[i].value) ? tokens[i].value : aliasValue;
 		const nameIndex = i + 1;
 		const end = declarationEnd(tokens, nameIndex);
 		const parts = splitTokenArguments(tokens, nameIndex, end);
@@ -382,7 +394,10 @@ function parseVariables(tokens, text, functions) {
 			const declaration = parseVariableDeclarator(part, type, declarationScope, tokens[i].start, tokens[i].start, declarationInfo);
 			if (declaration) addVariable(variables, declaration.name, declaration);
 		}
-		i = Math.max(i, nameIndex - 1);
+		// All declarators and initializer tokens belong to this one declaration.
+		// Skip them as a unit so later operators (including chained `*` expressions)
+		// cannot be reconsidered as declaration candidates by the outer scan.
+		i = Math.max(i, end - 1);
 	}
 	return variables;
 }
@@ -421,14 +436,13 @@ function parseDefines(text) {
 function parseSyntax(text, uri, getRelativePath) {
 	const tokens = tokenize(text);
 	const parsedFunctions = parseFunctionDeclarations(tokens, text, uri, getRelativePath);
-	const variables = parseVariables(tokens, text, parsedFunctions.functions);
 	const constants = parseDefines(text);
+	const variables = parseVariables(tokens, text, parsedFunctions.functions, constants);
 	return new ParsedSource({
 		tokens, functions: parsedFunctions.functions, declarationPositions: parsedFunctions.declarationPositions,
 		variables, constants, text
 	});
 }
-
 module.exports = {
 	splitTokenArguments, parseParameter, preprocessorGuardsAt, parseFunctionDeclarations,
 	buildLexicalScopes, innermostScopeAt, addVariable, resolveVariable,

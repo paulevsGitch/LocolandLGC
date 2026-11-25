@@ -9,7 +9,7 @@ Language support for Locoland `.lgc` scripts.
 - Completion and hover data for commonly used helpers from the supplied script set (`basefunctions.lgc`, `ai_functions.lgc`, capture, environment, weather and reinforcement scripts).
 - Workspace indexing of `.lgc` files for user-defined functions and `#define` constants.
 - Signature help, navigation to workspace function declarations and workspace symbol search.
-- Static diagnostics for unmatched delimiters, known function arity, inferable `int`/`string`/`char` argument mismatches, assignments to explicitly typed variables, non-constant variable initializers, unsupported `int` declarations in `for` headers and likely missing statement semicolons.
+- Static diagnostics for unmatched delimiters, undeclared variables and unknown types, case-sensitive function names and declaration order, function arity and argument types, assignments to explicitly typed variables, non-constant variable initializers, unsupported `int` declarations in `for` headers, repeated type names in declarations, mixed string/integer addition and likely missing statement semicolons.
 - Function-name collision diagnostics for duplicate definitions, unsupported overloads and user functions that reuse engine API names. The checker recognizes `#ifndef FunctionName` fallback declarations used by the supplied script library.
 - Scope-aware variable renaming with **F2** and the editor context menu. Only references bound to the selected declaration are renamed, so same-named variables in nested blocks remain untouched.
 - Snippets for functions, control flow, unit iteration, train iteration and common `Action()` patterns.
@@ -81,7 +81,7 @@ Example configuration using Allman braces and tabs:
 
 ## Static analysis settings
 
-The following settings are available under **Locoland Logic Script**:
+The following settings are available under **Locoland Logic Script**. The test command also runs a catalogue contract audit over every bundled function and constant: it checks names, parameter and return types, values, signatures and non-empty hover descriptions. Constant types are inferred from their literal or macro values; expressions that cannot be safely resolved remain `unknown` rather than being guessed.
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
@@ -92,8 +92,13 @@ The following settings are available under **Locoland Logic Script**:
 | `lgc.analysis.checkConstantInitializers` | `true` | Report initializers that depend on runtime variables or function calls. Literal values, known `#define` values and constant array initializers are accepted. Unknown all-uppercase identifiers are treated as possible build-time defines. |
 | `lgc.analysis.checkForLoopIntDeclarations` | `true` | Report `for (int i = ...)`; declare `int i;` before the loop and assign `i` in the initializer. |
 | `lgc.analysis.checkSemicolons` | `true` | Report statement lines missing a terminating semicolon. Preprocessor directives and their backslash continuations are ignored. |
+| `lgc.analysis.checkFunctionDeclarationOrder` | `true` | Require a function to be declared before its call; earlier prototypes and `#include`d scripts count. |
+| `lgc.analysis.checkUnknownVariables` | `true` | Report undeclared variables/values, including unknown names in function arguments. |
+| `lgc.analysis.checkUnknownTypes` | `true` | Report unsupported variable types such as `bool`. |
+| `lgc.analysis.checkRepeatedDeclarationTypes` | `true` | Require `int a, b;` instead of `int a, int b;`. |
+| `lgc.analysis.checkStringAdditionTypes` | `true` | Require `itoa(number)` before adding an integer to a string. |
 | `lgc.analysis.checkFunctionNameCollisions` | `true` | Report duplicate definitions, overload attempts, collisions with engine API names and same-name declarations in other indexed workspace scripts. |
-| `lgc.analysis.strictUnknownFunctions` | `false` | Warn about calls not found in the bundled catalog or workspace scripts. |
+| `lgc.analysis.strictUnknownFunctions` | `true` | Report calls not found in the engine API, current file or scripts included before the call. Function names are case-sensitive. |
 | `lgc.analysis.severity` | `Warning` | Default severity for static-analysis findings. |
 | `lgc.analysis.maxWorkspaceFiles` | `500` | Maximum `.lgc` files indexed in a workspace. |
 
@@ -154,16 +159,16 @@ Place the cursor on a variable name and press **F2**, or choose **LGC: Rename Va
 
 ## API data and language assumptions
 
-`data/functions.json` contains 154 engine/compatibility API entries and 69 project helper entries. `data/constants.json` contains 471 constants collected from the supplied `export.lgc` and `obsolete.lgc`.
+`data/functions.json` contains 452 functions extracted from the native API and the complete transitive include tree rooted at `header.lgc`. `data/constants.json` contains 666 constants: the 471 original catalogue records plus object-like defines found throughout the standard header sources. The generated English references are available in [docs/FUNCTIONS.md](docs/FUNCTIONS.md) and [docs/CONSTANTS.md](docs/CONSTANTS.md).
 
-The engine declarations in `export.lgc` do not consistently spell out return types. Parameter types are taken from the declarations; script-function return types are inferred only when all observed return expressions have the same known type. Uncertain return types are intentionally marked as `unknown` so the checker does not invent certainty.
+File-scope declarations are recognized even when preceded by preprocessor definitions. All functions from source files in the transitive include closure of the standard `header.lgc` are globally visible based on the `source` metadata in `data/functions.json`; no individual names are special-cased. Other script-library helpers still require the corresponding preceding `#include`. The engine declarations in `export.lgc` do not consistently spell out return types. Parameter types are taken from the declarations; script-function return types are inferred only when all observed return expressions have the same known type. Uncertain return types are intentionally marked as `unknown` so the checker does not invent certainty.
 
-LGC resembles a small C-like language, but it is not treated as standard C. The checker is deliberately conservative: it checks only known signatures and expressions with inferable types. In particular, pointer-like expressions, engine-specific values and unresolved expressions are not assigned guessed types. Strict unknown-function checking is off by default because game scripts frequently depend on conditional includes and project-specific declarations.
+LGC resembles a small C-like language, but it is not treated as standard C. The checker is deliberately conservative: it checks only known signatures and expressions with inferable types. In particular, pointer-like expressions, engine-specific values and unresolved expressions are not assigned guessed types. Strict unknown-function checking is enabled by default and can be disabled with `lgc.analysis.strictUnknownFunctions` for projects that rely on custom dynamic includes.
 
 ## Data sources
 
 - The API catalogue and constants were extracted from the user-supplied script archive, primarily `export.lgc` and `obsolete.lgc`.
-- The helper catalogue was derived from the supplied scripts, especially `basefunctions.lgc`, `ai_functions.lgc`, `Captures.lgc`, `civil.lgc`, `daynight.lgc`, `environmenttact.lgc`, `reinforcement.lgc` and `setarmygamma.lgc`.
+- The standard function catalogue was extracted from all 27 sources in the transitive `header.lgc` include tree, including `menuend.lgc` (which defines `Win()`), AI event handlers and their fallback dependencies. The constants catalogue merges the supplied `constants.json` with object-like defines from those same sources.
 - Project context: [Dysprohol/OpenLocoland](https://github.com/Dysprohol/OpenLocoland), particularly its [developer documentation](https://github.com/Dysprohol/OpenLocoland/blob/main/DEVELOPERS.md). The repository describes how OpenLocoland documents and restores the original Locoland engine; it is not presented as an official language specification.
 
 ## Limitations
@@ -171,7 +176,7 @@ LGC resembles a small C-like language, but it is not treated as standard C. The 
 - There is no formal LGC grammar or compiler specification in the supplied materials. Syntax coverage is based on the supplied scripts and engine declarations.
 - The static checker is not a game runtime or full compiler. It recognizes common `#ifndef NAME` fallback function guards but does not fully evaluate arbitrary preprocessor branches.
 - `Action()` and `AddCommand()` argument semantics depend on the selected `ACT_*` opcode; the checker validates their declared integer parameter types but cannot validate every action-specific payload.
-- The bundled helper catalogue documents common functions, not every mission-specific callback or function used by every map. Workspace indexing discovers additional functions from `.lgc` files included in the opened workspace.
+- Functions outside the standard-header source tree remain workspace-specific. Workspace indexing discovers additional declarations from `.lgc` files in the opened project, while source-aware diagnostics prevent unrelated level folders from leaking symbols into each other.
 
 ## License
 
@@ -182,3 +187,50 @@ MIT. This extension is an independent fan-made development aid and is not affili
 This release follows the modular source layout used by the upstream [LocolandLGC repository](https://github.com/paulevsGitch/LocolandLGC): parsing and document modelling, static analysis, document caching, workspace indexing and language providers remain separate modules. The initializer diagnostics, safe Quick Fix, scope-aware variable rename and function-name collision checks are integrated into those modules rather than relying on the earlier monolithic extension implementation.
 
 Run `npm test` to perform JavaScript syntax checks and the regression smoke suite.
+
+
+### Names, declarations and expression types (0.1.6)
+
+LGC variable declarations have one type per declaration statement:
+
+```c
+int a, b;       // valid
+int a, int b;   // error: do not repeat the type after the comma
+```
+
+Only `int`, `string` and `char` are supported variable types. A declaration such as `bool enabled;` is diagnosed as an unknown variable type. Pointer-like declarations remain conservatively typed as `unknown` where the language sources do not establish a safe primitive type.
+
+Function names are case-sensitive. The API function is `Sin(time)`, not `sin(time)`. A user function is visible after its declaration in the current file, or after a preceding `#include` that makes its source available. A later definition does not retroactively make an earlier call valid; add a prototype before the call when needed.
+
+Identifiers used as values must resolve to a declared variable, parameter, known constant or `#define`. Unknown names in function arguments are errors. All-uppercase unresolved names remain exempt because game builds may provide conditional macros outside the editor workspace.
+
+LGC does not implicitly convert integers to strings during `+` concatenation. Use `itoa()` explicitly:
+
+```c
+string label;
+label = "Score: " + itoa(score);
+```
+
+The analyser reports mixed string/integer addition even when the destination variable is a string. Assignment and argument type mismatches are errors rather than warnings.
+
+
+## Standard header, macro styling and game-script validation
+
+Standard engine and library functions are recognised from `data/functions.json` by their `source` metadata. The source list in `data/always-available-sources.json` contains the complete transitive include closure of `header.lgc`; this includes engine exports, legacy API helpers and standard script libraries. Object-like aliases such as `GetVid -> GetVidData`, `SetVid -> SetVidData` and `sprintf -> Printf` are generated from `#define` directives in their declared source file, so they need no analyzer name-specific exception. Functions from other `.lgc` files still require a preceding `#include` or a declaration earlier in the same script.
+
+File-scope variables are indexed across the workspace with their declaring source path. This lets scripts resolve global arrays from standard header libraries without treating unrelated script globals as universally visible. Local variables and parameters continue to use lexical-scope-aware lookup.
+
+`#define` directives must follow `#define NAME value` syntax. The analyser reports `=` and `;` tokens inside directives; quoted string contents are ignored. Known `#define` names and catalogue constants are displayed in bold without overriding their syntax colour.
+
+Run the inline regression suite with `npm test`. To validate every standard level script in a game installation, run:
+
+```sh
+npm run test:game -- "C:\Games\Locoland"
+```
+
+The integration test scans `.lgc` files below folders `l01`–`l20` and prints the script name, line and diagnostic reason for every failure. It does not add game files or previous user-provided maps to the test fixtures.
+
+
+### Game-wide global variables
+
+The checker includes a small verified catalogue of game globals in `data/global-variables.json`. This covers variables declared by `header.lgc` (`time_game_total`, `nuke_time`, `end`, `we_are_win`) and the train-tactics globals used by level scripts (`ai_trains`, `ai_trains_task`, `ai_trains_task2`, `ai_trains_type`, `ai_trains_target`, `temp_array`, `stgbeh`). Their type and array metadata are used both for unknown-variable diagnostics and expression type inference.
