@@ -321,7 +321,7 @@ const collisionDiagnostics = analyzeDocument(collisionDocument, collisionParsed,
 const collisions = collisionDiagnostics.filter(item => item.code === "lgc.functionNameCollision");
 assert(collisions.some(item => item.message.includes("LocalName") && item.message.includes("overloading is unsupported")),
 	"overloaded functions must produce a collision diagnostic");
-assert(collisions.some(item => item.message.includes("AddCommand") && item.message.includes("engine already exports")),
+assert(collisions.some(item => item.message.includes("AddCommand") && item.message.includes("standard header already provides")),
 	"user functions must not replace names from the engine API");
 assert(collisions.some(item => item.message.includes("Duplicate") && item.message.includes("another definition")),
 	"duplicate definitions must produce a collision diagnostic");
@@ -345,16 +345,17 @@ const guardedDiagnostics = analyzeDocument(guardedDocument, guardedParsed,
 assert(!guardedDiagnostics.some(item => item.code === "lgc.functionNameCollision"),
 	"a same-name #ifndef fallback should not be reported as a duplicate definition");
 
+// Workspace declarations are visible for collision checks when the current script includes them.
 const workspaceCollisionUri = { toString: () => "file:///another-script.lgc" };
 const workspaceCollisionFunction = parseSource("void WorkspaceHelper() {}", workspaceCollisionUri).functions[0];
 setWorkspaceFunctionEntriesForTests(new Map([["WorkspaceHelper", [workspaceCollisionFunction]]]));
-const currentCollisionSource = "void WorkspaceHelper() {}";
+const currentCollisionSource = '#include "another-script.lgc"\nvoid WorkspaceHelper() {}';
 const currentCollisionDocument = makeDocumentForText(currentCollisionSource);
 const currentCollisionParsed = parseSource(currentCollisionSource, uri);
 const workspaceCollisionDiagnostics = analyzeDocument(currentCollisionDocument, currentCollisionParsed,
 	makeFunctionMap(currentCollisionDocument, currentCollisionParsed), makeConstantMap(currentCollisionParsed));
 assert(workspaceCollisionDiagnostics.some(item => item.code === "lgc.functionNameCollision" &&
-	item.message.includes("another script already declares")),
+	item.message.includes("another included script already declares")),
 	"a function name already used by another workspace script must be reported");
 setWorkspaceFunctionEntriesForTests(new Map());
 
