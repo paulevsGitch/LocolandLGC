@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.7 - Syntax validation, catalogue documentation and maintenance
+
+- Diagnose commas used instead of semicolons between top-level `for` header clauses.
+- Diagnose duplicate variable declarations within the same lexical scope and duplicate `#define` names within the same preprocessor branch, while preserving nested shadowing and mutually exclusive preprocessor alternatives.
+- Diagnose repeated assignment operators such as `dx = = expression`; equality comparisons remain valid.
+- Raise missing required function-argument diagnostics to Error severity while preserving optional-parameter behavior.
+- Add independent syntax-check settings and include the new syntax regression suite in `npm test` and `npm run check`.
+- Expand English API, constant and global-variable descriptions using developer comments and implementation details from the supplied complete game-script archive.
+- Record explicit types in every bundled constant and add generated Markdown references for functions, constants and standard global variables.
+- Add typed JSDoc contracts for module imports, shared state, semantic catalogue records, model properties and source-module functions.
+- Consolidate repeated syntax-analysis responsibilities under the syntax-check module and keep the existing source/module boundaries.
+
 ## 0.1.6 - Semantic analysis improvements and file-scope hotfix
 
 - Diagnose repeated type names in comma-separated declarations (`int a, int b;`).

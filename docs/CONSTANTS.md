@@ -1,783 +1,783 @@
 # LGC Constants Reference
 
-Complete object-like constant catalogue extracted from the standard `header.lgc` include tree and `constants.json`.
+Object-like constants and standard preprocessor aliases available through the supplied game header sources.
 
-**Entries:** 666. All source paths refer to the original script files.
+**Entries:** 666. Every entry includes an explicit primitive or macro type, replacement value, source file and English description. `function` identifies a function-like compatibility alias.
 
 ## `ai_default_event.lgc`
 
 7 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `F505_MARGIN` | `150` | Standard-header constant `F505_MARGIN` defined in `ai_default_event.lgc`. Value: 150. |
-| `F505_TIME_BETWEEN` | `10` | Standard-header constant `F505_TIME_BETWEEN` defined in `ai_default_event.lgc`. Value: 10. |
-| `F505_TIME_OPEN` | `1000` | Standard-header constant `F505_TIME_OPEN` defined in `ai_default_event.lgc`. Value: 1000. |
-| `F505_TOP_Z` | `40` | Standard-header constant `F505_TOP_Z` defined in `ai_default_event.lgc`. Value: 40. |
-| `FORTS_CAPTURE_RANGE` | `75` | Standard-header constant `FORTS_CAPTURE_RANGE` defined in `ai_default_event.lgc`. Value: 75. |
-| `TOWERS_FORT_DISTANCE` | `150` | Standard-header constant `TOWERS_FORT_DISTANCE` defined in `ai_default_event.lgc`. Value: 150. |
-| `TYKVA_COUNT` | `20` | Standard-header constant `TYKVA_COUNT` defined in `ai_default_event.lgc`. Value: 20. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `F505_MARGIN` | `int` | `150` | Margin used by the F505 bear-generator event logic. |
+| `F505_TIME_BETWEEN` | `int` | `10` | Delay between F505 bear-generator activations. |
+| `F505_TIME_OPEN` | `int` | `1000` | Open/active duration used by the F505 bear-generator sequence. |
+| `F505_TOP_Z` | `int` | `40` | Upper Z coordinate used by the F505 bear-generator sequence. |
+| `FORTS_CAPTURE_RANGE` | `int` | `75` | Capture range used by the standard fort-capture logic. |
+| `TOWERS_FORT_DISTANCE` | `int` | `150` | Distance within which towers are checked around forts and factories. |
+| `TYKVA_COUNT` | `int` | `20` | Number of pumpkins used by the corresponding standard event script. |
 
 ## `ai_events.lgc`
 
 2 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `AI_DEFINE` | `1` | Standard-header constant `AI_DEFINE` defined in `ai_events.lgc`. Value: 1. |
-| `AI_L03_LGC` | `1` | Standard-header constant `AI_L03_LGC` defined in `ai_events.lgc`. Value: 1. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `AI_DEFINE` | `int` | `1` | Include guard for the standard AI event definitions. |
+| `AI_L03_LGC` | `int` | `1` | Build/level preprocessor flag for the level-03 AI event source. |
 
 ## `ai_functions.lgc`
 
 16 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `AI_FUNCTIONS_LGC` | `1` | Standard-header constant `AI_FUNCTIONS_LGC` defined in `ai_functions.lgc`. Value: 1. |
-| `COVER_BATTLE_RANGE` | `0` | Standard-header constant `COVER_BATTLE_RANGE` defined in `ai_functions.lgc`. Value: 0. |
-| `TRADIUS_ALLINRADIUS` | `2` | Standard-header constant `TRADIUS_ALLINRADIUS` defined in `ai_functions.lgc`. Value: 2. |
-| `TRADIUS_BATTLERADIUS` | `9` | Standard-header constant `TRADIUS_BATTLERADIUS` defined in `ai_functions.lgc`. Value: 9. |
-| `TRADIUS_INRADIUS` | `1` | Standard-header constant `TRADIUS_INRADIUS` defined in `ai_functions.lgc`. Value: 1. |
-| `TRADIUS_NOTINRADIUS` | `0` | Standard-header constant `TRADIUS_NOTINRADIUS` defined in `ai_functions.lgc`. Value: 0. |
-| `TRAINBEHAVE_HAUNT` | `4` | Standard-header constant `TRAINBEHAVE_HAUNT` defined in `ai_functions.lgc`. Value: 4. |
-| `TRAINBEHAVE_HAUNT_BIGFIRE` | `5` | Standard-header constant `TRAINBEHAVE_HAUNT_BIGFIRE` defined in `ai_functions.lgc`. Value: 5. |
-| `TRAINBEHAVE_WITH_BIGFIRE` | `3` | Standard-header constant `TRAINBEHAVE_WITH_BIGFIRE` defined in `ai_functions.lgc`. Value: 3. |
-| `TRAINBEHAVE_WITH_FIRE` | `2` | Standard-header constant `TRAINBEHAVE_WITH_FIRE` defined in `ai_functions.lgc`. Value: 2. |
-| `TRAINBEHAVE_WITHOUT_FIRE` | `1` | Standard-header constant `TRAINBEHAVE_WITHOUT_FIRE` defined in `ai_functions.lgc`. Value: 1. |
-| `VID_ENGINE_ANTIAIR` | `(-1)` | Standard-header constant `VID_ENGINE_ANTIAIR` defined in `ai_functions.lgc`. Value: (-1). |
-| `VID_ENGINE_FARWEAPON` | `(-3)` | Standard-header constant `VID_ENGINE_FARWEAPON` defined in `ai_functions.lgc`. Value: (-3). |
-| `VID_ENGINE_NEARWEAPON` | `(-2)` | Standard-header constant `VID_ENGINE_NEARWEAPON` defined in `ai_functions.lgc`. Value: (-2). |
-| `VID_ENGINE_OTHER` | `(-5)` | Standard-header constant `VID_ENGINE_OTHER` defined in `ai_functions.lgc`. Value: (-5). |
-| `VID_ENGINE_STEAM` | `(-4)` | Standard-header constant `VID_ENGINE_STEAM` defined in `ai_functions.lgc`. Value: (-4). |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `AI_FUNCTIONS_LGC` | `int` | `1` | Include guard indicating that the standard AI helper functions are loaded. |
+| `COVER_BATTLE_RANGE` | `int` | `0` | Default battle-range threshold used by AI train tactics. |
+| `TRADIUS_ALLINRADIUS` | `int` | `2` | Train radius-selection mode that includes all targets in the radius. |
+| `TRADIUS_BATTLERADIUS` | `int` | `9` | Train radius-selection mode using the battle radius. |
+| `TRADIUS_INRADIUS` | `int` | `1` | Train radius-selection mode for targets inside the radius. |
+| `TRADIUS_NOTINRADIUS` | `int` | `0` | Train radius-selection mode for targets outside the radius. |
+| `TRAINBEHAVE_HAUNT` | `int` | `4` | Train behaviour mode that pursues an enemy when one is encountered. |
+| `TRAINBEHAVE_HAUNT_BIGFIRE` | `int` | `5` | Pursuit behaviour with super-weapon firing enabled. |
+| `TRAINBEHAVE_WITH_BIGFIRE` | `int` | `3` | Train behaviour mode that allows firing even with super weapons. |
+| `TRAINBEHAVE_WITH_FIRE` | `int` | `2` | Train behaviour mode that allows firing. |
+| `TRAINBEHAVE_WITHOUT_FIRE` | `int` | `1` | Train behaviour mode that avoids firing. |
+| `VID_ENGINE_ANTIAIR` | `int` | `(-1)` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_ENGINE_FARWEAPON` | `int` | `(-3)` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_ENGINE_NEARWEAPON` | `int` | `(-2)` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_ENGINE_OTHER` | `int` | `(-5)` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_ENGINE_STEAM` | `int` | `(-4)` | VID property selector used with `GetVidData()` and `SetVidData()`. |
 
 ## `basefunctions.lgc`
 
 2 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `MUXI_MARGIN` | `(-30)` | Standard-header constant `MUXI_MARGIN` defined in `basefunctions.lgc`. Value: (-30). |
-| `RAIL_Z` | `0` | Standard-header constant `RAIL_Z` defined in `basefunctions.lgc`. Value: 0. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `MUXI_MARGIN` | `int` | `(-30)` | Vertical margin used by the fly-spawning logic. |
+| `RAIL_Z` | `int` | `0` | Z coordinate assigned to railway-related elements. |
 
 ## `civil.lgc`
 
 5 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `CIVIL_TRAIN_RANDOM` | `0` | Standard-header constant `CIVIL_TRAIN_RANDOM` defined in `civil.lgc`. Value: 0. |
-| `CIVIL_TRAIN_REBIRTH` | `0` | Standard-header constant `CIVIL_TRAIN_REBIRTH` defined in `civil.lgc`. Value: 0. |
-| `CIVILPATROLTIME_BUILD` | `20000` | Standard-header constant `CIVILPATROLTIME_BUILD` defined in `civil.lgc`. Value: 20000. |
-| `CIVILPATROLTIME_STOP` | `5000` | Standard-header constant `CIVILPATROLTIME_STOP` defined in `civil.lgc`. Value: 5000. |
-| `TORNADO_TIME` | `120000` | Standard-header constant `TORNADO_TIME` defined in `civil.lgc`. Value: 120000. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `CIVIL_TRAIN_RANDOM` | `int` | `0` | Mode flag used by the civilian-train selection logic for random behaviour. |
+| `CIVIL_TRAIN_REBIRTH` | `int` | `0` | Mode flag controlling civilian-train respawn behaviour. |
+| `CIVILPATROLTIME_BUILD` | `int` | `20000` | Civilian patrol timing constant used while a patrol train is being built. |
+| `CIVILPATROLTIME_STOP` | `int` | `5000` | Civilian patrol timing constant used while a patrol train is stopped. |
+| `TORNADO_TIME` | `int` | `120000` | Duration or interval setting used by the tornado effect. |
 
 ## `constants.lgc`
 
 36 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `DIFF_EASY` | `1` | Standard-header constant `DIFF_EASY` defined in `constants.lgc`. Value: 1. |
-| `DIFF_EASY_ARMY0` | `200` | Standard-header constant `DIFF_EASY_ARMY0` defined in `constants.lgc`. Value: 200. |
-| `DIFF_EASY_ARMY1` | `100` | Standard-header constant `DIFF_EASY_ARMY1` defined in `constants.lgc`. Value: 100. |
-| `DIFF_HARD` | `3` | Standard-header constant `DIFF_HARD` defined in `constants.lgc`. Value: 3. |
-| `DIFF_HARD_ARMY0` | `100` | Standard-header constant `DIFF_HARD_ARMY0` defined in `constants.lgc`. Value: 100. |
-| `DIFF_HARD_ARMY1` | `100` | Standard-header constant `DIFF_HARD_ARMY1` defined in `constants.lgc`. Value: 100. |
-| `DIFF_NORMAL` | `2` | Standard-header constant `DIFF_NORMAL` defined in `constants.lgc`. Value: 2. |
-| `DIFF_NORMAL_ARMY0` | `150` | Standard-header constant `DIFF_NORMAL_ARMY0` defined in `constants.lgc`. Value: 150. |
-| `DIFF_NORMAL_ARMY1` | `100` | Standard-header constant `DIFF_NORMAL_ARMY1` defined in `constants.lgc`. Value: 100. |
-| `FACTORY_MONEY` | `3` | Standard-header constant `FACTORY_MONEY` defined in `constants.lgc`. Value: 3. |
-| `GAMMA_END1` | `0x0039E239` | Standard-header constant `GAMMA_END1` defined in `constants.lgc`. Value: 0x0039E239. |
-| `GAMMA_END2` | `0x00CB7F7F` | Standard-header constant `GAMMA_END2` defined in `constants.lgc`. Value: 0x00CB7F7F. |
-| `KEY_BUILD_MODE` | `'B'` | Standard-header constant `KEY_BUILD_MODE` defined in `constants.lgc`. Value: 'B'. |
-| `KEY_CHANGE_ARMY` | `'A'` | Standard-header constant `KEY_CHANGE_ARMY` defined in `constants.lgc`. Value: 'A'. |
-| `KEY_CREATE_BIG_TRAIN` | `'#'` | Standard-header constant `KEY_CREATE_BIG_TRAIN` defined in `constants.lgc`. Value: '#'. |
-| `KEY_EXPLOSION` | `'x'` | Standard-header constant `KEY_EXPLOSION` defined in `constants.lgc`. Value: 'x'. |
-| `KEY_KILLEM_ALL` | `'K'` | Standard-header constant `KEY_KILLEM_ALL` defined in `constants.lgc`. Value: 'K'. |
-| `KEY_MAP_EXIT` | `27` | Standard-header constant `KEY_MAP_EXIT` defined in `constants.lgc`. Value: 27. |
-| `KEY_OBJECTIVES` | `79` | Standard-header constant `KEY_OBJECTIVES` defined in `constants.lgc`. Value: 79. |
-| `KEY_REPAIR` | `'h'` | Standard-header constant `KEY_REPAIR` defined in `constants.lgc`. Value: 'h'. |
-| `KEY_SET_MONEY` | `'M'` | Standard-header constant `KEY_SET_MONEY` defined in `constants.lgc`. Value: 'M'. |
-| `KEY_SHOW_AIDEBUG` | `'D'` | Standard-header constant `KEY_SHOW_AIDEBUG` defined in `constants.lgc`. Value: 'D'. |
-| `KEY_STATEBAR` | `9` | Standard-header constant `KEY_STATEBAR` defined in `constants.lgc`. Value: 9. |
-| `KEY_TRAIN_DELETE` | `4` | Standard-header constant `KEY_TRAIN_DELETE` defined in `constants.lgc`. Value: 4. |
-| `KEY_UNIT_DELETE` | `'d'` | Standard-header constant `KEY_UNIT_DELETE` defined in `constants.lgc`. Value: 'd'. |
-| `KEY_VICTORY` | `'W'` | Standard-header constant `KEY_VICTORY` defined in `constants.lgc`. Value: 'W'. |
-| `MENU_DISABLE` | `0` | Standard-header constant `MENU_DISABLE` defined in `constants.lgc`. Value: 0. |
-| `MENU_LOADING` | `1` | Standard-header constant `MENU_LOADING` defined in `constants.lgc`. Value: 1. |
-| `MENU_LOADING_F1` | `4` | Standard-header constant `MENU_LOADING_F1` defined in `constants.lgc`. Value: 4. |
-| `MENU_OPTIONS_SHIFT_X` | `(-18)` | Standard-header constant `MENU_OPTIONS_SHIFT_X` defined in `constants.lgc`. Value: (-18). |
-| `MENU_OPTIONS_SHIFT_Y` | `(-10)` | Standard-header constant `MENU_OPTIONS_SHIFT_Y` defined in `constants.lgc`. Value: (-10). |
-| `MENU_UNLOADING` | `3` | Standard-header constant `MENU_UNLOADING` defined in `constants.lgc`. Value: 3. |
-| `MENU_WORKING` | `2` | Standard-header constant `MENU_WORKING` defined in `constants.lgc`. Value: 2. |
-| `NUKE_END` | `0x006000` | Standard-header constant `NUKE_END` defined in `constants.lgc`. Value: 0x006000. |
-| `REBUILD_ADDON` | `0` | Standard-header constant `REBUILD_ADDON` defined in `constants.lgc`. Value: 0. |
-| `RENEW_TIMEOUT` | `0` | Standard-header constant `RENEW_TIMEOUT` defined in `constants.lgc`. Value: 0. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `DIFF_EASY` | `int` | `1` | Easy game difficulty level. |
+| `DIFF_EASY_ARMY0` | `int` | `200` | Starting unit allowance for the player army on Easy difficulty. |
+| `DIFF_EASY_ARMY1` | `int` | `100` | Starting unit allowance for the enemy army on Easy difficulty. |
+| `DIFF_HARD` | `int` | `3` | Hard game difficulty level. |
+| `DIFF_HARD_ARMY0` | `int` | `100` | Starting unit allowance for the player army on Hard difficulty. |
+| `DIFF_HARD_ARMY1` | `int` | `100` | Starting unit allowance for the enemy army on Hard difficulty. |
+| `DIFF_NORMAL` | `int` | `2` | Normal game difficulty level. |
+| `DIFF_NORMAL_ARMY0` | `int` | `150` | Starting unit allowance for the player army on Normal difficulty. |
+| `DIFF_NORMAL_ARMY1` | `int` | `100` | Starting unit allowance for the enemy army on Normal difficulty. |
+| `FACTORY_MONEY` | `int` | `3` | Factory production money multiplier used by the standard scripts. |
+| `GAMMA_END1` | `int` | `0x0039E239` | Gamma/colour value used by the first end-screen transition. |
+| `GAMMA_END2` | `int` | `0x00CB7F7F` | Gamma/colour value used by the second end-screen transition. |
+| `KEY_BUILD_MODE` | `char` | `'B'` | Developer cheat key for entering build mode. |
+| `KEY_CHANGE_ARMY` | `char` | `'A'` | Developer cheat key for changing the active army. |
+| `KEY_CREATE_BIG_TRAIN` | `char` | `'#'` | Developer cheat key for creating a large train. |
+| `KEY_EXPLOSION` | `char` | `'x'` | Developer cheat key for triggering an explosion. |
+| `KEY_KILLEM_ALL` | `char` | `'K'` | Developer cheat key for removing all units belonging to army 1. |
+| `KEY_MAP_EXIT` | `int` | `27` | Virtual-key code for leaving the current map and returning to the menu (Escape). |
+| `KEY_OBJECTIVES` | `int` | `79` | Virtual-key code used to open the objectives panel (O). |
+| `KEY_REPAIR` | `char` | `'h'` | Developer cheat key for repairing a unit. |
+| `KEY_SET_MONEY` | `char` | `'M'` | Developer cheat key for granting money. |
+| `KEY_SHOW_AIDEBUG` | `char` | `'D'` | Developer cheat key for displaying AI debug information. |
+| `KEY_STATEBAR` | `int` | `9` | Virtual-key code used to toggle the state bar (Tab). |
+| `KEY_TRAIN_DELETE` | `int` | `4` | Virtual-key code for deleting a train; the source comment identifies Ctrl+D. |
+| `KEY_UNIT_DELETE` | `char` | `'d'` | Virtual-key code for the unit-delete command. |
+| `KEY_VICTORY` | `char` | `'W'` | Developer cheat key for forcing a victory state. |
+| `MENU_DISABLE` | `int` | `0` | Menu state indicating that the menu is disabled. |
+| `MENU_LOADING` | `int` | `1` | Menu state used while a menu or screen is loading. |
+| `MENU_LOADING_F1` | `int` | `4` | Menu state used by the F1 loading/help screen. |
+| `MENU_OPTIONS_SHIFT_X` | `int` | `(-18)` | Menu-state or menu-layout constant used by standard menu scripts. |
+| `MENU_OPTIONS_SHIFT_Y` | `int` | `(-10)` | Menu-state or menu-layout constant used by standard menu scripts. |
+| `MENU_UNLOADING` | `int` | `3` | Menu state used while a menu or screen is unloading. |
+| `MENU_WORKING` | `int` | `2` | Menu state used while the main menu is active. |
+| `NUKE_END` | `int` | `0x006000` | Final gamma/colour value used by the nuclear effect. |
+| `REBUILD_ADDON` | `int` | `0` | Train-rebuild option flag used by the standard train-tactics scripts. |
+| `RENEW_TIMEOUT` | `int` | `0` | Timeout used by the standard renewal/rebuild logic. |
 
 ## `daynight.lgc`
 
 22 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `ENV_SOUND_FREQ` | `30` | Standard-header constant `ENV_SOUND_FREQ` defined in `daynight.lgc`. Value: 30. |
-| `GAMMA1` | `0x00000000` | Standard-header constant `GAMMA1` defined in `daynight.lgc`. Value: 0x00000000. |
-| `GAMMA2` | `0x00272727` | Standard-header constant `GAMMA2` defined in `daynight.lgc`. Value: 0x00272727. |
-| `GAMMA3` | `0x00505050` | Standard-header constant `GAMMA3` defined in `daynight.lgc`. Value: 0x00505050. |
-| `GAMMA4` | `0x00272727` | Standard-header constant `GAMMA4` defined in `daynight.lgc`. Value: 0x00272727. |
-| `NUKE` | `1` | Standard-header constant `NUKE` defined in `daynight.lgc`. Value: 1. |
-| `NUKE_GAMMA` | `0x6633aa` | Standard-header constant `NUKE_GAMMA` defined in `daynight.lgc`. Value: 0x6633aa. |
-| `NUKE_TIME` | `10` | Standard-header constant `NUKE_TIME` defined in `daynight.lgc`. Value: 10. |
-| `RAIN` | `0` | Standard-header constant `RAIN` defined in `daynight.lgc`. Value: 0. |
-| `RAIN_GAMMA1` | `0x00101010` | Standard-header constant `RAIN_GAMMA1` defined in `daynight.lgc`. Value: 0x00101010. |
-| `RAIN_GAMMA2` | `0x00373737` | Standard-header constant `RAIN_GAMMA2` defined in `daynight.lgc`. Value: 0x00373737. |
-| `RAIN_GAMMA3` | `0x00707070` | Standard-header constant `RAIN_GAMMA3` defined in `daynight.lgc`. Value: 0x00707070. |
-| `RAIN_GAMMA4` | `0x00373737` | Standard-header constant `RAIN_GAMMA4` defined in `daynight.lgc`. Value: 0x00373737. |
-| `RAIN_GAMMA_TIME` | `2000` | Standard-header constant `RAIN_GAMMA_TIME` defined in `daynight.lgc`. Value: 2000. |
-| `RAIN_TYPE` | `0` | Standard-header constant `RAIN_TYPE` defined in `daynight.lgc`. Value: 0. |
-| `START_DAYNIGHT` | `1` | Standard-header constant `START_DAYNIGHT` defined in `daynight.lgc`. Value: 1. |
-| `SVERCHOK` | `0` | Standard-header constant `SVERCHOK` defined in `daynight.lgc`. Value: 0. |
-| `TIME1` | `300000` | Standard-header constant `TIME1` defined in `daynight.lgc`. Value: 300000. |
-| `TIME2` | `300000` | Standard-header constant `TIME2` defined in `daynight.lgc`. Value: 300000. |
-| `TIME3` | `300000` | Standard-header constant `TIME3` defined in `daynight.lgc`. Value: 300000. |
-| `TIME4` | `300000` | Standard-header constant `TIME4` defined in `daynight.lgc`. Value: 300000. |
-| `TIME_CHANGE` | `30000` | Standard-header constant `TIME_CHANGE` defined in `daynight.lgc`. Value: 30000. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `ENV_SOUND_FREQ` | `int` | `30` | Sound-effect frequency setting used by the day/night environment script. |
+| `GAMMA1` | `int` | `0x00000000` | Gamma preset for the first day/night phase. |
+| `GAMMA2` | `int` | `0x00272727` | Gamma preset for the second day/night phase. |
+| `GAMMA3` | `int` | `0x00505050` | Gamma preset for the third day/night phase. |
+| `GAMMA4` | `int` | `0x00272727` | Gamma preset for the fourth day/night phase. |
+| `NUKE` | `int` | `1` | Effect/state flag for the nuclear flash sequence. |
+| `NUKE_GAMMA` | `int` | `0x6633aa` | Gamma value used during the nuclear flash. |
+| `NUKE_TIME` | `int` | `10` | Timing value used by the nuclear flash effect. |
+| `RAIN` | `int` | `0` | Effect/state flag for the standard rain system. |
+| `RAIN_GAMMA1` | `int` | `0x00101010` | Gamma preset used during the first rain/day-night phase. |
+| `RAIN_GAMMA2` | `int` | `0x00373737` | Gamma preset used during the second rain/day-night phase. |
+| `RAIN_GAMMA3` | `int` | `0x00707070` | Gamma preset used during the third rain/day-night phase. |
+| `RAIN_GAMMA4` | `int` | `0x00373737` | Gamma preset used during the fourth rain/day-night phase. |
+| `RAIN_GAMMA_TIME` | `int` | `2000` | Time interval used when transitioning gamma during rain. |
+| `RAIN_TYPE` | `int` | `0` | Rain effect type selector. |
+| `START_DAYNIGHT` | `int` | `1` | Initial day/night phase selector. |
+| `SVERCHOK` | `int` | `0` | Ambient environment effect flag for the grasshopper/cricket sound. |
+| `TIME1` | `int` | `300000` | Duration of the first day/night phase in milliseconds. |
+| `TIME2` | `int` | `300000` | Duration of the second day/night phase in milliseconds. |
+| `TIME3` | `int` | `300000` | Duration of the third day/night phase in milliseconds. |
+| `TIME4` | `int` | `300000` | Duration of the fourth day/night phase in milliseconds. |
+| `TIME_CHANGE` | `int` | `30000` | Duration of the gamma transition between day/night phases in milliseconds. |
 
 ## `dokeys.lgc`
 
 2 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `SCR_X` | `72` | Standard-header constant `SCR_X` defined in `dokeys.lgc`. Value: 72. |
-| `SCR_Y` | `167` | Standard-header constant `SCR_Y` defined in `dokeys.lgc`. Value: 167. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `SCR_X` | `int` | `72` | X offset from the centre of the construction-help display. |
+| `SCR_Y` | `int` | `167` | Y offset from the centre of the construction-help display. |
 
 ## `environmenttact.lgc`
 
 8 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `CLOUD_ADD_Z` | `0` | Standard-header constant `CLOUD_ADD_Z` defined in `environmenttact.lgc`. Value: 0. |
-| `METEOR_HEIGHT` | `1000` | Standard-header constant `METEOR_HEIGHT` defined in `environmenttact.lgc`. Value: 1000. |
-| `METEOR_RAIN_DELAY` | `10000` | Standard-header constant `METEOR_RAIN_DELAY` defined in `environmenttact.lgc`. Value: 10000. |
-| `METEOR_RAIN_TIME` | `10000` | Standard-header constant `METEOR_RAIN_TIME` defined in `environmenttact.lgc`. Value: 10000. |
-| `NO_RAIN_TIME` | `` | Context-dependent standard-header constant. It is defined in daynight.lgc, environmenttact.lgc; the active value depends on the include/preprocessor context. |
-| `QUAKE_TIME` | `3` | Standard-header constant `QUAKE_TIME` defined in `environmenttact.lgc`. Value: 3. |
-| `RAIN_TIME` | `` | Context-dependent standard-header constant. It is defined in daynight.lgc, environmenttact.lgc; the active value depends on the include/preprocessor context. |
-| `SQUALL_TIME` | `30` | Standard-header constant `SQUALL_TIME` defined in `environmenttact.lgc`. Value: 30. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `CLOUD_ADD_Z` | `int` | `0` | Additional Z offset applied to clouds. |
+| `METEOR_HEIGHT` | `int` | `1000` | Spawn height used for meteorites. |
+| `METEOR_RAIN_DELAY` | `int` | `10000` | Pause between meteor showers. |
+| `METEOR_RAIN_TIME` | `int` | `10000` | Duration of a meteor shower. |
+| `NO_RAIN_TIME` | `int` | `` | No-rain duration setting; its effective value depends on the active preprocessor branch. |
+| `QUAKE_TIME` | `int` | `3` | Duration of an earthquake effect, in seconds. |
+| `RAIN_TIME` | `int` | `` | Rain-duration setting; its effective value depends on the active preprocessor branch. |
+| `SQUALL_TIME` | `int` | `30` | Interval between wind gusts. |
 
 ## `explode.lgc`
 
 3 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `EXPLODE_COLORER` | `1` | Standard-header constant `EXPLODE_COLORER` defined in `explode.lgc`. Value: 1. |
-| `EXPLODE_DAMAGE` | `15` | Standard-header constant `EXPLODE_DAMAGE` defined in `explode.lgc`. Value: 15. |
-| `EXPLODE_LGC` | `1` | Standard-header constant `EXPLODE_LGC` defined in `explode.lgc`. Value: 1. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `EXPLODE_COLORER` | `int` | `1` | Include or configuration flag for the standard explosion effects. |
+| `EXPLODE_DAMAGE` | `int` | `15` | Damage setting used by the standard explosion effect script. |
+| `EXPLODE_LGC` | `int` | `1` | Include guard for the explosion helper script. |
 
 ## `export.lgc`
 
 410 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `ACT_ADD_AMMO` | `93` | Action opcode used with Action() and AddCommand(). Value: 93 |
-| `ACT_ADD_ITEM` | `54` | Action opcode used with Action() and AddCommand(). Value: 54 |
-| `ACT_ATTACK` | `32` | Action opcode used with Action() and AddCommand(). Value: 32 |
-| `ACT_BACKUP_COMMAND` | `70` | Action opcode used with Action() and AddCommand(). Value: 70 |
-| `ACT_BUILD_UNIT` | `35` | Action opcode used with Action() and AddCommand(). Value: 35 |
-| `ACT_CHANGE_ANIMATION` | `61` | Action opcode used with Action() and AddCommand(). Value: 61 |
-| `ACT_CHANGE_COOR` | `63` | Action opcode used with Action() and AddCommand(). Value: 63 |
-| `ACT_CHANGE_DIRECTION` | `60` | Action opcode used with Action() and AddCommand(). Value: 60 |
-| `ACT_CHANGE_VID` | `62` | Action opcode used with Action() and AddCommand(). Value: 62 |
-| `ACT_CLASH_ENGINE` | `151` | Action opcode used with Action() and AddCommand(). Value: 151 |
-| `ACT_CLEAR_COMMAND` | `42` | Action opcode used with Action() and AddCommand(). Value: 42 |
-| `ACT_CLEAR_STACK` | `72` | Action opcode used with Action() and AddCommand(). Value: 72 |
-| `ACT_COOR_ATTACK` | `37` | Action opcode used with Action() and AddCommand(). Value: 37 |
-| `ACT_CYCLE_STACK` | `71` | Action opcode used with Action() and AddCommand(). Value: 71 |
-| `ACT_DAMAGE` | `85` | Action opcode used with Action() and AddCommand(). Value: 85 |
-| `ACT_DELETE_ALL_ITEM` | `57` | Action opcode used with Action() and AddCommand(). Value: 57 |
-| `ACT_DELETE_ITEM` | `55` | Action opcode used with Action() and AddCommand(). Value: 55 |
-| `ACT_DESTROY_UNIT` | `134` | Action opcode used with Action() and AddCommand(). Value: 134 |
-| `ACT_FIRST_ENGINE` | `154` | Action opcode used with Action() and AddCommand(). Value: 154 |
-| `ACT_FLAGMAN_TRIGGER` | `43` | Action opcode used with Action() and AddCommand(). Value: 43 |
-| `ACT_FORCELINK_ENGINE` | `152` | Action opcode used with Action() and AddCommand(). Value: 152 |
-| `ACT_GET_AMMO` | `92` | Action opcode used with Action() and AddCommand(). Value: 92 |
-| `ACT_GET_ANIMATION` | `91` | Action opcode used with Action() and AddCommand(). Value: 91 |
-| `ACT_GET_ARMY` | `96` | Action opcode used with Action() and AddCommand(). Value: 96 |
-| `ACT_GET_BATTLE_RANGE` | `100` | Action opcode used with Action() and AddCommand(). Value: 100 |
-| `ACT_GET_BEHAVE` | `94` | Action opcode used with Action() and AddCommand(). Value: 94 |
-| `ACT_GET_COMMAND` | `111` | Action opcode used with Action() and AddCommand(). Value: 111 |
-| `ACT_GET_GOAL` | `90` | Action opcode used with Action() and AddCommand(). Value: 90 |
-| `ACT_GET_HP` | `87` | Action opcode used with Action() and AddCommand(). Value: 87 |
-| `ACT_GET_ITEM` | `58` | Action opcode used with Action() and AddCommand(). Value: 58 |
-| `ACT_GET_LINK` | `101` | Action opcode used with Action() and AddCommand(). Value: 101 |
-| `ACT_GET_PERCENT_HP` | `89` | Action opcode used with Action() and AddCommand(). Value: 89 |
-| `ACT_GET_SPEED` | `109` | Action opcode used with Action() and AddCommand(). Value: 109 |
-| `ACT_GET_TEXT` | `121` | Action opcode used with Action() and AddCommand(). Value: 121 |
-| `ACT_GET_TIMER` | `105` | Action opcode used with Action() and AddCommand(). Value: 105 |
-| `ACT_GET_UPLINK` | `103` | Action opcode used with Action() and AddCommand(). Value: 103 |
-| `ACT_GET_ZSPEED` | `107` | Action opcode used with Action() and AddCommand(). Value: 107 |
-| `ACT_HAVE_ITEM` | `56` | Action opcode used with Action() and AddCommand(). Value: 56 |
-| `ACT_IN_TRAIN` | `158` | Action opcode used with Action() and AddCommand(). Value: 158 |
-| `ACT_IS_FIRST` | `157` | Action opcode used with Action() and AddCommand(). Value: 157 |
-| `ACT_IS_TRAIN` | `159` | Action opcode used with Action() and AddCommand(). Value: 159 |
-| `ACT_LAST_ENGINE` | `155` | Action opcode used with Action() and AddCommand(). Value: 155 |
-| `ACT_LINK_ENGINE` | `150` | Action opcode used with Action() and AddCommand(). Value: 150 |
-| `ACT_LOGIC_RUN` | `131` | Action opcode used with Action() and AddCommand(). Value: 131 |
-| `ACT_MOVE` | `33` | Action opcode used with Action() and AddCommand(). Value: 33 |
-| `ACT_MOVE_TO` | `34` | Action opcode used with Action() and AddCommand(). Value: 34 |
-| `ACT_NEXT_COMMAND` | `130` | Action opcode used with Action() and AddCommand(). Value: 130 |
-| `ACT_NEXT_ENGINE` | `156` | Action opcode used with Action() and AddCommand(). Value: 156 |
-| `ACT_NONE` | `255` | Action opcode used with Action() and AddCommand(). Value: 255 |
-| `ACT_PATH_BLOCK` | `50` | Action opcode used with Action() and AddCommand(). Value: 50 |
-| `ACT_PATH_GROUND` | `51` | Action opcode used with Action() and AddCommand(). Value: 51 |
-| `ACT_PATH_LIMIT` | `52` | Action opcode used with Action() and AddCommand(). Value: 52 |
-| `ACT_PATROL` | `36` | Action opcode used with Action() and AddCommand(). Value: 36 |
-| `ACT_PAUSE` | `40` | Action opcode used with Action() and AddCommand(). Value: 40 |
-| `ACT_PLAY_SFX` | `135` | Action opcode used with Action() and AddCommand(). Value: 135 |
-| `ACT_RANDOM` | `38` | Action opcode used with Action() and AddCommand(). Value: 38 |
-| `ACT_REPAIR` | `86` | Action opcode used with Action() and AddCommand(). Value: 86 |
-| `ACT_RESTORE` | `81` | Action opcode used with Action() and AddCommand(). Value: 81 |
-| `ACT_ROTATE` | `41` | Action opcode used with Action() and AddCommand(). Value: 41 |
-| `ACT_SAVE` | `80` | Action opcode used with Action() and AddCommand(). Value: 80 |
-| `ACT_SET_ARMY` | `97` | Action opcode used with Action() and AddCommand(). Value: 97 |
-| `ACT_SET_BEHAVE` | `95` | Action opcode used with Action() and AddCommand(). Value: 95 |
-| `ACT_SET_DEATH_TIMER` | `112` | Action opcode used with Action() and AddCommand(). Value: 112 |
-| `ACT_SET_FILE` | `123` | Action opcode used with Action() and AddCommand(). Value: 123 |
-| `ACT_SET_HP` | `88` | Action opcode used with Action() and AddCommand(). Value: 88 |
-| `ACT_SET_INVISIBLE` | `98` | Action opcode used with Action() and AddCommand(). Value: 98 |
-| `ACT_SET_LINK` | `102` | Action opcode used with Action() and AddCommand(). Value: 102 |
-| `ACT_SET_SPEED` | `110` | Action opcode used with Action() and AddCommand(). Value: 110 |
-| `ACT_SET_TEXT` | `120` | Action opcode used with Action() and AddCommand(). Value: 120 |
-| `ACT_SET_TEXT_COUNT` | `122` | Action opcode used with Action() and AddCommand(). Value: 122 |
-| `ACT_SET_TIMER` | `106` | Action opcode used with Action() and AddCommand(). Value: 106 |
-| `ACT_SET_UPLINK` | `104` | Action opcode used with Action() and AddCommand(). Value: 104 |
-| `ACT_SET_ZSPEED` | `108` | Action opcode used with Action() and AddCommand(). Value: 108 |
-| `ACT_STOP` | `39` | Action opcode used with Action() and AddCommand(). Value: 39 |
-| `ACT_STOP_STACK` | `73` | Action opcode used with Action() and AddCommand(). Value: 73 |
-| `ACT_TRAIN_BEHAVE` | `153` | Action opcode used with Action() and AddCommand(). Value: 153 |
-| `ACT_UNDO_INSERT` | `133` | Action opcode used with Action() and AddCommand(). Value: 133 |
-| `ACT_UNDO_REMOVE` | `132` | Action opcode used with Action() and AddCommand(). Value: 132 |
-| `ANI_BIRTH` | `14` | Animation identifier. Value: 14 |
-| `ANI_BUILD` | `1` | Animation identifier. Value: 1 |
-| `ANI_CLASH` | `12` | Animation identifier. Value: 12 |
-| `ANI_CLOSE` | `7` | Animation identifier. Value: 7 |
-| `ANI_DEATH` | `15` | Animation identifier. Value: 15 |
-| `ANI_DEATH2` | `16` | Animation identifier. Value: 16 |
-| `ANI_FIGHT` | `8` | Animation identifier. Value: 8 |
-| `ANI_FONT_NEXT_CHAR` | `1` | Animation identifier. Value: 1 |
-| `ANI_FONT_NEXT_LINE` | `2` | Animation identifier. Value: 2 |
-| `ANI_FONT_NORMAL` | `0` | Animation identifier. Value: 0 |
-| `ANI_GO` | `2` | Animation identifier. Value: 2 |
-| `ANI_HIT` | `7` | Animation identifier. Value: 7 |
-| `ANI_L_ROTATE` | `4` | Animation identifier. Value: 4 |
-| `ANI_LAZY` | `12` | Animation identifier. Value: 12 |
-| `ANI_LINK` | `11` | Animation identifier. Value: 11 |
-| `ANI_LOAD` | `11` | Animation identifier. Value: 11 |
-| `ANI_MENUDISABLE` | `6` | Animation identifier. Value: 6 |
-| `ANI_MENUDISABLEDOWN` | `6` | Animation identifier. Value: 6 |
-| `ANI_MENUDISABLEUP` | `7` | Animation identifier. Value: 7 |
-| `ANI_MENUPRESSDOWN` | `4` | Animation identifier. Value: 4 |
-| `ANI_MENUPRESSUP` | `5` | Animation identifier. Value: 5 |
-| `ANI_MENUSELECTDOWN` | `2` | Animation identifier. Value: 2 |
-| `ANI_MENUSELECTUP` | `3` | Animation identifier. Value: 3 |
-| `ANI_MENUSTANDDOWN` | `0` | Animation identifier. Value: 0 |
-| `ANI_MENUSTANDUP` | `1` | Animation identifier. Value: 1 |
-| `ANI_OPEN` | `6` | Animation identifier. Value: 6 |
-| `ANI_R_ROTATE` | `5` | Animation identifier. Value: 5 |
-| `ANI_SALUT` | `9` | Animation identifier. Value: 9 |
-| `ANI_STAND` | `0` | Animation identifier. Value: 0 |
-| `ANI_STAND_OPEN` | `10` | Animation identifier. Value: 10 |
-| `ANI_START_MOVE` | `3` | Animation identifier. Value: 3 |
-| `ANI_STOP_MOVE` | `1` | Animation identifier. Value: 1 |
-| `ANI_UNLOAD` | `12` | Animation identifier. Value: 12 |
-| `ANI_WOUND` | `13` | Animation identifier. Value: 13 |
-| `B_AVIA` | `4` | Sprite class identifier. Value: 4 |
-| `B_BALLOON` | `26` | Sprite class identifier. Value: 26 |
-| `B_BUILDING` | `3` | Sprite class identifier. Value: 3 |
-| `B_CANNON` | `5` | Sprite class identifier. Value: 5 |
-| `B_CIV_ROBOT` | `20` | Sprite class identifier. Value: 20 |
-| `B_CREATURE` | `25` | Sprite class identifier. Value: 25 |
-| `B_DEPO` | `24` | Sprite class identifier. Value: 24 |
-| `B_ENGINE` | `21` | Sprite class identifier. Value: 21 |
-| `B_FRAME` | `10` | Sprite class identifier. Value: 10 |
-| `B_LINKER` | `12` | Sprite class identifier. Value: 12 |
-| `B_MISSILE` | `27` | Sprite class identifier. Value: 27 |
-| `B_OBJECT` | `1` | Sprite class identifier. Value: 1 |
-| `B_PRIMITIVE` | `6` | Sprite class identifier. Value: 6 |
-| `B_RAIL` | `22` | Sprite class identifier. Value: 22 |
-| `B_REGION` | `23` | Sprite class identifier. Value: 23 |
-| `B_SPRITE` | `9` | Sprite class identifier. Value: 9 |
-| `B_TERRAIN` | `0` | Sprite class identifier. Value: 0 |
-| `B_TEXT` | `19` | Sprite class identifier. Value: 19 |
-| `B_UNIT` | `2` | Sprite class identifier. Value: 2 |
-| `BEH_ACTIVE` | `2` | Unit, train or text behavior flag. Value: 2 |
-| `BEH_AGGRESSIVE` | `1` | Unit, train or text behavior flag. Value: 1 |
-| `BEH_BIGFIRE` | `16` | Unit, train or text behavior flag. Value: 16 |
-| `BEH_BOTTOM` | `4` | Unit, train or text behavior flag. Value: 4 |
-| `BEH_CAREFUL` | `4` | Unit, train or text behavior flag. Value: 4 |
-| `BEH_CENTER` | `(BEH_CENTER_X+BEH_CENTER_Y)` | Unit, train or text behavior flag. Value: (BEH_CENTER_X+BEH_CENTER_Y) |
-| `BEH_CENTER_X` | `1` | Unit, train or text behavior flag. Value: 1 |
-| `BEH_CENTER_Y` | `8` | Unit, train or text behavior flag. Value: 8 |
-| `BEH_FILE` | `(2*16)` | Unit, train or text behavior flag. Value: (2*16) |
-| `BEH_HAUNT` | `8` | Unit, train or text behavior flag. Value: 8 |
-| `BEH_LEFT` | `0` | Unit, train or text behavior flag. Value: 0 |
-| `BEH_LOAD_FROM` | `(16+32+64)` | Unit, train or text behavior flag. Value: (16+32+64) |
-| `BEH_NOT_LOAD` | `(0*16)` | Unit, train or text behavior flag. Value: (0*16) |
-| `BEH_RIGHT` | `2` | Unit, train or text behavior flag. Value: 2 |
-| `BEH_SCRIPT_FILE` | `(4*16)` | Unit, train or text behavior flag. Value: (4*16) |
-| `BEH_SCRIPT_STRINGS` | `(5*16)` | Unit, train or text behavior flag. Value: (5*16) |
-| `BEH_SCRIPT_UPDATED` | `(6*16)` | Unit, train or text behavior flag. Value: (6*16) |
-| `BEH_SCRIPT_VARIABLE` | `(3*16)` | Unit, train or text behavior flag. Value: (3*16) |
-| `BEH_STRINGS_INI` | `(1*16)` | Unit, train or text behavior flag. Value: (1*16) |
-| `BEH_TOP` | `0` | Unit, train or text behavior flag. Value: 0 |
-| `COM_ATTACK` | `3` | Sprite command identifier. Value: 3 |
-| `COM_BUILD` | `16` | Sprite command identifier. Value: 16 |
-| `COM_DISTATTACK` | `5` | Sprite command identifier. Value: 5 |
-| `COM_ENGINE_ATTACK` | `28` | Sprite command identifier. Value: 28 |
-| `COM_ENGINE_CLASH` | `27` | Sprite command identifier. Value: 27 |
-| `COM_ENGINE_LINK` | `26` | Sprite command identifier. Value: 26 |
-| `COM_ENGINE_MINE` | `24` | Sprite command identifier. Value: 24 |
-| `COM_ENGINE_MOVE` | `23` | Sprite command identifier. Value: 23 |
-| `COM_ENGINE_ONEATTACK` | `29` | Sprite command identifier. Value: 29 |
-| `COM_ENGINE_PATROL` | `25` | Sprite command identifier. Value: 25 |
-| `COM_MOVE` | `1` | Sprite command identifier. Value: 1 |
-| `COM_MOVE3D` | `2` | Sprite command identifier. Value: 2 |
-| `COM_NEARATTACK` | `6` | Sprite command identifier. Value: 6 |
-| `COM_NONE` | `0` | Sprite command identifier. Value: 0 |
-| `COM_ONEATTACK` | `4` | Sprite command identifier. Value: 4 |
-| `COM_OTHER` | `31` | Sprite command identifier. Value: 31 |
-| `COM_PASSIVE` | `17` | Sprite command identifier. Value: 17 |
-| `COM_PATROL` | `7` | Sprite command identifier. Value: 7 |
-| `COM_PAUSE` | `18` | Sprite command identifier. Value: 18 |
-| `COM_ROTATE` | `19` | Sprite command identifier. Value: 19 |
-| `COM_TARAN` | `8` | Sprite command identifier. Value: 8 |
-| `CURSOR_ATTACK` | `5` | Game cursor mode identifier. Value: 5 |
-| `CURSOR_CLASH` | `3` | Game cursor mode identifier. Value: 3 |
-| `CURSOR_CYCLE` | `9` | Game cursor mode identifier. Value: 9 |
-| `CURSOR_DELETE` | `15` | Game cursor mode identifier. Value: 15 |
-| `CURSOR_FIGHT` | `5` | Game cursor mode identifier. Value: 5 |
-| `CURSOR_FIGHT2` | `6` | Game cursor mode identifier. Value: 6 |
-| `CURSOR_LINK` | `10` | Game cursor mode identifier. Value: 10 |
-| `CURSOR_MOVE` | `2` | Game cursor mode identifier. Value: 2 |
-| `CURSOR_NORMAL` | `0` | Game cursor mode identifier. Value: 0 |
-| `CURSOR_NOTMOVE` | `8` | Game cursor mode identifier. Value: 8 |
-| `CURSOR_OFF` | `-1` | Game cursor mode identifier. Value: -1 |
-| `CURSOR_SELECT` | `7` | Game cursor mode identifier. Value: 7 |
-| `CURSOR_UNLINK` | `11` | Game cursor mode identifier. Value: 11 |
-| `EFF_ALPHAAPPEAR` | `5` | Visual effect identifier used with Effect(). Value: 5 |
-| `EFF_FADE` | `3` | Visual effect identifier used with Effect(). Value: 3 |
-| `EFF_FADE_IN` | `9` | Visual effect identifier used with Effect(). Value: 9 |
-| `EFF_FADE_OUT` | `10` | Visual effect identifier used with Effect(). Value: 10 |
-| `EFF_LINESHIFT` | `7` | Visual effect identifier used with Effect(). Value: 7 |
-| `EFF_NONE` | `0` | Visual effect identifier used with Effect(). Value: 0 |
-| `EFF_NUKE` | `1` | Visual effect identifier used with Effect(). Value: 1 |
-| `EFF_OPEN_WINDOW` | `4` | Visual effect identifier used with Effect(). Value: 4 |
-| `EFF_PIXELAPPEAR` | `6` | Visual effect identifier used with Effect(). Value: 6 |
-| `EFF_SCALE_WINDOW` | `8` | Visual effect identifier used with Effect(). Value: 8 |
-| `EFF_SCROLL` | `2` | Visual effect identifier used with Effect(). Value: 2 |
-| `ENV_BORN_RAIN` | `0x0800` | Environment effect flag used with SetEnvironment(). Value: 0x0800 |
-| `ENV_BORN_SNOW` | `0x8000` | Environment effect flag used with SetEnvironment(). Value: 0x8000 |
-| `ENV_EARTHQUAKE` | `4` | Environment effect flag used with SetEnvironment(). Value: 4 |
-| `ENV_FOG` | `32` | Environment effect flag used with SetEnvironment(). Value: 32 |
-| `ENV_FOGAPPEAR` | `0x0200` | Environment effect flag used with SetEnvironment(). Value: 0x0200 |
-| `ENV_FOGINV` | `0x0100` | Environment effect flag used with SetEnvironment(). Value: 0x0100 |
-| `ENV_GROUND_SNOW` | `64` | Environment effect flag used with SetEnvironment(). Value: 64 |
-| `ENV_LONGSHADOW` | `2` | Environment effect flag used with SetEnvironment(). Value: 2 |
-| `ENV_MASK_RAIN` | `0x0C00` | Environment effect flag used with SetEnvironment(). Value: 0x0C00 |
-| `ENV_MASK_SNOW` | `0xC000` | Environment effect flag used with SetEnvironment(). Value: 0xC000 |
-| `ENV_RAIN` | `0x0C00` | Environment effect flag used with SetEnvironment(). Value: 0x0C00 |
-| `ENV_SHADOW` | `1` | Environment effect flag used with SetEnvironment(). Value: 1 |
-| `ENV_SNOW` | `0xC000` | Environment effect flag used with SetEnvironment(). Value: 0xC000 |
-| `ENV_SQUALL` | `128` | Environment effect flag used with SetEnvironment(). Value: 128 |
-| `ENV_STOP` | `0x80000000` | Environment effect flag used with SetEnvironment(). Value: 0x80000000 |
-| `ENV_STOP_RAIN` | `0x0400` | Environment effect flag used with SetEnvironment(). Value: 0x0400 |
-| `ENV_STOP_SNOW` | `0x4000` | Environment effect flag used with SetEnvironment(). Value: 0x4000 |
-| `ENV_STOPALL` | `0xFFFFFFFF` | Environment effect flag used with SetEnvironment(). Value: 0xFFFFFFFF |
-| `GETSPRITE_ARMY0` | `0x10000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x10000 |
-| `GETSPRITE_ARMY1` | `0x20000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x20000 |
-| `GETSPRITE_ARMY2` | `0x40000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x40000 |
-| `GETSPRITE_ARMY3` | `0x80000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x80000 |
-| `GETSPRITE_AVIA` | `0x800000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x800000 |
-| `GETSPRITE_CANNON` | `0x20000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x20000000 |
-| `GETSPRITE_CLASS` | `0x1000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x1000 |
-| `GETSPRITE_FREE` | `0x80000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x80000000 |
-| `GETSPRITE_HASH` | `0x8000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x8000 |
-| `GETSPRITE_MENU` | `0x1000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x1000000 |
-| `GETSPRITE_OBJECT` | `0x200000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x200000 |
-| `GETSPRITE_RAILWAY` | `0x2000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x2000000 |
-| `GETSPRITE_REGION` | `0x4000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x4000000 |
-| `GETSPRITE_SPRITE` | `0x40000000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x40000000 |
-| `GETSPRITE_TERRAIN` | `0x100000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x100000 |
-| `GETSPRITE_UNIT` | `0x400000` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x400000 |
-| `GETSPRITE_VID` | `0x800` | Sprite lookup filter flag used with GetSprite() and FindNearestSprite(). Value: 0x800 |
-| `INPUT_CTRL` | `32` | Input-state bit flag. Value: 32 |
-| `INPUT_DOWN` | `512` | Input-state bit flag. Value: 512 |
-| `INPUT_FIRST` | `1024` | Input-state bit flag. Value: 1024 |
-| `INPUT_LCLICK` | `1` | Input-state bit flag. Value: 1 |
-| `INPUT_LDOWN` | `4` | Input-state bit flag. Value: 4 |
-| `INPUT_LEFT` | `64` | Input-state bit flag. Value: 64 |
-| `INPUT_RCLICK` | `2` | Input-state bit flag. Value: 2 |
-| `INPUT_RDOWN` | `8` | Input-state bit flag. Value: 8 |
-| `INPUT_RIGHT` | `128` | Input-state bit flag. Value: 128 |
-| `INPUT_SECOND` | `2048` | Input-state bit flag. Value: 2048 |
-| `INPUT_SHIFT` | `16` | Input-state bit flag. Value: 16 |
-| `INPUT_UP` | `256` | Input-state bit flag. Value: 256 |
-| `NET_CLEARKILL` | `9` | Network information selector used with GetNetInfo(). Value: 9 |
-| `NET_KILLPLAYER` | `10` | Network information selector used with GetNetInfo(). Value: 10 |
-| `NET_NAMEPLAYER` | `2` | Network information selector used with GetNetInfo(). Value: 2 |
-| `NET_NOPLAYER` | `6` | Network information selector used with GetNetInfo(). Value: 6 |
-| `NET_NUMPLAYER` | `1` | Network information selector used with GetNetInfo(). Value: 1 |
-| `PROP_ACCELERATE` | `6` | Train property selector used with TrainProperty(). Value: 6 |
-| `PROP_AMMO` | `5` | Train property selector used with TrainProperty(). Value: 5 |
-| `PROP_AMMO_MAX` | `11` | Train property selector used with TrainProperty(). Value: 11 |
-| `PROP_AMMO_NO` | `10` | Train property selector used with TrainProperty(). Value: 10 |
-| `PROP_BUILD_TIME` | `7` | Train property selector used with TrainProperty(). Value: 7 |
-| `PROP_FREE` | `9` | Train property selector used with TrainProperty(). Value: 9 |
-| `PROP_HP` | `4` | Train property selector used with TrainProperty(). Value: 4 |
-| `PROP_LIFE` | `3` | Train property selector used with TrainProperty(). Value: 3 |
-| `PROP_SPEED` | `1` | Train property selector used with TrainProperty(). Value: 1 |
-| `PROP_WEAPON` | `2` | Train property selector used with TrainProperty(). Value: 2 |
-| `SCROLL_FLAGMAN_IN_CENTER` | `16` | Map viewport scrolling mode flag. Value: 16 |
-| `SCROLL_FROM_BORDER` | `1` | Map viewport scrolling mode flag. Value: 1 |
-| `SCROLL_NONE` | `0` | Map viewport scrolling mode flag. Value: 0 |
-| `SCROLL_TO_FLAGMAN` | `4` | Map viewport scrolling mode flag. Value: 4 |
-| `SCROLL_TO_FLAGMAN_WITH_DIRECTION` | `8` | Map viewport scrolling mode flag. Value: 8 |
-| `SCROLL_WITH_ARROWS` | `32` | Map viewport scrolling mode flag. Value: 32 |
-| `SCROLL_WITH_MOUSE` | `2` | Map viewport scrolling mode flag. Value: 2 |
-| `STAT_ACTIVE_FORT_GUN` | `13` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 13 |
-| `STAT_AGRESSIVE_TRAIN` | `7` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 7 |
-| `STAT_ALL_GUN_POWER` | `20` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 20 |
-| `STAT_ANTI_AVIA` | `5` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 5 |
-| `STAT_ANTIAVIA_GUN_POWER` | `18` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 18 |
-| `STAT_AVIA` | `3` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 3 |
-| `STAT_AVIA_GUN_POWER` | `17` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 17 |
-| `STAT_BATTLE_TRAIN` | `6` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 6 |
-| `STAT_DAMAGED_FORT_GUN` | `14` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 14 |
-| `STAT_DAMAGED_UNITS` | `21` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 21 |
-| `STAT_ENGINE_GUN_POWER` | `16` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 16 |
-| `STAT_FREE_DEPO` | `12` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 12 |
-| `STAT_GROUND_GUN_POWER` | `19` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 19 |
-| `STAT_LIFE` | `15` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 15 |
-| `STAT_MOBILE_TRAIN` | `2` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 2 |
-| `STAT_PASSIVE_TRAIN` | `10` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 10 |
-| `STAT_PATROL_TRAIN` | `9` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 9 |
-| `STAT_SUPER_WEAPON` | `4` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 4 |
-| `STAT_TRAIN` | `1` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 1 |
-| `STAT_VERYDANGER_TRAIN` | `8` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 8 |
-| `STAT_WORKING_DEPO` | `11` | Statistic selector used with GetStatistics() and CalcStatistics(). Value: 11 |
-| `U_AVIA` | `8` | Sprite type bit flag. Value: 8 |
-| `U_CANNON` | `512` | Sprite type bit flag. Value: 512 |
-| `U_MENU` | `16` | Sprite type bit flag. Value: 16 |
-| `U_OBJECT` | `2` | Sprite type bit flag. Value: 2 |
-| `U_RAILWAY` | `32` | Sprite type bit flag. Value: 32 |
-| `U_REGION` | `64` | Sprite type bit flag. Value: 64 |
-| `U_SPRITE` | `1024` | Sprite type bit flag. Value: 1024 |
-| `U_TACTIC` | `128` | Sprite type bit flag. Value: 128 |
-| `U_TERRAIN` | `1` | Sprite type bit flag. Value: 1 |
-| `U_UNIT` | `4` | Sprite type bit flag. Value: 4 |
-| `VID_AMMO` | `26` | Game object property identifier used with GetVidData() and SetVidData(). Value: 26 |
-| `VID_BATTLERANGE` | `23` | Game object property identifier used with GetVidData() and SetVidData(). Value: 23 |
-| `VID_BUILDTIME` | `55` | Game object property identifier used with GetVidData() and SetVidData(). Value: 55 |
-| `VID_CHILD` | `60` | Game object property identifier used with GetVidData() and SetVidData(). Value: 60 |
-| `VID_CLASS` | `47` | Game object property identifier used with GetVidData() and SetVidData(). Value: 47 |
-| `VID_COUNT` | `28` | Game object property identifier used with GetVidData() and SetVidData(). Value: 28 |
-| `VID_COUNT0` | `34` | Game object property identifier used with GetVidData() and SetVidData(). Value: 34 |
-| `VID_COUNT1` | `35` | Game object property identifier used with GetVidData() and SetVidData(). Value: 35 |
-| `VID_COUNT2` | `36` | Game object property identifier used with GetVidData() and SetVidData(). Value: 36 |
-| `VID_COUNT3` | `37` | Game object property identifier used with GetVidData() and SetVidData(). Value: 37 |
-| `VID_DAMAGE` | `124` | Game object property identifier used with GetVidData() and SetVidData(). Value: 124 |
-| `VID_DETECTRANGE` | `50` | Game object property identifier used with GetVidData() and SetVidData(). Value: 50 |
-| `VID_EXCHANGEVID` | `52` | Game object property identifier used with GetVidData() and SetVidData(). Value: 52 |
-| `VID_FRAME_SPEED` | `58` | Game object property identifier used with GetVidData() and SetVidData(). Value: 58 |
-| `VID_GAMMA` | `18` | Game object property identifier used with GetVidData() and SetVidData(). Value: 18 |
-| `VID_HIDE` | `56` | Game object property identifier used with GetVidData() and SetVidData(). Value: 56 |
-| `VID_HP_COEFF0` | `42` | Game object property identifier used with GetVidData() and SetVidData(). Value: 42 |
-| `VID_HP_COEFF1` | `43` | Game object property identifier used with GetVidData() and SetVidData(). Value: 43 |
-| `VID_HP_COEFF2` | `44` | Game object property identifier used with GetVidData() and SetVidData(). Value: 44 |
-| `VID_HP_COEFF3` | `45` | Game object property identifier used with GetVidData() and SetVidData(). Value: 45 |
-| `VID_KILLEDUNIT` | `29` | Game object property identifier used with GetVidData() and SetVidData(). Value: 29 |
-| `VID_KILLEDUNIT0` | `30` | Game object property identifier used with GetVidData() and SetVidData(). Value: 30 |
-| `VID_KILLEDUNIT1` | `31` | Game object property identifier used with GetVidData() and SetVidData(). Value: 31 |
-| `VID_KILLEDUNIT2` | `32` | Game object property identifier used with GetVidData() and SetVidData(). Value: 32 |
-| `VID_KILLEDUNIT3` | `33` | Game object property identifier used with GetVidData() and SetVidData(). Value: 33 |
-| `VID_LIFETIME` | `49` | Game object property identifier used with GetVidData() and SetVidData(). Value: 49 |
-| `VID_LINK` | `59` | Game object property identifier used with GetVidData() and SetVidData(). Value: 59 |
-| `VID_MAXHP` | `1` | Game object property identifier used with GetVidData() and SetVidData(). Value: 1 |
-| `VID_MAXHP0` | `38` | Game object property identifier used with GetVidData() and SetVidData(). Value: 38 |
-| `VID_MAXHP1` | `39` | Game object property identifier used with GetVidData() and SetVidData(). Value: 39 |
-| `VID_MAXHP2` | `40` | Game object property identifier used with GetVidData() and SetVidData(). Value: 40 |
-| `VID_MAXHP3` | `41` | Game object property identifier used with GetVidData() and SetVidData(). Value: 41 |
-| `VID_MAXUNIT` | `25` | Game object property identifier used with GetVidData() and SetVidData(). Value: 25 |
-| `VID_MOVE_MASK` | `54` | Game object property identifier used with GetVidData() and SetVidData(). Value: 54 |
-| `VID_NAME` | `27` | Game object property identifier used with GetVidData() and SetVidData(). Value: 27 |
-| `VID_NO_CHILD` | `92` | Game object property identifier used with GetVidData() and SetVidData(). Value: 92 |
-| `VID_NO_DIR` | `53` | Game object property identifier used with GetVidData() and SetVidData(). Value: 53 |
-| `VID_NOT_CREATE_AS_CHILD` | `57` | Game object property identifier used with GetVidData() and SetVidData(). Value: 57 |
-| `VID_PROPERTY` | `22` | Game object property identifier used with GetVidData() and SetVidData(). Value: 22 |
-| `VID_RECOLORUNIT` | `125` | Game object property identifier used with GetVidData() and SetVidData(). Value: 125 |
-| `VID_RECOLORUNIT0` | `126` | Game object property identifier used with GetVidData() and SetVidData(). Value: 126 |
-| `VID_RECOLORUNIT1` | `127` | Game object property identifier used with GetVidData() and SetVidData(). Value: 127 |
-| `VID_RECOLORUNIT2` | `128` | Game object property identifier used with GetVidData() and SetVidData(). Value: 128 |
-| `VID_RECOLORUNIT3` | `129` | Game object property identifier used with GetVidData() and SetVidData(). Value: 129 |
-| `VID_SPEED` | `48` | Game object property identifier used with GetVidData() and SetVidData(). Value: 48 |
-| `VID_SPRITETYPE` | `46` | Game object property identifier used with GetVidData() and SetVidData(). Value: 46 |
-| `VID_WEAPONAIM` | `51` | Game object property identifier used with GetVidData() and SetVidData(). Value: 51 |
-| `VK_ADD` | `0x6B00` | Virtual key or mouse-button code. Value: 0x6B00 |
-| `VK_BACK` | `0x08` | Virtual key or mouse-button code. Value: 0x08 |
-| `VK_CANCEL` | `0x03` | Virtual key or mouse-button code. Value: 0x03 |
-| `VK_CLEAR` | `0x0C` | Virtual key or mouse-button code. Value: 0x0C |
-| `VK_DECIMAL` | `0x6E00` | Virtual key or mouse-button code. Value: 0x6E00 |
-| `VK_DELETE` | `0x2E00` | Virtual key or mouse-button code. Value: 0x2E00 |
-| `VK_DIVIDE` | `0x6F00` | Virtual key or mouse-button code. Value: 0x6F00 |
-| `VK_DOWN` | `0x2800` | Virtual key or mouse-button code. Value: 0x2800 |
-| `VK_END` | `0x2300` | Virtual key or mouse-button code. Value: 0x2300 |
-| `VK_ESCAPE` | `0x1B` | Virtual key or mouse-button code. Value: 0x1B |
-| `VK_EXECUTE` | `0x2B00` | Virtual key or mouse-button code. Value: 0x2B00 |
-| `VK_F1` | `0x7000` | Virtual key or mouse-button code. Value: 0x7000 |
-| `VK_F10` | `0x7900` | Virtual key or mouse-button code. Value: 0x7900 |
-| `VK_F11` | `0x7A00` | Virtual key or mouse-button code. Value: 0x7A00 |
-| `VK_F12` | `0x7B00` | Virtual key or mouse-button code. Value: 0x7B00 |
-| `VK_F13` | `0x7C00` | Virtual key or mouse-button code. Value: 0x7C00 |
-| `VK_F14` | `0x7D00` | Virtual key or mouse-button code. Value: 0x7D00 |
-| `VK_F15` | `0x7E00` | Virtual key or mouse-button code. Value: 0x7E00 |
-| `VK_F16` | `0x7F00` | Virtual key or mouse-button code. Value: 0x7F00 |
-| `VK_F17` | `0x8000` | Virtual key or mouse-button code. Value: 0x8000 |
-| `VK_F18` | `0x8100` | Virtual key or mouse-button code. Value: 0x8100 |
-| `VK_F19` | `0x8200` | Virtual key or mouse-button code. Value: 0x8200 |
-| `VK_F2` | `0x7100` | Virtual key or mouse-button code. Value: 0x7100 |
-| `VK_F20` | `0x8300` | Virtual key or mouse-button code. Value: 0x8300 |
-| `VK_F21` | `0x8400` | Virtual key or mouse-button code. Value: 0x8400 |
-| `VK_F22` | `0x8500` | Virtual key or mouse-button code. Value: 0x8500 |
-| `VK_F23` | `0x8600` | Virtual key or mouse-button code. Value: 0x8600 |
-| `VK_F24` | `0x8700` | Virtual key or mouse-button code. Value: 0x8700 |
-| `VK_F3` | `0x7200` | Virtual key or mouse-button code. Value: 0x7200 |
-| `VK_F4` | `0x7300` | Virtual key or mouse-button code. Value: 0x7300 |
-| `VK_F5` | `0x7400` | Virtual key or mouse-button code. Value: 0x7400 |
-| `VK_F6` | `0x7500` | Virtual key or mouse-button code. Value: 0x7500 |
-| `VK_F7` | `0x7600` | Virtual key or mouse-button code. Value: 0x7600 |
-| `VK_F8` | `0x7700` | Virtual key or mouse-button code. Value: 0x7700 |
-| `VK_F9` | `0x7800` | Virtual key or mouse-button code. Value: 0x7800 |
-| `VK_HELP` | `0x2F00` | Virtual key or mouse-button code. Value: 0x2F00 |
-| `VK_HOME` | `0x2400` | Virtual key or mouse-button code. Value: 0x2400 |
-| `VK_INSERT` | `0x2D00` | Virtual key or mouse-button code. Value: 0x2D00 |
-| `VK_LBUTTON` | `0x01` | Virtual key or mouse-button code. Value: 0x01 |
-| `VK_LEFT` | `0x2500` | Virtual key or mouse-button code. Value: 0x2500 |
-| `VK_MBUTTON` | `0x04` | Virtual key or mouse-button code. Value: 0x04 |
-| `VK_MULTIPLY` | `0x6A00` | Virtual key or mouse-button code. Value: 0x6A00 |
-| `VK_NEXT` | `0x2200` | Virtual key or mouse-button code. Value: 0x2200 |
-| `VK_NUMLOCK` | `0x90` | Virtual key or mouse-button code. Value: 0x90 |
-| `VK_NUMPAD0` | `0x6000` | Virtual key or mouse-button code. Value: 0x6000 |
-| `VK_NUMPAD1` | `0x6100` | Virtual key or mouse-button code. Value: 0x6100 |
-| `VK_NUMPAD2` | `0x6200` | Virtual key or mouse-button code. Value: 0x6200 |
-| `VK_NUMPAD3` | `0x6300` | Virtual key or mouse-button code. Value: 0x6300 |
-| `VK_NUMPAD4` | `0x6400` | Virtual key or mouse-button code. Value: 0x6400 |
-| `VK_NUMPAD5` | `0x6500` | Virtual key or mouse-button code. Value: 0x6500 |
-| `VK_NUMPAD6` | `0x6600` | Virtual key or mouse-button code. Value: 0x6600 |
-| `VK_NUMPAD7` | `0x6700` | Virtual key or mouse-button code. Value: 0x6700 |
-| `VK_NUMPAD8` | `0x6800` | Virtual key or mouse-button code. Value: 0x6800 |
-| `VK_NUMPAD9` | `0x6900` | Virtual key or mouse-button code. Value: 0x6900 |
-| `VK_PRINT` | `0x2A00` | Virtual key or mouse-button code. Value: 0x2A00 |
-| `VK_PRIOR` | `0x2100` | Virtual key or mouse-button code. Value: 0x2100 |
-| `VK_RBUTTON` | `0x02` | Virtual key or mouse-button code. Value: 0x02 |
-| `VK_RETURN` | `0x0D` | Virtual key or mouse-button code. Value: 0x0D |
-| `VK_RIGHT` | `0x2700` | Virtual key or mouse-button code. Value: 0x2700 |
-| `VK_SCROLL` | `0x91` | Virtual key or mouse-button code. Value: 0x91 |
-| `VK_SELECT` | `0x2900` | Virtual key or mouse-button code. Value: 0x2900 |
-| `VK_SEPARATOR` | `0x6C00` | Virtual key or mouse-button code. Value: 0x6C00 |
-| `VK_SNAPSHOT` | `0x2C00` | Virtual key or mouse-button code. Value: 0x2C00 |
-| `VK_SPACE` | `0x20` | Virtual key or mouse-button code. Value: 0x20 |
-| `VK_SUBTRACT` | `0x6D00` | Virtual key or mouse-button code. Value: 0x6D00 |
-| `VK_TAB` | `0x09` | Virtual key or mouse-button code. Value: 0x09 |
-| `VK_UP` | `0x2600` | Virtual key or mouse-button code. Value: 0x2600 |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `ACT_ADD_AMMO` | `int` | `93` | Add `var1` ammunition to weapon slot `var2`; returns the resulting ammunition count. |
+| `ACT_ADD_ITEM` | `int` | `54` | Add an item with the NVID in `var1` to a unit item list. |
+| `ACT_ATTACK` | `int` | `32` | Attack the target specified by `var1`. |
+| `ACT_BACKUP_COMMAND` | `int` | `70` | Push the currently executing command onto the action stack. |
+| `ACT_BUILD_UNIT` | `int` | `35` | Build a unit with the NVID in `var1`. |
+| `ACT_CHANGE_ANIMATION` | `int` | `61` | Set the unit animation to `var1`. |
+| `ACT_CHANGE_COOR` | `int` | `63` | Set the sprite coordinates using `var1` (X), `var2` (Y) and `var3` (Z). |
+| `ACT_CHANGE_DIRECTION` | `int` | `60` | Set the unit direction to `var1`. |
+| `ACT_CHANGE_VID` | `int` | `62` | Change the sprite VID to `var1`; `var2` optionally changes animation, with -1 leaving it unchanged. |
+| `ACT_CLASH_ENGINE` | `int` | `151` | Ram the engine referenced by `var1`. |
+| `ACT_CLEAR_COMMAND` | `int` | `42` | Stop the currently executing command. |
+| `ACT_CLEAR_STACK` | `int` | `72` | Clear the action stack. |
+| `ACT_COOR_ATTACK` | `int` | `37` | Fire a single shot at the map coordinates in `var1`/`var2`. |
+| `ACT_CYCLE_STACK` | `int` | `71` | Loop the command stack to the command index specified by `var1`. |
+| `ACT_DAMAGE` | `int` | `85` | Apply damage from `var1`; `var2` identifies the unit that caused it. A return value of 1 indicates that repair is not needed. |
+| `ACT_DELETE_ALL_ITEM` | `int` | `57` | Remove all items from a unit item list. |
+| `ACT_DELETE_ITEM` | `int` | `55` | Remove an item with the NVID in `var1` from a unit item list. |
+| `ACT_DESTROY_UNIT` | `int` | `134` | Destroy an object with NVID `var1` at coordinates `var2`/`var3`. |
+| `ACT_FIRST_ENGINE` | `int` | `154` | Return the first engine in a train. |
+| `ACT_FLAGMAN_TRIGGER` | `int` | `43` | Pause command-stack execution while Flagman distance exceeds the thresholds in `var1`/`var2`/`var3`. |
+| `ACT_FORCELINK_ENGINE` | `int` | `152` | Force-link the engine referenced by `var1` to reconnect a split train. |
+| `ACT_GET_AMMO` | `int` | `92` | Return ammunition for the weapon slot specified by `var1`. |
+| `ACT_GET_ANIMATION` | `int` | `91` | Return the current animation. |
+| `ACT_GET_ARMY` | `int` | `96` | Return the army number. |
+| `ACT_GET_BATTLE_RANGE` | `int` | `100` | Return the unit battle range, accounting for linked objects. |
+| `ACT_GET_BEHAVE` | `int` | `94` | Return the current behaviour mode. |
+| `ACT_GET_COMMAND` | `int` | `111` | Return the command currently being executed (`COM_*`). |
+| `ACT_GET_GOAL` | `int` | `90` | Action opcode used with `Action()` and `AddCommand()`; the opcode selects the `get goal` action. |
+| `ACT_GET_HP` | `int` | `87` | Return the unit hit points. |
+| `ACT_GET_ITEM` | `int` | `58` | Return the item stored in the slot specified by `var1`. |
+| `ACT_GET_LINK` | `int` | `101` | Return the sprite linked to this sprite. |
+| `ACT_GET_PERCENT_HP` | `int` | `89` | Return unit hit points as a percentage. |
+| `ACT_GET_SPEED` | `int` | `109` | Return the current speed. |
+| `ACT_GET_TEXT` | `int` | `121` | Return the string associated with an `STEXT` sprite. |
+| `ACT_GET_TIMER` | `int` | `105` | Action opcode that returns the unit timer value. |
+| `ACT_GET_UPLINK` | `int` | `103` | Return the parent sprite to which this sprite is linked. |
+| `ACT_GET_ZSPEED` | `int` | `107` | Return the current Z speed. |
+| `ACT_HAVE_ITEM` | `int` | `56` | Test whether the unit has an item with the NVID in `var1`. |
+| `ACT_IN_TRAIN` | `int` | `158` | Return whether the engine specified by `var1` is present in the train. |
+| `ACT_IS_FIRST` | `int` | `157` | Return whether the wagon is the first wagon in its train. |
+| `ACT_IS_TRAIN` | `int` | `159` | Return whether the sprite is a locomotive/train engine. |
+| `ACT_LAST_ENGINE` | `int` | `155` | Return the last engine in a train. |
+| `ACT_LINK_ENGINE` | `int` | `150` | Link the engine referenced by `var1` to the train. |
+| `ACT_LOGIC_RUN` | `int` | `131` | Run `LogicRun` with the value in `var1` and the current sprite. |
+| `ACT_MOVE` | `int` | `33` | Move to the map coordinates in `var1` and `var2`. |
+| `ACT_MOVE_TO` | `int` | `34` | Move to the sprite target referenced by `var1`. |
+| `ACT_NEXT_COMMAND` | `int` | `130` | Animation-completion callback invoked when a sprite finishes playing an animation. |
+| `ACT_NEXT_ENGINE` | `int` | `156` | Return the next engine in a train. |
+| `ACT_NONE` | `int` | `255` | No-op command; performs no action. |
+| `ACT_PATH_BLOCK` | `int` | `50` | Path-blocked movement callback; `var1` and `var2` contain the last X/Y movement deltas. |
+| `ACT_PATH_GROUND` | `int` | `51` | Ground-intersection movement callback; `var1` is the new Z and `var2` is the ground Z. |
+| `ACT_PATH_LIMIT` | `int` | `52` | Movement callback invoked when an object leaves the map boundaries. |
+| `ACT_PATROL` | `int` | `36` | Patrol to the map point in `var1`/`var2` and return. |
+| `ACT_PAUSE` | `int` | `40` | Wait for `var1` plus a random amount up to `var2` milliseconds. |
+| `ACT_PLAY_SFX` | `int` | `135` | Play the sound effect identified by `var1`. |
+| `ACT_RANDOM` | `int` | `38` | Perform a random idle action, such as a lazy animation, a head turn, or no action. |
+| `ACT_REPAIR` | `int` | `86` | Fully restore hit points and rebuild a destroyed turret. |
+| `ACT_RESTORE` | `int` | `81` | Restore sprite-specific state from the stream referenced by `var1`. |
+| `ACT_ROTATE` | `int` | `41` | Turn toward the direction specified by `var1`. |
+| `ACT_SAVE` | `int` | `80` | Save the sprite-specific state to the stream referenced by `var1`. |
+| `ACT_SET_ARMY` | `int` | `97` | Set the army number to `var1`. |
+| `ACT_SET_BEHAVE` | `int` | `95` | Set the behaviour mode to `var1`. |
+| `ACT_SET_DEATH_TIMER` | `int` | `112` | Set the time until the sprite dies; 999999 disables the death timer. |
+| `ACT_SET_FILE` | `int` | `123` | Set the filename associated with the sprite. |
+| `ACT_SET_HP` | `int` | `88` | Set hit points using `var1`; when `var1` is zero, `var2` is interpreted as a percentage of maximum HP. |
+| `ACT_SET_INVISIBLE` | `int` | `98` | Set visibility using `var1` (1 hides the object; 0 makes it visible). |
+| `ACT_SET_LINK` | `int` | `102` | Link the sprite referenced by `var1` to this sprite. |
+| `ACT_SET_SPEED` | `int` | `110` | Set speed to `var1`. |
+| `ACT_SET_TEXT` | `int` | `120` | Set the string associated with an `STEXT` sprite. |
+| `ACT_SET_TEXT_COUNT` | `int` | `122` | Set the number of characters currently displayed. |
+| `ACT_SET_TIMER` | `int` | `106` | Action opcode that sets the unit timer value using the supplied timer value. |
+| `ACT_SET_UPLINK` | `int` | `104` | Unlink this sprite from its parent. |
+| `ACT_SET_ZSPEED` | `int` | `108` | Set Z speed to `var1`. |
+| `ACT_STOP` | `int` | `39` | Stop executing commands; a non-zero `var1` requests an immediate stop. |
+| `ACT_STOP_STACK` | `int` | `73` | Stop execution of subsequent action-stack commands. |
+| `ACT_TRAIN_BEHAVE` | `int` | `153` | Set the train behaviour mode using a `TRAINBEHAVE_*` value in `var1`. |
+| `ACT_UNDO_INSERT` | `int` | `133` | Map-editor undo operation that restores a unit to the screen without recreating the underlying object. |
+| `ACT_UNDO_REMOVE` | `int` | `132` | Map-editor undo operation that removes a unit from the screen without deleting the underlying object. |
+| `ANI_BIRTH` | `int` | `14` | Animation-state identifier used by sprite animation functions. |
+| `ANI_BUILD` | `int` | `1` | Animation-state identifier used by sprite animation functions. |
+| `ANI_CLASH` | `int` | `12` | Animation-state identifier used by sprite animation functions. |
+| `ANI_CLOSE` | `int` | `7` | Animation-state identifier used by sprite animation functions. |
+| `ANI_DEATH` | `int` | `15` | Animation-state identifier used by sprite animation functions. |
+| `ANI_DEATH2` | `int` | `16` | Animation-state identifier used by sprite animation functions. |
+| `ANI_FIGHT` | `int` | `8` | Animation-state identifier used by sprite animation functions. |
+| `ANI_FONT_NEXT_CHAR` | `int` | `1` | Animation-state identifier used by sprite animation functions. |
+| `ANI_FONT_NEXT_LINE` | `int` | `2` | Animation-state identifier used by sprite animation functions. |
+| `ANI_FONT_NORMAL` | `int` | `0` | Animation-state identifier used by sprite animation functions. |
+| `ANI_GO` | `int` | `2` | Animation-state identifier used by sprite animation functions. |
+| `ANI_HIT` | `int` | `7` | Animation-state identifier used by sprite animation functions. |
+| `ANI_L_ROTATE` | `int` | `4` | Animation-state identifier used by sprite animation functions. |
+| `ANI_LAZY` | `int` | `12` | Animation-state identifier used by sprite animation functions. |
+| `ANI_LINK` | `int` | `11` | Animation-state identifier used by sprite animation functions. |
+| `ANI_LOAD` | `int` | `11` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUDISABLE` | `int` | `6` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUDISABLEDOWN` | `int` | `6` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUDISABLEUP` | `int` | `7` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUPRESSDOWN` | `int` | `4` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUPRESSUP` | `int` | `5` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUSELECTDOWN` | `int` | `2` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUSELECTUP` | `int` | `3` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUSTANDDOWN` | `int` | `0` | Animation-state identifier used by sprite animation functions. |
+| `ANI_MENUSTANDUP` | `int` | `1` | Animation-state identifier used by sprite animation functions. |
+| `ANI_OPEN` | `int` | `6` | Animation-state identifier used by sprite animation functions. |
+| `ANI_R_ROTATE` | `int` | `5` | Animation-state identifier used by sprite animation functions. |
+| `ANI_SALUT` | `int` | `9` | Animation-state identifier used by sprite animation functions. |
+| `ANI_STAND` | `int` | `0` | Animation-state identifier used by sprite animation functions. |
+| `ANI_STAND_OPEN` | `int` | `10` | Animation-state identifier used by sprite animation functions. |
+| `ANI_START_MOVE` | `int` | `3` | Animation-state identifier used by sprite animation functions. |
+| `ANI_STOP_MOVE` | `int` | `1` | Animation-state identifier used by sprite animation functions. |
+| `ANI_UNLOAD` | `int` | `12` | Animation-state identifier used by sprite animation functions. |
+| `ANI_WOUND` | `int` | `13` | Animation-state identifier used by sprite animation functions. |
+| `B_AVIA` | `int` | `4` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_BALLOON` | `int` | `26` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_BUILDING` | `int` | `3` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_CANNON` | `int` | `5` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_CIV_ROBOT` | `int` | `20` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_CREATURE` | `int` | `25` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_DEPO` | `int` | `24` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_ENGINE` | `int` | `21` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_FRAME` | `int` | `10` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_LINKER` | `int` | `12` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_MISSILE` | `int` | `27` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_OBJECT` | `int` | `1` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_PRIMITIVE` | `int` | `6` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_RAIL` | `int` | `22` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_REGION` | `int` | `23` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_SPRITE` | `int` | `9` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_TERRAIN` | `int` | `0` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_TEXT` | `int` | `19` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `B_UNIT` | `int` | `2` | Sprite-class identifier returned by `GetVid()`/`GetVidData()` through `VID_CLASS`. |
+| `BEH_ACTIVE` | `int` | `2` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_AGGRESSIVE` | `int` | `1` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_BIGFIRE` | `int` | `16` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_BOTTOM` | `int` | `4` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_CAREFUL` | `int` | `4` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_CENTER` | `int` | `(BEH_CENTER_X+BEH_CENTER_Y)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_CENTER_X` | `int` | `1` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_CENTER_Y` | `int` | `8` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_FILE` | `int` | `(2*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_HAUNT` | `int` | `8` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_LEFT` | `int` | `0` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_LOAD_FROM` | `int` | `(16+32+64)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_NOT_LOAD` | `int` | `(0*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_RIGHT` | `int` | `2` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_SCRIPT_FILE` | `int` | `(4*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_SCRIPT_STRINGS` | `int` | `(5*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_SCRIPT_UPDATED` | `int` | `(6*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_SCRIPT_VARIABLE` | `int` | `(3*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_STRINGS_INI` | `int` | `(1*16)` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `BEH_TOP` | `int` | `0` | Text or sprite behaviour flag used when loading or displaying text resources. |
+| `COM_ATTACK` | `int` | `3` | Sprite command identifier. Value: 3 |
+| `COM_BUILD` | `int` | `16` | Sprite command identifier. Value: 16 |
+| `COM_DISTATTACK` | `int` | `5` | Sprite command identifier. Value: 5 |
+| `COM_ENGINE_ATTACK` | `int` | `28` | Sprite command identifier. Value: 28 |
+| `COM_ENGINE_CLASH` | `int` | `27` | Sprite command identifier. Value: 27 |
+| `COM_ENGINE_LINK` | `int` | `26` | Sprite command identifier. Value: 26 |
+| `COM_ENGINE_MINE` | `int` | `24` | Sprite command identifier. Value: 24 |
+| `COM_ENGINE_MOVE` | `int` | `23` | Sprite command identifier. Value: 23 |
+| `COM_ENGINE_ONEATTACK` | `int` | `29` | Sprite command identifier. Value: 29 |
+| `COM_ENGINE_PATROL` | `int` | `25` | Sprite command identifier. Value: 25 |
+| `COM_MOVE` | `int` | `1` | Sprite command identifier. Value: 1 |
+| `COM_MOVE3D` | `int` | `2` | Sprite command identifier. Value: 2 |
+| `COM_NEARATTACK` | `int` | `6` | Sprite command identifier. Value: 6 |
+| `COM_NONE` | `int` | `0` | Sprite command identifier. Value: 0 |
+| `COM_ONEATTACK` | `int` | `4` | Sprite command identifier. Value: 4 |
+| `COM_OTHER` | `int` | `31` | Sprite command identifier. Value: 31 |
+| `COM_PASSIVE` | `int` | `17` | Sprite command identifier. Value: 17 |
+| `COM_PATROL` | `int` | `7` | Sprite command identifier. Value: 7 |
+| `COM_PAUSE` | `int` | `18` | Sprite command identifier. Value: 18 |
+| `COM_ROTATE` | `int` | `19` | Sprite command identifier. Value: 19 |
+| `COM_TARAN` | `int` | `8` | Sprite command identifier. Value: 8 |
+| `CURSOR_ATTACK` | `int` | `5` | Game cursor mode identifier. Value: 5 |
+| `CURSOR_CLASH` | `int` | `3` | Game cursor mode identifier. Value: 3 |
+| `CURSOR_CYCLE` | `int` | `9` | Game cursor mode identifier. Value: 9 |
+| `CURSOR_DELETE` | `int` | `15` | Game cursor mode identifier. Value: 15 |
+| `CURSOR_FIGHT` | `int` | `5` | Game cursor mode identifier. Value: 5 |
+| `CURSOR_FIGHT2` | `int` | `6` | Game cursor mode identifier. Value: 6 |
+| `CURSOR_LINK` | `int` | `10` | Game cursor mode identifier. Value: 10 |
+| `CURSOR_MOVE` | `int` | `2` | Game cursor mode identifier. Value: 2 |
+| `CURSOR_NORMAL` | `int` | `0` | Game cursor mode identifier. Value: 0 |
+| `CURSOR_NOTMOVE` | `int` | `8` | Game cursor mode identifier. Value: 8 |
+| `CURSOR_OFF` | `int` | `-1` | Game cursor mode identifier. Value: -1 |
+| `CURSOR_SELECT` | `int` | `7` | Game cursor mode identifier. Value: 7 |
+| `CURSOR_UNLINK` | `int` | `11` | Game cursor mode identifier. Value: 11 |
+| `EFF_ALPHAAPPEAR` | `int` | `5` | Engine effect identifier used with `Effect()`. |
+| `EFF_FADE` | `int` | `3` | Engine effect identifier used with `Effect()`. |
+| `EFF_FADE_IN` | `int` | `9` | Engine effect identifier used with `Effect()`. |
+| `EFF_FADE_OUT` | `int` | `10` | Engine effect identifier used with `Effect()`. |
+| `EFF_LINESHIFT` | `int` | `7` | Engine effect identifier used with `Effect()`. |
+| `EFF_NONE` | `int` | `0` | Engine effect identifier used with `Effect()`. |
+| `EFF_NUKE` | `int` | `1` | Engine effect identifier used with `Effect()`. |
+| `EFF_OPEN_WINDOW` | `int` | `4` | Engine effect identifier used with `Effect()`. |
+| `EFF_PIXELAPPEAR` | `int` | `6` | Engine effect identifier used with `Effect()`. |
+| `EFF_SCALE_WINDOW` | `int` | `8` | Engine effect identifier used with `Effect()`. |
+| `EFF_SCROLL` | `int` | `2` | Engine effect identifier used with `Effect()`. |
+| `ENV_BORN_RAIN` | `int` | `0x0800` | Environment effect flag used with SetEnvironment(). Value: 0x0800 |
+| `ENV_BORN_SNOW` | `int` | `0x8000` | Environment effect flag used with SetEnvironment(). Value: 0x8000 |
+| `ENV_EARTHQUAKE` | `int` | `4` | Environment effect flag used with SetEnvironment(). Value: 4 |
+| `ENV_FOG` | `int` | `32` | Environment effect flag used with SetEnvironment(). Value: 32 |
+| `ENV_FOGAPPEAR` | `int` | `0x0200` | Environment effect flag used with SetEnvironment(). Value: 0x0200 |
+| `ENV_FOGINV` | `int` | `0x0100` | Environment effect flag used with SetEnvironment(). Value: 0x0100 |
+| `ENV_GROUND_SNOW` | `int` | `64` | Environment effect flag used with SetEnvironment(). Value: 64 |
+| `ENV_LONGSHADOW` | `int` | `2` | Environment effect flag used with SetEnvironment(). Value: 2 |
+| `ENV_MASK_RAIN` | `int` | `0x0C00` | Environment effect flag used with SetEnvironment(). Value: 0x0C00 |
+| `ENV_MASK_SNOW` | `int` | `0xC000` | Environment effect flag used with SetEnvironment(). Value: 0xC000 |
+| `ENV_RAIN` | `int` | `0x0C00` | Environment effect flag used with SetEnvironment(). Value: 0x0C00 |
+| `ENV_SHADOW` | `int` | `1` | Environment effect flag used with SetEnvironment(). Value: 1 |
+| `ENV_SNOW` | `int` | `0xC000` | Environment effect flag used with SetEnvironment(). Value: 0xC000 |
+| `ENV_SQUALL` | `int` | `128` | Environment effect flag used with SetEnvironment(). Value: 128 |
+| `ENV_STOP` | `int` | `0x80000000` | Environment effect flag used with SetEnvironment(). Value: 0x80000000 |
+| `ENV_STOP_RAIN` | `int` | `0x0400` | Environment effect flag used with SetEnvironment(). Value: 0x0400 |
+| `ENV_STOP_SNOW` | `int` | `0x4000` | Environment effect flag used with SetEnvironment(). Value: 0x4000 |
+| `ENV_STOPALL` | `int` | `0xFFFFFFFF` | Environment effect flag used with SetEnvironment(). Value: 0xFFFFFFFF |
+| `GETSPRITE_ARMY0` | `int` | `0x10000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_ARMY1` | `int` | `0x20000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_ARMY2` | `int` | `0x40000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_ARMY3` | `int` | `0x80000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_AVIA` | `int` | `0x800000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_CANNON` | `int` | `0x20000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_CLASS` | `int` | `0x1000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_FREE` | `int` | `0x80000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_HASH` | `int` | `0x8000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_MENU` | `int` | `0x1000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_OBJECT` | `int` | `0x200000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_RAILWAY` | `int` | `0x2000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_REGION` | `int` | `0x4000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_SPRITE` | `int` | `0x40000000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_TERRAIN` | `int` | `0x100000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_UNIT` | `int` | `0x400000` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `GETSPRITE_VID` | `int` | `0x800` | Sprite-filter flag used by `GetSprite()`, `FirstInBox()` and related search functions. |
+| `INPUT_CTRL` | `int` | `32` | Input-state bit flag. Value: 32 |
+| `INPUT_DOWN` | `int` | `512` | Input-state bit flag. Value: 512 |
+| `INPUT_FIRST` | `int` | `1024` | Input-state bit flag. Value: 1024 |
+| `INPUT_LCLICK` | `int` | `1` | Input-state bit flag. Value: 1 |
+| `INPUT_LDOWN` | `int` | `4` | Input-state bit flag. Value: 4 |
+| `INPUT_LEFT` | `int` | `64` | Input-state bit flag. Value: 64 |
+| `INPUT_RCLICK` | `int` | `2` | Input-state bit flag. Value: 2 |
+| `INPUT_RDOWN` | `int` | `8` | Input-state bit flag. Value: 8 |
+| `INPUT_RIGHT` | `int` | `128` | Input-state bit flag. Value: 128 |
+| `INPUT_SECOND` | `int` | `2048` | Input-state bit flag. Value: 2048 |
+| `INPUT_SHIFT` | `int` | `16` | Input-state bit flag. Value: 16 |
+| `INPUT_UP` | `int` | `256` | Input-state bit flag. Value: 256 |
+| `NET_CLEARKILL` | `int` | `9` | Network information selector used with GetNetInfo(). Value: 9 |
+| `NET_KILLPLAYER` | `int` | `10` | Network information selector used with GetNetInfo(). Value: 10 |
+| `NET_NAMEPLAYER` | `int` | `2` | Network information selector used with GetNetInfo(). Value: 2 |
+| `NET_NOPLAYER` | `int` | `6` | Network information selector used with GetNetInfo(). Value: 6 |
+| `NET_NUMPLAYER` | `int` | `1` | Network information selector used with GetNetInfo(). Value: 1 |
+| `PROP_ACCELERATE` | `int` | `6` | Train acceleration capability. |
+| `PROP_AMMO` | `int` | `5` | Remaining ammunition as a percentage. |
+| `PROP_AMMO_MAX` | `int` | `11` | Maximum ammunition capacity of the train. |
+| `PROP_AMMO_NO` | `int` | `10` | Current ammunition count for the train. |
+| `PROP_BUILD_TIME` | `int` | `7` | Build time for the train. |
+| `PROP_FREE` | `int` | `9` | Whether the train is idle. |
+| `PROP_HP` | `int` | `4` | Remaining life in hit points. |
+| `PROP_LIFE` | `int` | `3` | Remaining life as a percentage. |
+| `PROP_SPEED` | `int` | `1` | Train speed capability. |
+| `PROP_WEAPON` | `int` | `2` | Train firepower, accounting for ammunition. |
+| `SCROLL_FLAGMAN_IN_CENTER` | `int` | `16` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_FROM_BORDER` | `int` | `1` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_NONE` | `int` | `0` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_TO_FLAGMAN` | `int` | `4` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_TO_FLAGMAN_WITH_DIRECTION` | `int` | `8` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_WITH_ARROWS` | `int` | `32` | Screen-scrolling mode used with `SetScrollType()`. |
+| `SCROLL_WITH_MOUSE` | `int` | `2` | Screen-scrolling mode used with `SetScrollType()`. |
+| `STAT_ACTIVE_FORT_GUN` | `int` | `13` | Number of intact fort guns. |
+| `STAT_AGRESSIVE_TRAIN` | `int` | `7` | Number of trains currently assigned an attack target. |
+| `STAT_ALL_GUN_POWER` | `int` | `20` | Aggregate firepower score across all units. |
+| `STAT_ANTI_AVIA` | `int` | `5` | Number of anti-air units. |
+| `STAT_ANTIAVIA_GUN_POWER` | `int` | `18` | Aggregate anti-air firepower score. |
+| `STAT_AVIA` | `int` | `3` | Number of air units. |
+| `STAT_AVIA_GUN_POWER` | `int` | `17` | Aggregate air-unit firepower score. |
+| `STAT_BATTLE_TRAIN` | `int` | `6` | Number of armed and equipped locomotive trains. |
+| `STAT_DAMAGED_FORT_GUN` | `int` | `14` | Number of destroyed or damaged fort guns. |
+| `STAT_DAMAGED_UNITS` | `int` | `21` | Count of wounded units. |
+| `STAT_ENGINE_GUN_POWER` | `int` | `16` | Aggregate rail-unit firepower score, calculated from ammunition, per-shot damage, reload time, range and shared/unit coefficients. |
+| `STAT_FREE_DEPO` | `int` | `12` | Number of idle depots. |
+| `STAT_GROUND_GUN_POWER` | `int` | `19` | Aggregate ground-unit firepower score. |
+| `STAT_LIFE` | `int` | `15` | Total hit points. |
+| `STAT_MOBILE_TRAIN` | `int` | `2` | Number of trains with locomotives. |
+| `STAT_PASSIVE_TRAIN` | `int` | `10` | Number of passive trains. |
+| `STAT_PATROL_TRAIN` | `int` | `9` | Number of trains currently patrolling. |
+| `STAT_SUPER_WEAPON` | `int` | `4` | Number of long-range heavy weapons. |
+| `STAT_TRAIN` | `int` | `1` | Total number of trains. |
+| `STAT_VERYDANGER_TRAIN` | `int` | `8` | Number of trains classified as very dangerous to the enemy; the source notes that this rating is tuned during testing. |
+| `STAT_WORKING_DEPO` | `int` | `11` | Number of depots currently working. |
+| `U_AVIA` | `int` | `8` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_CANNON` | `int` | `512` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_MENU` | `int` | `16` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_OBJECT` | `int` | `2` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_RAILWAY` | `int` | `32` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_REGION` | `int` | `64` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_SPRITE` | `int` | `1024` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_TACTIC` | `int` | `128` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_TERRAIN` | `int` | `1` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `U_UNIT` | `int` | `4` | Sprite-type bit flag used by sprite search and type-filtering functions. |
+| `VID_AMMO` | `int` | `26` | Maximum ammunition count. |
+| `VID_BATTLERANGE` | `int` | `23` | Weapon battle range. |
+| `VID_BUILDTIME` | `int` | `55` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_CHILD` | `int` | `60` | VID range for child objects. |
+| `VID_CLASS` | `int` | `47` | Sprite class; compare with the `B_*` constants. |
+| `VID_COUNT` | `int` | `28` | Number of units of this type currently present on the map. |
+| `VID_COUNT0` | `int` | `34` | Number of units of this type belonging to army 0. |
+| `VID_COUNT1` | `int` | `35` | Number of units of this type belonging to army 1. |
+| `VID_COUNT2` | `int` | `36` | Number of units of this type belonging to army 2. |
+| `VID_COUNT3` | `int` | `37` | Number of units of this type belonging to army 3. |
+| `VID_DAMAGE` | `int` | `124` | Damage dealt to nearby objects when this unit dies. |
+| `VID_DETECTRANGE` | `int` | `50` | Enemy detection range in pixels. |
+| `VID_EXCHANGEVID` | `int` | `52` | VID used to exchange/swap the object VID. |
+| `VID_FRAME_SPEED` | `int` | `58` | FLC animation playback speed. |
+| `VID_GAMMA` | `int` | `18` | Gamma/brightness value. |
+| `VID_HIDE` | `int` | `56` | Visibility flag controlling whether the VID is drawn. |
+| `VID_HP_COEFF0` | `int` | `42` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_HP_COEFF1` | `int` | `43` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_HP_COEFF2` | `int` | `44` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_HP_COEFF3` | `int` | `45` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_KILLEDUNIT` | `int` | `29` | Number of times this object has been killed. |
+| `VID_KILLEDUNIT0` | `int` | `30` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_KILLEDUNIT1` | `int` | `31` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_KILLEDUNIT2` | `int` | `32` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_KILLEDUNIT3` | `int` | `33` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_LIFETIME` | `int` | `49` | Unit lifetime in milliseconds. |
+| `VID_LINK` | `int` | `59` | VID of the object linked to this object. |
+| `VID_MAXHP` | `int` | `1` | Maximum hit points. |
+| `VID_MAXHP0` | `int` | `38` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_MAXHP1` | `int` | `39` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_MAXHP2` | `int` | `40` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_MAXHP3` | `int` | `41` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_MAXUNIT` | `int` | `25` | Maximum number of units of this type allowed on the map. |
+| `VID_MOVE_MASK` | `int` | `54` | Movement mask. |
+| `VID_NAME` | `int` | `27` | Object name. |
+| `VID_NO_CHILD` | `int` | `92` | VID range for objects without children. |
+| `VID_NO_DIR` | `int` | `53` | Number of directions supported by the object. |
+| `VID_NOT_CREATE_AS_CHILD` | `int` | `57` | Flag that prevents this VID from being created as a child or linked object. |
+| `VID_PROPERTY` | `int` | `22` | Property selector slot. |
+| `VID_RECOLORUNIT` | `int` | `125` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_RECOLORUNIT0` | `int` | `126` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_RECOLORUNIT1` | `int` | `127` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_RECOLORUNIT2` | `int` | `128` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_RECOLORUNIT3` | `int` | `129` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_SPEED` | `int` | `48` | Unit movement speed. |
+| `VID_SPRITETYPE` | `int` | `46` | Sprite type; compare with the `U_*` constants. |
+| `VID_WEAPONAIM` | `int` | `51` | Weapon accuracy. |
+| `VK_ADD` | `int` | `0x6B00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_BACK` | `int` | `0x08` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_CANCEL` | `int` | `0x03` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_CLEAR` | `int` | `0x0C` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_DECIMAL` | `int` | `0x6E00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_DELETE` | `int` | `0x2E00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_DIVIDE` | `int` | `0x6F00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_DOWN` | `int` | `0x2800` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_END` | `int` | `0x2300` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_ESCAPE` | `int` | `0x1B` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_EXECUTE` | `int` | `0x2B00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F1` | `int` | `0x7000` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F10` | `int` | `0x7900` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F11` | `int` | `0x7A00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F12` | `int` | `0x7B00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F13` | `int` | `0x7C00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F14` | `int` | `0x7D00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F15` | `int` | `0x7E00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F16` | `int` | `0x7F00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F17` | `int` | `0x8000` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F18` | `int` | `0x8100` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F19` | `int` | `0x8200` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F2` | `int` | `0x7100` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F20` | `int` | `0x8300` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F21` | `int` | `0x8400` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F22` | `int` | `0x8500` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F23` | `int` | `0x8600` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F24` | `int` | `0x8700` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F3` | `int` | `0x7200` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F4` | `int` | `0x7300` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F5` | `int` | `0x7400` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F6` | `int` | `0x7500` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F7` | `int` | `0x7600` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F8` | `int` | `0x7700` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_F9` | `int` | `0x7800` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_HELP` | `int` | `0x2F00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_HOME` | `int` | `0x2400` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_INSERT` | `int` | `0x2D00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_LBUTTON` | `int` | `0x01` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_LEFT` | `int` | `0x2500` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_MBUTTON` | `int` | `0x04` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_MULTIPLY` | `int` | `0x6A00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NEXT` | `int` | `0x2200` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMLOCK` | `int` | `0x90` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD0` | `int` | `0x6000` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD1` | `int` | `0x6100` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD2` | `int` | `0x6200` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD3` | `int` | `0x6300` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD4` | `int` | `0x6400` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD5` | `int` | `0x6500` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD6` | `int` | `0x6600` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD7` | `int` | `0x6700` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD8` | `int` | `0x6800` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_NUMPAD9` | `int` | `0x6900` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_PRINT` | `int` | `0x2A00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_PRIOR` | `int` | `0x2100` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_RBUTTON` | `int` | `0x02` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_RETURN` | `int` | `0x0D` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_RIGHT` | `int` | `0x2700` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SCROLL` | `int` | `0x91` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SELECT` | `int` | `0x2900` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SEPARATOR` | `int` | `0x6C00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SNAPSHOT` | `int` | `0x2C00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SPACE` | `int` | `0x20` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_SUBTRACT` | `int` | `0x6D00` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_TAB` | `int` | `0x09` | Windows virtual-key code returned by `GetKey()`. |
+| `VK_UP` | `int` | `0x2600` | Windows virtual-key code returned by `GetKey()`. |
 
 ## `menuend.lgc`
 
 19 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `A0_LENGTH` | `6` | Standard-header constant `A0_LENGTH` defined in `menuend.lgc`. Value: 6. |
-| `A1_LENGTH` | `6` | Standard-header constant `A1_LENGTH` defined in `menuend.lgc`. Value: 6. |
-| `A2_LENGTH` | `8` | Standard-header constant `A2_LENGTH` defined in `menuend.lgc`. Value: 8. |
-| `BONUS_LEVEL_SCORES` | `100` | Standard-header constant `BONUS_LEVEL_SCORES` defined in `menuend.lgc`. Value: 100. |
-| `BONUS_TIME_LIMIT` | `20` | Standard-header constant `BONUS_TIME_LIMIT` defined in `menuend.lgc`. Value: 20. |
-| `BONUS_TIME_PER_MINUTE` | `5` | Standard-header constant `BONUS_TIME_PER_MINUTE` defined in `menuend.lgc`. Value: 5. |
-| `FH` | `` | Context-dependent standard-header constant. It is defined in menutact.lgc, menuend.lgc; the active value depends on the include/preprocessor context. |
-| `FW` | `` | Context-dependent standard-header constant. It is defined in menutact.lgc, menuend.lgc; the active value depends on the include/preprocessor context. |
-| `MENU_BACK_VID` | `465` | Standard-header constant `MENU_BACK_VID` defined in `menuend.lgc`. Value: 465. |
-| `MENU_BUTTON_VID` | `474` | Standard-header constant `MENU_BUTTON_VID` defined in `menuend.lgc`. Value: 474. |
-| `NAME_LENGTH` | `24` | Standard-header constant `NAME_LENGTH` defined in `menuend.lgc`. Value: 24. |
-| `NUKE_TIME_ENDS` | `1500` | Standard-header constant `NUKE_TIME_ENDS` defined in `menuend.lgc`. Value: 1500. |
-| `STAT_DY` | `9` | Standard-header constant `STAT_DY` defined in `menuend.lgc`. Value: 9. |
-| `STAT_X` | `100` | Standard-header constant `STAT_X` defined in `menuend.lgc`. Value: 100. |
-| `STAT_X_2` | `300` | Standard-header constant `STAT_X_2` defined in `menuend.lgc`. Value: 300. |
-| `STAT_Y` | `150` | Standard-header constant `STAT_Y` defined in `menuend.lgc`. Value: 150. |
-| `TEXT_LEFT` | `50` | Standard-header constant `TEXT_LEFT` defined in `menuend.lgc`. Value: 50. |
-| `TEXT_TOP` | `20` | Standard-header constant `TEXT_TOP` defined in `menuend.lgc`. Value: 20. |
-| `TIME_TO_VICTORY` | `3` | Standard-header constant `TIME_TO_VICTORY` defined in `menuend.lgc`. Value: 3. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `A0_LENGTH` | `int` | `6` | Number of entries in the first end-screen score/name table. |
+| `A1_LENGTH` | `int` | `6` | Number of entries in the second end-screen score/name table. |
+| `A2_LENGTH` | `int` | `8` | Number of entries in the third end-screen score/name table. |
+| `BONUS_LEVEL_SCORES` | `int` | `100` | Score awarded for completing a level successfully. |
+| `BONUS_TIME_LIMIT` | `int` | `20` | Time limit in minutes used by the completion-time bonus calculation. |
+| `BONUS_TIME_PER_MINUTE` | `int` | `5` | Score awarded for each minute saved under the level time limit. |
+| `FH` | `int` | `` | Menu font dimension. The effective value depends on the active menu include: `menutact.lgc` and `menuend.lgc` use different values. |
+| `FW` | `int` | `` | Menu font dimension. The effective value depends on the active menu include: `menutact.lgc` and `menuend.lgc` use different values. |
+| `MENU_BACK_VID` | `int` | `465` | Menu-state or menu-layout constant used by standard menu scripts. |
+| `MENU_BUTTON_VID` | `int` | `474` | Menu-state or menu-layout constant used by standard menu scripts. |
+| `NAME_LENGTH` | `int` | `24` | Maximum name length used by the end-screen score table. |
+| `NUKE_TIME_ENDS` | `int` | `1500` | Duration of the nuclear effect in the end-menu sequence. |
+| `STAT_DY` | `int` | `9` | Statistic selector used with `GetStatistics()` and `CalcStatistics()`. |
+| `STAT_X` | `int` | `100` | Statistic selector used with `GetStatistics()` and `CalcStatistics()`. |
+| `STAT_X_2` | `int` | `300` | Statistic selector used with `GetStatistics()` and `CalcStatistics()`. |
+| `STAT_Y` | `int` | `150` | Statistic selector used with `GetStatistics()` and `CalcStatistics()`. |
+| `TEXT_LEFT` | `int` | `50` | Left margin used when drawing menu text. |
+| `TEXT_TOP` | `int` | `20` | Top margin used when drawing menu text. |
+| `TIME_TO_VICTORY` | `int` | `3` | Delay in seconds before the victory sequence is triggered. |
 
 ## `menutact.lgc`
 
 43 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `BAR_X` | `769` | Standard-header constant `BAR_X` defined in `menutact.lgc`. Value: 769. |
-| `BAR_Y` | `519` | Standard-header constant `BAR_Y` defined in `menutact.lgc`. Value: 519. |
-| `BREIF_HEAD_X` | `-182` | Standard-header constant `BREIF_HEAD_X` defined in `menutact.lgc`. Value: -182. |
-| `BREIF_HEAD_Y` | `2197` | Standard-header constant `BREIF_HEAD_Y` defined in `menutact.lgc`. Value: 2197. |
-| `BREIF_HEAD_Z` | `2300` | Standard-header constant `BREIF_HEAD_Z` defined in `menutact.lgc`. Value: 2300. |
-| `BTN_DY` | `47` | Standard-header constant `BTN_DY` defined in `menutact.lgc`. Value: 47. |
-| `BTN_X` | `288` | Standard-header constant `BTN_X` defined in `menutact.lgc`. Value: 288. |
-| `BTN_Y` | `223` | Standard-header constant `BTN_Y` defined in `menutact.lgc`. Value: 223. |
-| `EDITOR_BRIEF_COLS` | `44` | Standard-header constant `EDITOR_BRIEF_COLS` defined in `menutact.lgc`. Value: 44. |
-| `EDITOR_HEAD_CHAR` | `18` | Standard-header constant `EDITOR_HEAD_CHAR` defined in `menutact.lgc`. Value: 18. |
-| `EDITOR_ROW_CHAR` | `8` | Standard-header constant `EDITOR_ROW_CHAR` defined in `menutact.lgc`. Value: 8. |
-| `EDITOR_ROW_HEAD_Y` | `-95` | Standard-header constant `EDITOR_ROW_HEAD_Y` defined in `menutact.lgc`. Value: -95. |
-| `EDITOR_ROW_LINES` | `10` | Standard-header constant `EDITOR_ROW_LINES` defined in `menutact.lgc`. Value: 10. |
-| `EDITOR_ROW_LOW_Y` | `106` | Standard-header constant `EDITOR_ROW_LOW_Y` defined in `menutact.lgc`. Value: 106. |
-| `EDITOR_ROW_RIGHT` | `178` | Standard-header constant `EDITOR_ROW_RIGHT` defined in `menutact.lgc`. Value: 178. |
-| `EDITOR_ROW_X` | `-150` | Standard-header constant `EDITOR_ROW_X` defined in `menutact.lgc`. Value: -150. |
-| `EDITOR_ROW_Y` | `80` | Standard-header constant `EDITOR_ROW_Y` defined in `menutact.lgc`. Value: 80. |
-| `LONLY_X` | `287` | Standard-header constant `LONLY_X` defined in `menutact.lgc`. Value: 287. |
-| `LONLY_Y` | `530` | Standard-header constant `LONLY_Y` defined in `menutact.lgc`. Value: 530. |
-| `MAIN_FLC_DIR` | `6` | Standard-header constant `MAIN_FLC_DIR` defined in `menutact.lgc`. Value: 6. |
-| `MAIN_X` | `534` | Standard-header constant `MAIN_X` defined in `menutact.lgc`. Value: 534. |
-| `MAIN_Y` | `366` | Standard-header constant `MAIN_Y` defined in `menutact.lgc`. Value: 366. |
-| `MAPS_NUM` | `20` | Standard-header constant `MAPS_NUM` defined in `menutact.lgc`. Value: 20. |
-| `MENU_GAMMA` | `0x007F3C7F` | Standard-header constant `MENU_GAMMA` defined in `menutact.lgc`. Value: 0x007F3C7F. |
-| `SCR_DEF_X` | `1024` | Standard-header constant `SCR_DEF_X` defined in `menutact.lgc`. Value: 1024. |
-| `SCR_DEF_Y` | `768` | Standard-header constant `SCR_DEF_Y` defined in `menutact.lgc`. Value: 768. |
-| `SO_BTN_D` | `200` | Standard-header constant `SO_BTN_D` defined in `menutact.lgc`. Value: 200. |
-| `SO_BTN_DD` | `57` | Standard-header constant `SO_BTN_DD` defined in `menutact.lgc`. Value: 57. |
-| `SO_BTN_H` | `10` | Standard-header constant `SO_BTN_H` defined in `menutact.lgc`. Value: 10. |
-| `SO_BTN_W` | `20` | Standard-header constant `SO_BTN_W` defined in `menutact.lgc`. Value: 20. |
-| `SO_BTN_X` | `265` | Standard-header constant `SO_BTN_X` defined in `menutact.lgc`. Value: 265. |
-| `SO_BTN_Y` | `223` | Standard-header constant `SO_BTN_Y` defined in `menutact.lgc`. Value: 223. |
-| `u_btn_delete` | `85` | Standard-header constant `u_btn_delete` defined in `menutact.lgc`. Value: 85. |
-| `u_btn_diff_down` | `230` | Standard-header constant `u_btn_diff_down` defined in `menutact.lgc`. Value: 230. |
-| `u_btn_diff_str` | `108` | Standard-header constant `u_btn_diff_str` defined in `menutact.lgc`. Value: 108. |
-| `u_btn_diff_up` | `250` | Standard-header constant `u_btn_diff_up` defined in `menutact.lgc`. Value: 250. |
-| `u_btn_edit` | `65` | Standard-header constant `u_btn_edit` defined in `menutact.lgc`. Value: 65. |
-| `u_btn_width` | `16` | Standard-header constant `u_btn_width` defined in `menutact.lgc`. Value: 16. |
-| `UO_H` | `20` | Standard-header constant `UO_H` defined in `menutact.lgc`. Value: 20. |
-| `USR_X` | `-103` | Standard-header constant `USR_X` defined in `menutact.lgc`. Value: -103. |
-| `USR_X_PLUS` | `57` | Standard-header constant `USR_X_PLUS` defined in `menutact.lgc`. Value: 57. |
-| `USR_Y` | `45` | Standard-header constant `USR_Y` defined in `menutact.lgc`. Value: 45. |
-| `USR_Y_PLUS` | `7` | Standard-header constant `USR_Y_PLUS` defined in `menutact.lgc`. Value: 7. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `BAR_X` | `int` | `769` | X coordinate of the menu barometer. |
+| `BAR_Y` | `int` | `519` | Y coordinate of the menu barometer. |
+| `BREIF_HEAD_X` | `int` | `-182` | X coordinate of the briefing heading. |
+| `BREIF_HEAD_Y` | `int` | `2197` | Y coordinate of the briefing heading. |
+| `BREIF_HEAD_Z` | `int` | `2300` | Z coordinate of the briefing heading. |
+| `BTN_DY` | `int` | `47` | Vertical distance between buttons in a menu column. |
+| `BTN_X` | `int` | `288` | X coordinate of the first button in a menu column. |
+| `BTN_Y` | `int` | `223` | Y coordinate of the first button in a menu column. |
+| `EDITOR_BRIEF_COLS` | `int` | `44` | Number of text columns available in the briefing editor. |
+| `EDITOR_HEAD_CHAR` | `int` | `18` | Character width used for the editor briefing heading. |
+| `EDITOR_ROW_CHAR` | `int` | `8` | Character width used for an editor briefing row. |
+| `EDITOR_ROW_HEAD_Y` | `int` | `-95` | Vertical offset of the editor briefing-row heading. |
+| `EDITOR_ROW_LINES` | `int` | `10` | Maximum number of text lines displayed in one editor briefing row. |
+| `EDITOR_ROW_LOW_Y` | `int` | `106` | Lower vertical bound of the editor briefing row. |
+| `EDITOR_ROW_RIGHT` | `int` | `178` | Right boundary of the editor briefing row. |
+| `EDITOR_ROW_X` | `int` | `-150` | X coordinate of the editor briefing row. |
+| `EDITOR_ROW_Y` | `int` | `80` | Y coordinate of the editor briefing row. |
+| `LONLY_X` | `int` | `287` | X coordinate of the standalone menu button. |
+| `LONLY_Y` | `int` | `530` | Y coordinate of the standalone menu button. |
+| `MAIN_FLC_DIR` | `int` | `6` | Number of frames in the menu-screen FLC animation. |
+| `MAIN_X` | `int` | `534` | X coordinate of the centre of the large in-map menu screen. |
+| `MAIN_Y` | `int` | `366` | Y coordinate of the centre of the large in-map menu screen. |
+| `MAPS_NUM` | `int` | `20` | Number of standard campaign maps. |
+| `MENU_GAMMA` | `int` | `0x007F3C7F` | Menu-state or menu-layout constant used by standard menu scripts. |
+| `SCR_DEF_X` | `int` | `1024` | Width of the menu background FLC. |
+| `SCR_DEF_Y` | `int` | `768` | Height of the menu background FLC. |
+| `SO_BTN_D` | `int` | `200` | Horizontal spacing used by the options/menu button layout. |
+| `SO_BTN_DD` | `int` | `57` | Additional horizontal spacing used by the options/menu button layout. |
+| `SO_BTN_H` | `int` | `10` | Height of the options/menu button. |
+| `SO_BTN_W` | `int` | `20` | Width of the options/menu button. |
+| `SO_BTN_X` | `int` | `265` | X coordinate of the options/menu button group. |
+| `SO_BTN_Y` | `int` | `223` | Y coordinate of the options/menu button group. |
+| `u_btn_delete` | `int` | `85` | Left X coordinate of the user-menu delete button. |
+| `u_btn_diff_down` | `int` | `230` | Left X coordinate of the user-menu difficulty-decrease button. |
+| `u_btn_diff_str` | `int` | `108` | Left X coordinate of the user-menu difficulty label. |
+| `u_btn_diff_up` | `int` | `250` | Left X coordinate of the user-menu difficulty-increase button. |
+| `u_btn_edit` | `int` | `65` | Left X coordinate of the user-menu edit button. |
+| `u_btn_width` | `int` | `16` | Width of user-menu buttons. |
+| `UO_H` | `int` | `20` | Height of an individual user-menu option row. |
+| `USR_X` | `int` | `-103` | X coordinate of the first user-menu player entry. |
+| `USR_X_PLUS` | `int` | `57` | Horizontal increment between user-menu player entries. |
+| `USR_Y` | `int` | `45` | Y coordinate of the first user-menu player entry. |
+| `USR_Y_PLUS` | `int` | `7` | Vertical increment between user-menu player entries. |
 
 ## `obsolete.lgc`
 
 61 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `act_addammo` | `93` | Game-script constant exported by the Locoland engine. Value: 93 |
-| `act_attack` | `32` | Game-script constant exported by the Locoland engine. Value: 32 |
-| `act_buildunit` | `35` | Game-script constant exported by the Locoland engine. Value: 35 |
-| `act_changeaction` | `201` | Game-script constant exported by the Locoland engine. Value: 201 |
-| `act_changecoor` | `203` | Game-script constant exported by the Locoland engine. Value: 203 |
-| `act_changecoor_z` | `204` | Game-script constant exported by the Locoland engine. Value: 204 |
-| `act_clash_engine` | `151` | Game-script constant exported by the Locoland engine. Value: 151 |
-| `act_clearstack` | `72` | Game-script constant exported by the Locoland engine. Value: 72 |
-| `act_close` | `7` | Game-script constant exported by the Locoland engine. Value: 7 |
-| `act_cycleaction` | `71` | Game-script constant exported by the Locoland engine. Value: 71 |
-| `act_damage` | `85` | Game-script constant exported by the Locoland engine. Value: 85 |
-| `act_death` | `15` | Game-script constant exported by the Locoland engine. Value: 15 |
-| `act_firstengine` | `154` | Game-script constant exported by the Locoland engine. Value: 154 |
-| `act_forcelinkengine` | `152` | Game-script constant exported by the Locoland engine. Value: 152 |
-| `act_getaction` | `202` | Game-script constant exported by the Locoland engine. Value: 202 |
-| `act_getammo` | `92` | Game-script constant exported by the Locoland engine. Value: 92 |
-| `act_getarmy` | `96` | Game-script constant exported by the Locoland engine. Value: 96 |
-| `act_getbehave` | `94` | Game-script constant exported by the Locoland engine. Value: 94 |
-| `act_gethp` | `87` | Game-script constant exported by the Locoland engine. Value: 87 |
-| `act_getlink` | `101` | Game-script constant exported by the Locoland engine. Value: 101 |
-| `act_getpercenthp` | `89` | Game-script constant exported by the Locoland engine. Value: 89 |
-| `act_getstate` | `255` | Game-script constant exported by the Locoland engine. Value: 255 |
-| `act_getuplink` | `103` | Game-script constant exported by the Locoland engine. Value: 103 |
-| `act_getweaponrange` | `100` | Game-script constant exported by the Locoland engine. Value: 100 |
-| `act_intrain` | `158` | Game-script constant exported by the Locoland engine. Value: 158 |
-| `act_lastengine` | `155` | Game-script constant exported by the Locoland engine. Value: 155 |
-| `act_linkengine` | `150` | Game-script constant exported by the Locoland engine. Value: 150 |
-| `act_menudisable` | `6` | Game-script constant exported by the Locoland engine. Value: 6 |
-| `act_menustanddown` | `0` | Game-script constant exported by the Locoland engine. Value: 0 |
-| `act_menustandup` | `1` | Game-script constant exported by the Locoland engine. Value: 1 |
-| `act_move` | `33` | Game-script constant exported by the Locoland engine. Value: 33 |
-| `act_nextengine` | `156` | Game-script constant exported by the Locoland engine. Value: 156 |
-| `act_open` | `6` | Game-script constant exported by the Locoland engine. Value: 6 |
-| `act_repair` | `86` | Game-script constant exported by the Locoland engine. Value: 86 |
-| `act_restore` | `200` | Game-script constant exported by the Locoland engine. Value: 200 |
-| `act_salut` | `9` | Game-script constant exported by the Locoland engine. Value: 9 |
-| `act_setarmy` | `97` | Game-script constant exported by the Locoland engine. Value: 97 |
-| `act_setbehave` | `95` | Game-script constant exported by the Locoland engine. Value: 95 |
-| `act_setstate` | `255` | Game-script constant exported by the Locoland engine. Value: 255 |
-| `act_stand` | `0` | Game-script constant exported by the Locoland engine. Value: 0 |
-| `act_stand_open` | `10` | Game-script constant exported by the Locoland engine. Value: 10 |
-| `act_stop` | `39` | Game-script constant exported by the Locoland engine. Value: 39 |
-| `act_train_behave` | `153` | Game-script constant exported by the Locoland engine. Value: 153 |
-| `b_engine` | `21` | Game-script constant exported by the Locoland engine. Value: 21 |
-| `beh_active` | `2` | Game-script constant exported by the Locoland engine. Value: 2 |
-| `beh_aggressive` | `1` | Game-script constant exported by the Locoland engine. Value: 1 |
-| `eff_alphaappear` | `5` | Game-script constant exported by the Locoland engine. Value: 5 |
-| `eff_fade` | `3` | Game-script constant exported by the Locoland engine. Value: 3 |
-| `eff_lineshift` | `7` | Game-script constant exported by the Locoland engine. Value: 7 |
-| `eff_none` | `0` | Game-script constant exported by the Locoland engine. Value: 0 |
-| `eff_nuke` | `1` | Game-script constant exported by the Locoland engine. Value: 1 |
-| `eff_openwindow` | `4` | Game-script constant exported by the Locoland engine. Value: 4 |
-| `eff_pixelappear` | `6` | Game-script constant exported by the Locoland engine. Value: 6 |
-| `eff_scroll` | `2` | Game-script constant exported by the Locoland engine. Value: 2 |
-| `GetVid` | `GetVidData` | Game-script constant exported by the Locoland engine. Value: GetVidData |
-| `SetVid` | `SetVidData` | Game-script constant exported by the Locoland engine. Value: SetVidData |
-| `sprintf` | `Printf` | Game-script constant exported by the Locoland engine. Value: Printf |
-| `u_avia` | `8` | Game-script constant exported by the Locoland engine. Value: 8 |
-| `u_monster` | `4` | Game-script constant exported by the Locoland engine. Value: 4 |
-| `VID_BEHAVE` | `47` | Game object property identifier used with GetVidData() and SetVidData(). Value: 47 |
-| `VID_TYPEUNIT` | `46` | Game object property identifier used with GetVidData() and SetVidData(). Value: 46 |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `act_addammo` | `int` | `93` | Action opcode that adds ammunition; `var1` is the number of rounds to add and the action returns the resulting ammunition amount. |
+| `act_attack` | `int` | `32` | Action opcode for attacking a monster; the legacy comment specifies the monster pointer in `var1`. |
+| `act_buildunit` | `int` | `35` | Action opcode for building a unit; `var1` supplies the unit NVID. |
+| `act_changeaction` | `int` | `201` | Action opcode that changes the unit action; `var1` supplies the action code and `var2` the direction. |
+| `act_changecoor` | `int` | `203` | Action opcode that changes the unit X and Y coordinates using `var1` and `var2`. |
+| `act_changecoor_z` | `int` | `204` | Action opcode that changes the unit Z coordinate using `var1`. |
+| `act_clash_engine` | `int` | `151` | Action opcode for ramming or colliding with another train engine; `var1` identifies that engine. |
+| `act_clearstack` | `int` | `72` | Action opcode that clears the unit action-command stack. |
+| `act_close` | `int` | `7` | Action opcode used to close an object or interactive unit. |
+| `act_cycleaction` | `int` | `71` | Action opcode that loops the unit action-command stack. |
+| `act_damage` | `int` | `85` | Legacy action opcode associated with unit damage. The original source comment notes that its behavior may be changed, so its payload semantics are not documented more specifically. |
+| `act_death` | `int` | `15` | Action opcode for the unit death action. |
+| `act_firstengine` | `int` | `154` | Action opcode that returns the first engine in a train consist. |
+| `act_forcelinkengine` | `int` | `152` | Action opcode that links a detached engine to a consist; `var1` identifies the engine to attach. |
+| `act_getaction` | `int` | `202` | Action opcode that returns the unit current action code. |
+| `act_getammo` | `int` | `92` | Action opcode that returns the unit ammunition amount. |
+| `act_getarmy` | `int` | `96` | Action opcode that returns the unit army number. |
+| `act_getbehave` | `int` | `94` | Action opcode that returns the current unit behavior code. |
+| `act_gethp` | `int` | `87` | Action opcode that returns the unit hit-point value. |
+| `act_getlink` | `int` | `101` | Action opcode that returns the engine linked to the current unit. |
+| `act_getpercenthp` | `int` | `89` | Action opcode that returns the unit hit points as a percentage. |
+| `act_getstate` | `int` | `255` | Action opcode that returns the current unit state. |
+| `act_getuplink` | `int` | `103` | Action opcode that returns the upstream linked engine. |
+| `act_getweaponrange` | `int` | `100` | Action opcode that returns a unit weapon range, taking a linked unit into account. |
+| `act_intrain` | `int` | `158` | Action opcode that checks whether an engine is present in the train consist; `var1` is the engine handle to search for. |
+| `act_lastengine` | `int` | `155` | Action opcode that returns the last engine in a train consist. |
+| `act_linkengine` | `int` | `150` | Action opcode that links a train engine; `var1` is the engine to attach. |
+| `act_menudisable` | `int` | `6` | Menu-button state opcode that disables the button. |
+| `act_menustanddown` | `int` | `0` | Menu-button state opcode for the normal, unpressed button. |
+| `act_menustandup` | `int` | `1` | Menu-button state opcode for the pressed button. |
+| `act_move` | `int` | `33` | Action opcode for movement; `var1` supplies the target X coordinate and `var2` supplies the target Y coordinate. |
+| `act_nextengine` | `int` | `156` | Action opcode that returns the next engine in a train consist. |
+| `act_open` | `int` | `6` | Action opcode used to open an object or interactive unit. |
+| `act_repair` | `int` | `86` | Action opcode for restoring hit points, including repairing a damaged or destroyed tower. |
+| `act_restore` | `int` | `200` | Action opcode that restores the sprite information from the stream pointer supplied in `var1`. |
+| `act_salut` | `int` | `9` | Action opcode that plays the unit salute action. |
+| `act_setarmy` | `int` | `97` | Action opcode that assigns the unit to an army; `var1` is the target army number. |
+| `act_setbehave` | `int` | `95` | Action opcode that sets the unit behavior; `var1` is the new behavior code. |
+| `act_setstate` | `int` | `255` | Action opcode that sets the unit state; `var1` is the new state value. |
+| `act_stand` | `int` | `0` | Action opcode that places the unit in its standing/default action state. |
+| `act_stand_open` | `int` | `10` | Action opcode for the standing-open state. |
+| `act_stop` | `int` | `39` | Action opcode that stops the unit; a non-zero `var1` requests an immediate stop. |
+| `act_train_behave` | `int` | `153` | Action opcode that sets a train consist behavior mode; `var1` is a `TRAINBEHAVE_*` value. |
+| `b_engine` | `int` | `21` | Sprite-class identifier for an engine (locomotive) unit. |
+| `beh_active` | `int` | `2` | Behavior mode in which an attacked unit, or a unit that sees an enemy but cannot attack it, moves instead of remaining idle. |
+| `beh_aggressive` | `int` | `1` | Behavior mode in which a unit attacks an enemy when the enemy enters its weapon range. |
+| `eff_alphaappear` | `int` | `5` | Engine effect identifier used with `Effect()`. |
+| `eff_fade` | `int` | `3` | Engine effect identifier used with `Effect()`. |
+| `eff_lineshift` | `int` | `7` | Engine effect identifier used with `Effect()`. |
+| `eff_none` | `int` | `0` | Engine effect identifier used with `Effect()`. |
+| `eff_nuke` | `int` | `1` | Engine effect identifier used with `Effect()`. |
+| `eff_openwindow` | `int` | `4` | Engine effect identifier used with `Effect()`. |
+| `eff_pixelappear` | `int` | `6` | Engine effect identifier used with `Effect()`. |
+| `eff_scroll` | `int` | `2` | Engine effect identifier used with `Effect()`. |
+| `GetVid` | `function` | `GetVidData` | Legacy preprocessor function alias for `GetVidData`. |
+| `SetVid` | `function` | `SetVidData` | Legacy preprocessor function alias for `SetVidData`. |
+| `sprintf` | `function` | `Printf` | Legacy preprocessor function alias for `Printf`. |
+| `u_avia` | `int` | `8` | Legacy lower-case alias for the `U_AVIA` sprite-type flag. |
+| `u_monster` | `int` | `4` | Legacy lower-case alias for the `U_UNIT` sprite-type flag. |
+| `VID_BEHAVE` | `int` | `47` | VID property selector used with `GetVidData()` and `SetVidData()`. |
+| `VID_TYPEUNIT` | `int` | `46` | VID property selector used with `GetVidData()` and `SetVidData()`. |
 
 ## `optfields.lgc`
 
 15 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `OPT_DY` | `40` | Standard-header constant `OPT_DY` defined in `optfields.lgc`. Value: 40. |
-| `OPT_EDITOR_DOWN` | `17` | Standard-header constant `OPT_EDITOR_DOWN` defined in `optfields.lgc`. Value: 17. |
-| `OPT_EDITOR_LEFT` | `956` | Standard-header constant `OPT_EDITOR_LEFT` defined in `optfields.lgc`. Value: 956. |
-| `OPT_EDITOR_RIGHT` | `957` | Standard-header constant `OPT_EDITOR_RIGHT` defined in `optfields.lgc`. Value: 957. |
-| `OPT_INTERFACE_LEFT` | `954` | Standard-header constant `OPT_INTERFACE_LEFT` defined in `optfields.lgc`. Value: 954. |
-| `OPT_INTERFACE_RIGHT` | `955` | Standard-header constant `OPT_INTERFACE_RIGHT` defined in `optfields.lgc`. Value: 955. |
-| `OPT_INTERFACE_ROW` | `(-4)` | Standard-header constant `OPT_INTERFACE_ROW` defined in `optfields.lgc`. Value: (-4). |
-| `OPT_INTERFACE_UP` | `7` | Standard-header constant `OPT_INTERFACE_UP` defined in `optfields.lgc`. Value: 7. |
-| `OPT_LEFT_X` | `(-73+99)` | Standard-header constant `OPT_LEFT_X` defined in `optfields.lgc`. Value: (-73+99). |
-| `OPT_MINIMAP_LEFT` | `952` | Standard-header constant `OPT_MINIMAP_LEFT` defined in `optfields.lgc`. Value: 952. |
-| `OPT_MINIMAP_RIGHT` | `953` | Standard-header constant `OPT_MINIMAP_RIGHT` defined in `optfields.lgc`. Value: 953. |
-| `OPT_MINIMAP_SIZES` | `3` | Standard-header constant `OPT_MINIMAP_SIZES` defined in `optfields.lgc`. Value: 3. |
-| `OPT_RIGHT_X` | `(72+99)` | Standard-header constant `OPT_RIGHT_X` defined in `optfields.lgc`. Value: (72+99). |
-| `OPT_ROW_Y` | `89` | Standard-header constant `OPT_ROW_Y` defined in `optfields.lgc`. Value: 89. |
-| `OPT_VALUE_X` | `99` | Standard-header constant `OPT_VALUE_X` defined in `optfields.lgc`. Value: 99. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `OPT_DY` | `int` | `40` | Vertical spacing used by the options rows. |
+| `OPT_EDITOR_DOWN` | `int` | `17` | Input/key code for moving down in the editor option control. |
+| `OPT_EDITOR_LEFT` | `int` | `956` | Input/key code for moving left in the editor option control. |
+| `OPT_EDITOR_RIGHT` | `int` | `957` | Input/key code for moving right in the editor option control. |
+| `OPT_INTERFACE_LEFT` | `int` | `954` | Input/key code for decreasing the interface-size option. |
+| `OPT_INTERFACE_RIGHT` | `int` | `955` | Input/key code for increasing the interface-size option. |
+| `OPT_INTERFACE_ROW` | `int` | `(-4)` | Row offset used by the interface-size option. |
+| `OPT_INTERFACE_UP` | `int` | `7` | Input/key code for increasing the interface-size option. |
+| `OPT_LEFT_X` | `int` | `(-73+99)` | Left X coordinate of the options panel. |
+| `OPT_MINIMAP_LEFT` | `int` | `952` | Input/key code for decreasing minimap size. |
+| `OPT_MINIMAP_RIGHT` | `int` | `953` | Input/key code for increasing minimap size. |
+| `OPT_MINIMAP_SIZES` | `int` | `3` | Number/list of supported minimap sizes used by the options menu. |
+| `OPT_RIGHT_X` | `int` | `(72+99)` | Right X coordinate of the options panel. |
+| `OPT_ROW_Y` | `int` | `89` | Base Y coordinate used by options rows. |
+| `OPT_VALUE_X` | `int` | `99` | X coordinate where options values are drawn. |
 
 ## `trainstactfunctions.lgc`
 
 15 constant(s).
 
-| Name | Value | Description |
-|---|---:|---|
-| `FIRSTATTACKTIME` | `180` | Standard-header constant `FIRSTATTACKTIME` defined in `trainstactfunctions.lgc`. Value: 180. |
-| `FIRSTCONTACTTIME` | `60` | Standard-header constant `FIRSTCONTACTTIME` defined in `trainstactfunctions.lgc`. Value: 60. |
-| `HELP_X` | `0` | Standard-header constant `HELP_X` defined in `trainstactfunctions.lgc`. Value: 0. |
-| `HELP_Y` | `0` | Standard-header constant `HELP_Y` defined in `trainstactfunctions.lgc`. Value: 0. |
-| `O_FROM_BACKUP` | `4` | Standard-header constant `O_FROM_BACKUP` defined in `trainstactfunctions.lgc`. Value: 4. |
-| `O_FROM_TASK2` | `3` | Standard-header constant `O_FROM_TASK2` defined in `trainstactfunctions.lgc`. Value: 3. |
-| `O_NONE` | `0` | Standard-header constant `O_NONE` defined in `trainstactfunctions.lgc`. Value: 0. |
-| `O_TO_BACKUP` | `2` | Standard-header constant `O_TO_BACKUP` defined in `trainstactfunctions.lgc`. Value: 2. |
-| `O_TO_TASK2` | `1` | Standard-header constant `O_TO_TASK2` defined in `trainstactfunctions.lgc`. Value: 1. |
-| `STG_COVER` | `20` | Standard-header constant `STG_COVER` defined in `trainstactfunctions.lgc`. Value: 20. |
-| `STG_DESTROY` | `9` | Standard-header constant `STG_DESTROY` defined in `trainstactfunctions.lgc`. Value: 9. |
-| `STG_DESTROY_TIME` | `10` | Standard-header constant `STG_DESTROY_TIME` defined in `trainstactfunctions.lgc`. Value: 10. |
-| `STG_PREPARE` | `1` | Standard-header constant `STG_PREPARE` defined in `trainstactfunctions.lgc`. Value: 1. |
-| `STG_STAND` | `0` | Standard-header constant `STG_STAND` defined in `trainstactfunctions.lgc`. Value: 0. |
-| `TIME_TO_ENEMY_HELP` | `5` | Standard-header constant `TIME_TO_ENEMY_HELP` defined in `trainstactfunctions.lgc`. Value: 5. |
+| Name | Type | Value | Description |
+|---|---|---|---|
+| `FIRSTATTACKTIME` | `int` | `180` | Initial delay before the AI train system starts its first attack. |
+| `FIRSTCONTACTTIME` | `int` | `60` | Initial delay before the AI train system makes first contact. |
+| `HELP_X` | `int` | `0` | X coordinate where the AI helper train is created. |
+| `HELP_Y` | `int` | `0` | Y coordinate where the AI helper train is created. |
+| `O_FROM_BACKUP` | `int` | `4` | Train-task option that restores the task saved when the player removed or displaced the train; the previous task value is swapped back into the backup slot. |
+| `O_FROM_TASK2` | `int` | `3` | Task-change option: restore the task from the secondary task slot. |
+| `O_NONE` | `int` | `0` | Task-change option: replace the current task without saving it. |
+| `O_TO_BACKUP` | `int` | `2` | Task-change option: back up the current task temporarily while the player is being removed. |
+| `O_TO_TASK2` | `int` | `1` | Task-change option: save the current task into the secondary task slot before switching. |
+| `STG_COVER` | `int` | `20` | AI train strategy: defensive/cover behaviour. |
+| `STG_DESTROY` | `int` | `9` | AI train strategy: destroy/attack behaviour. |
+| `STG_DESTROY_TIME` | `int` | `10` | Duration or delay associated with the destroy strategy, in minutes. |
+| `STG_PREPARE` | `int` | `1` | AI train strategy: preparation/standby behaviour. |
+| `STG_STAND` | `int` | `0` | AI train strategy: stand/idle behaviour. |
+| `TIME_TO_ENEMY_HELP` | `int` | `5` | Delay in minutes before the AI train system creates a helper force. |

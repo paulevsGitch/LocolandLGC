@@ -9,7 +9,7 @@ Language support for Locoland `.lgc` scripts.
 - Completion and hover data for commonly used helpers from the supplied script set (`basefunctions.lgc`, `ai_functions.lgc`, capture, environment, weather and reinforcement scripts).
 - Workspace indexing of `.lgc` files for user-defined functions and `#define` constants.
 - Signature help, navigation to workspace function declarations and workspace symbol search.
-- Static diagnostics for unmatched delimiters, undeclared variables and unknown types, case-sensitive function names and declaration order, function arity and argument types, assignments to explicitly typed variables, non-constant variable initializers, unsupported `int` declarations in `for` headers, repeated type names in declarations, mixed string/integer addition and likely missing statement semicolons.
+- Static diagnostics for unmatched delimiters, undeclared variables and unknown types, case-sensitive function names and declaration order, function arity and argument types, assignments to explicitly typed variables, non-constant variable initializers, unsupported `int` declarations in `for` headers, invalid comma separators in `for` clauses, duplicate variable/constant declarations, repeated assignment operators, repeated type names in declarations, mixed string/integer addition and likely missing statement semicolons.
 - Function-name collision diagnostics for duplicate definitions, unsupported overloads and user functions that reuse engine API names. The checker recognizes `#ifndef FunctionName` fallback declarations used by the supplied script library.
 - Scope-aware variable renaming with **F2** and the editor context menu. Only references bound to the selected declaration are renamed, so same-named variables in nested blocks remain untouched.
 - Snippets for functions, control flow, unit iteration, train iteration and common `Action()` patterns.
@@ -81,7 +81,7 @@ Example configuration using Allman braces and tabs:
 
 ## Static analysis settings
 
-The following settings are available under **Locoland Logic Script**. The test command also runs a catalogue contract audit over every bundled function and constant: it checks names, parameter and return types, values, signatures and non-empty hover descriptions. Constant types are inferred from their literal or macro values; expressions that cannot be safely resolved remain `unknown` rather than being guessed.
+The following settings are available under **Locoland Logic Script**. The test command runs syntax, semantic, refactoring and catalogue-contract regressions. The catalogue audit checks function names, parameter and return types, values, signatures and English hover descriptions. Every bundled constant has an explicit `int`, `string`, `char` or `function` type; a function-like alias is marked `function`.
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
@@ -92,6 +92,9 @@ The following settings are available under **Locoland Logic Script**. The test c
 | `lgc.analysis.checkConstantInitializers` | `true` | Report initializers that depend on runtime variables or function calls. Literal values, known `#define` values and constant array initializers are accepted. Unknown all-uppercase identifiers are treated as possible build-time defines. |
 | `lgc.analysis.checkForLoopIntDeclarations` | `true` | Report `for (int i = ...)`; declare `int i;` before the loop and assign `i` in the initializer. |
 | `lgc.analysis.checkSemicolons` | `true` | Report statement lines missing a terminating semicolon. Preprocessor directives and their backslash continuations are ignored. |
+| `lgc.analysis.checkForLoopSeparators` | `true` | Require semicolons between the three clauses of a `for` header; top-level commas are errors. |
+| `lgc.analysis.checkDuplicateDeclarations` | `true` | Report repeated variable declarations in the same lexical scope and repeated `#define` names in the same preprocessor branch. Nested shadowing remains valid. |
+| `lgc.analysis.checkRepeatedAssignmentOperators` | `true` | Report adjacent assignment operators such as `value = = expression`. |
 | `lgc.analysis.checkFunctionDeclarationOrder` | `true` | Require a function to be declared before its call; earlier prototypes and `#include`d scripts count. |
 | `lgc.analysis.checkUnknownVariables` | `true` | Report undeclared variables/values, including unknown names in function arguments. |
 | `lgc.analysis.checkUnknownTypes` | `true` | Report unsupported variable types such as `bool`. |
@@ -159,16 +162,29 @@ Place the cursor on a variable name and press **F2**, or choose **LGC: Rename Va
 
 ## API data and language assumptions
 
-`data/functions.json` contains 452 functions extracted from the native API and the complete transitive include tree rooted at `header.lgc`. `data/constants.json` contains 666 constants: the 471 original catalogue records plus object-like defines found throughout the standard header sources. The generated English references are available in [docs/FUNCTIONS.md](docs/FUNCTIONS.md) and [docs/CONSTANTS.md](docs/CONSTANTS.md).
+`data/functions.json` contains 452 functions extracted from the native API and the complete transitive include tree rooted at `header.lgc`. `data/constants.json` contains 666 constants: the 471 original catalogue records plus object-like defines found throughout the standard header sources. The generated English references are available in [docs/FUNCTIONS.md](docs/FUNCTIONS.md), [docs/CONSTANTS.md](docs/CONSTANTS.md) and [docs/GLOBAL_VARIABLES.md](docs/GLOBAL_VARIABLES.md).
 
 File-scope declarations are recognized even when preceded by preprocessor definitions. All functions from source files in the transitive include closure of the standard `header.lgc` are globally visible based on the `source` metadata in `data/functions.json`; no individual names are special-cased. Other script-library helpers still require the corresponding preceding `#include`. The engine declarations in `export.lgc` do not consistently spell out return types. Parameter types are taken from the declarations; script-function return types are inferred only when all observed return expressions have the same known type. Uncertain return types are intentionally marked as `unknown` so the checker does not invent certainty.
 
 LGC resembles a small C-like language, but it is not treated as standard C. The checker is deliberately conservative: it checks only known signatures and expressions with inferable types. In particular, pointer-like expressions, engine-specific values and unresolved expressions are not assigned guessed types. Strict unknown-function checking is enabled by default and can be disabled with `lgc.analysis.strictUnknownFunctions` for projects that rely on custom dynamic includes.
 
+### Additional syntax diagnostics (0.1.7)
+
+A `for` header uses semicolons to separate initialization, condition and increment expressions. Commas are allowed inside nested function calls and array/index expressions but not as top-level clause separators:
+
+```c
+for (i = 0; i < 50; i++) { Action(i); }
+for (i = 0, i < 50, i++) { Action(i); } // error: commas are not clause separators
+```
+
+A variable or `#define` cannot be declared twice in the same lexical/preprocessor branch. A nested block may shadow an outer variable, and mutually exclusive `#ifdef`/`#else` branches may define alternatives with the same name. Assignment syntax must use a single `=` token: `dx = = MapSizeX() / 2;` is an error, while comparisons such as `dx == 0` remain valid. Calls that omit required function arguments are reported as **Errors**; optional arguments remain optional.
+
+The new diagnostics can be enabled independently with `lgc.analysis.checkForLoopSeparators`, `lgc.analysis.checkDuplicateDeclarations` and `lgc.analysis.checkRepeatedAssignmentOperators`.
+
 ## Data sources
 
 - The API catalogue and constants were extracted from the user-supplied script archive, primarily `export.lgc` and `obsolete.lgc`.
-- The standard function catalogue was extracted from all 27 sources in the transitive `header.lgc` include tree, including `menuend.lgc` (which defines `Win()`), AI event handlers and their fallback dependencies. The constants catalogue merges the supplied `constants.json` with object-like defines from those same sources.
+- The standard function catalogue was extracted from all 28 sources in the transitive `header.lgc` include tree, including `menuend.lgc` (which defines `Win()`), AI event handlers and their fallback dependencies. The constants catalogue merges the supplied `constants.json` with object-like defines from those same sources.
 - Project context: [Dysprohol/OpenLocoland](https://github.com/Dysprohol/OpenLocoland), particularly its [developer documentation](https://github.com/Dysprohol/OpenLocoland/blob/main/DEVELOPERS.md). The repository describes how OpenLocoland documents and restores the original Locoland engine; it is not presented as an official language specification.
 
 ## Limitations

@@ -1,29 +1,57 @@
 "use strict";
+/** @type {typeof import("vscode")} */
 const VSCODE = require("vscode");
+/** @type {import("./models").FunctionCatalogueEntry[]} */
 const FUNCTION_CATALOG = require("../data/functions.json");
+/** @type {import("./models").ConstantCatalogueEntry[]} */
 const CONSTANT_CATALOG = require("../data/constants.json");
+/** @type {typeof import("./document-model")} */
 const { parseDocument } = require("./document-model");
+/** @type {typeof import("./analyzer")} */
 const {
 	analyzeDocument, expressionType, inferFunctionReturnTypes, isCompileTimeConstant
 } = require("./analyzer");
+/** @type {typeof import("./document-cache")} */
 const { DocumentCacheStore } = require("./document-cache");
+/** @type {typeof import("./workspace-index")} */
 const { WorkspaceIndex, createFunctionMap, createConstantMap } = require("./workspace-index");
+/** @type {typeof import("./providers")} */
 const {
 	FormattingProvider, CompletionProvider, HoverProvider, SignatureHelpProvider,
 	DefinitionProvider, WorkspaceSymbolProvider, RenameProvider, CodeActionProvider
 } = require("./providers");
+/** @type {typeof import("./lexer")} */
 const { tokenize } = require("./lexer");
+/** @type {typeof import("./parser")} */
 const {
 	parseSyntax, resolveVariable, parseVariables, splitTokenArguments
 } = require("./parser");
+/** @type {typeof import("./formatter")} */
 const { formatLgcText } = require("./formatter");
+/** @type {typeof import("./refactor")} */
 const { findVariableAt, variableReferenceTokens, renameVariableEdits, codeActionsForDiagnostics } = require("./refactor");
+/** @type {typeof import("./define-highlighting")} */
 const { collectDefinedNames, findDefinedIdentifierRanges } = require("./define-highlighting");
+/**
+ * Runtime resources owned by the activated VS Code extension.
+ * @typedef {object} ExtensionState
+ * @property {import("./workspace-index").WorkspaceIndex} workspaceIndex Workspace symbol index.
+ * @property {import("./document-cache").DocumentCacheStore} documentCache Parsed-document cache.
+ * @property {import("vscode").DiagnosticCollection} diagnosticCollection Published diagnostics.
+ * @property {Map<string, ReturnType<typeof setTimeout>>} diagnosticTimers Pending diagnostic refresh timers.
+ * @property {import("vscode").TextEditorDecorationType} defineDecoration Bold-blue constant decoration.
+ */
+/** @type {ExtensionState|undefined} */
 let activeState;
+/** @type {Map<string, import("./models").LgcFunction[]>} */
 let workspaceFunctionEntriesForTests = new Map();
+/** @type {Map<string, import("./models").VariableDeclaration[]>} */
 let workspaceVariableEntriesForTests = new Map();
 
-/** Refreshes static-analysis diagnostics for every currently open LGC document. */
+/** Refreshes static-analysis diagnostics for every currently open LGC document.
+ * @param {ExtensionState} state Active extension resources and workspace index.
+ * @returns {void} This function publishes diagnostics and decorations.
+ */
 function refreshOpenDiagnostics(state) {
 	for (const document of VSCODE.workspace.textDocuments) {
 		if (document.languageId === "lgc") updateDiagnostics(state, document);
@@ -35,6 +63,8 @@ function refreshOpenDiagnostics(state) {
  * Applies the standard blue, bold decoration to names known as #define or engine constants.
  * @param {*} state Active extension state.
  * @param {*} editor VS Code text editor.
+ 
+ * @returns {void} Publishes diagnostics or updates editor decorations.
  */
 function updateDefineHighlights(state, editor) {
 	if (!state || !state.defineDecoration || !editor) return;
@@ -51,13 +81,20 @@ function updateDefineHighlights(state, editor) {
 	editor.setDecorations(state.defineDecoration, ranges);
 }
 
-/** Refreshes define highlighting in all currently visible text editors. */
+/** Refreshes define highlighting in all currently visible text editors.
+ * @param {ExtensionState} state Active extension resources and workspace index.
+ * @returns {void} This function updates editor decorations.
+ */
 function refreshVisibleDefineHighlights(state) {
 	if (!state) return;
 	for (const editor of VSCODE.window.visibleTextEditors) updateDefineHighlights(state, editor);
 }
 
-/** Runs semantic analysis and publishes diagnostics for one open LGC document. */
+/** Runs semantic analysis and publishes diagnostics for one open LGC document. 
+ * @param {ExtensionState} state Active extension resources and workspace services.
+ * @param {import("vscode").TextDocument} document Open LGC document to parse and analyse.
+ * @returns {void} Publishes diagnostics or updates editor decorations.
+ */
 function updateDiagnostics(state, document) {
 	if (!state || document.languageId !== "lgc") return;
 	const cachedDocument = state.documentCache.get(document);
@@ -79,8 +116,16 @@ function updateDiagnostics(state, document) {
  * The parser, index, document cache and providers remain independent modules; this function
  * is the composition root that connects them to the VS Code extension host.
  * @param {*} context VS Code extension context and subscription owner.
+ 
+ * @returns {void} Publishes diagnostics or updates editor decorations.
  */
 function activate(context) {
+	/**
+	 * @param {string} text Complete LGC source text.
+	 * @param {import("vscode").Uri} uri Source document URI.
+	 * @param {(uri: import("vscode").Uri) => string} getRelativePath Converts a source URI to a workspace-relative path.
+	 * @returns {import("./models").ParsedSource} Parsed syntax and semantic declarations.
+	 */
 	const parseForWorkspace = (text, uri, getRelativePath) =>
 		parseDocument(text, uri, getRelativePath, FUNCTION_CATALOG);
 	const workspaceIndex = new WorkspaceIndex(VSCODE, FUNCTION_CATALOG, CONSTANT_CATALOG, parseForWorkspace);
@@ -181,7 +226,9 @@ function activate(context) {
 	refreshOpenDiagnostics(activeState);
 }
 
-/** Cancels pending work and releases document/workspace caches on extension shutdown. */
+/** Cancels pending work and releases document/workspace caches on extension shutdown. 
+ * @returns {void} Publishes diagnostics or updates editor decorations.
+ */
 function deactivate() {
 	if (!activeState) return;
 	for (const timer of activeState.diagnosticTimers.values()) clearTimeout(timer);
@@ -191,35 +238,62 @@ function deactivate() {
 	activeState = undefined;
 }
 
-/** Test helper that parses source using the same semantic pipeline as the extension. */
+/** Test helper that parses source using the same semantic pipeline as the extension. 
+ * @param {string} text Complete LGC source text.
+ * @param {import("vscode").Uri | null} uri Optional source URI for visibility and navigation metadata.
+ * @returns {import("./models").ParsedSource} Parsed syntax and semantic declarations.
+ */
 function parseSource(text, uri) {
 	return parseDocument(text, uri, value => value && value.fsPath ? value.fsPath : String(value), FUNCTION_CATALOG);
 }
 
-/** Test helper for creating the merged engine/workspace/current-document function map. */
+/** Test helper for creating the merged engine/workspace/current-document function map. 
+ * @param {import("vscode").TextDocument | null} _document Current document; retained for the test helper API.
+ * @param {import("./models").ParsedSource} parsed Parsed declarations to merge into a lookup map.
+ * @returns {Map<string, import("./models").LgcFunction>} Engine, included-script and local function lookup.
+ */
 function makeFunctionMap(_document, parsed) {
 	const workspaceFunctions = activeState ? activeState.workspaceIndex.workspaceFunctions : new Map();
 	return createFunctionMap(parsed, FUNCTION_CATALOG, workspaceFunctions);
 }
 
-/** Test helper for creating the merged constant map. */
+/** Test helper for creating the merged constant map. 
+ * @param {import("./models").ParsedSource} parsed Parsed declarations to merge into a lookup map.
+ * @returns {Map<string, import("./models").LgcConstant>} Engine and workspace constant lookup.
+ */
 function makeConstantMap(parsed) {
 	const workspaceConstants = activeState ? activeState.workspaceIndex.workspaceConstants : new Map();
 	return createConstantMap(parsed, CONSTANT_CATALOG, workspaceConstants);
 }
 
-/** Test adapter that runs diagnostics without requiring an activated VS Code extension host. */
+/** Test adapter that runs diagnostics without requiring an activated VS Code extension host. 
+ * @param {import("vscode").TextDocument} document Open LGC document to parse and analyse.
+ * @param {import("./models").ParsedSource} parsed Parsed declarations to merge into a lookup map.
+ * @param {Map<string, import("./models").LgcFunction>} functions Resolved function signatures for analysis.
+ * @param {Map<string, import("./models").LgcConstant>} constants Resolved constant and macro values.
+ * @returns {import("vscode").Diagnostic[]} Diagnostics produced for the supplied document.
+ */
 function analyzeForTests(document, parsed, functions, constants) {
 	const entries = activeState ? activeState.workspaceIndex.workspaceFunctionEntries : workspaceFunctionEntriesForTests;
 	const variableEntries = activeState ? activeState.workspaceIndex.workspaceVariableEntries : workspaceVariableEntriesForTests;
 	return analyzeDocument(VSCODE, document, parsed, functions, constants, entries, FUNCTION_CATALOG, variableEntries);
 }
 
-/** Injects workspace function declarations for regression tests. */
+/** Injects workspace function declarations for regression tests. 
+ * @param {Map<string, import("./models").LgcFunction[]>} entries Function declarations grouped by name for workspace-collision tests.
+ * @returns {void} Publishes diagnostics or updates editor decorations.
+ */
 function setWorkspaceFunctionEntriesForTests(entries) { workspaceFunctionEntriesForTests = entries || new Map(); }
-/** Injects workspace global declarations for regression tests. */
+/** Injects workspace global declarations for regression tests. 
+ * @param {Map<string, object[]>} entries File-scope variable entries grouped by name for visibility tests.
+ * @returns {void} Publishes diagnostics or updates editor decorations.
+ */
 function setWorkspaceVariableEntriesForTests(entries) { workspaceVariableEntriesForTests = entries || new Map(); }
-/** Test adapter for the non-constant-initializer Quick Fix provider. */
+/** Test adapter for the non-constant-initializer Quick Fix provider. 
+ * @param {import("vscode").TextDocument} document Open LGC document to parse and analyse.
+ * @param {import("vscode").CodeActionContext} context Diagnostics and selection context supplied by VS Code.
+ * @returns {import("vscode").CodeAction[]} Quick fixes available for the current diagnostics.
+ */
 function codeActionsForTests(document, context) {
 	return codeActionsForDiagnostics(VSCODE, document, context, (text, uri) => parseSource(text, uri));
 }

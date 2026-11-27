@@ -1,11 +1,15 @@
 "use strict";
 
+/**
+ * @type {Set<string>}
+ */
 const CONTINUATION_TOKENS = new Set([
 	",", ".", "=", "+", "-", "*", "/", "%", "&", "|", "^", "!", "~",
 	"<", ">", "<=", ">=", "==", "!=", "&&", "||", "?", "(", "[", "->"
 ]);
 
-const CONTROL_WORDS = new Set(["if", "for", "while", "switch"]);
+/** @type {typeof import("./language-constants")} */
+const { CONTROL_WORDS } = require("./language-constants");
 
 /**
  * Returns physical line numbers occupied by preprocessor directives, including
@@ -209,4 +213,166 @@ function findMissingSemicolonTokens(tokens, sourceText, parsed = {}) {
 	return missing;
 }
 
-module.exports = { preprocessorLines, findForLoopIntDeclarations, findMissingSemicolonTokens };
+
+
+/**
+ * Finds top-level commas used as separators in a `for` header where LGC requires
+ * semicolons. Commas nested inside function calls, array indices or grouped
+ * expressions are not considered separators.
+ *
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Complete source text, used to skip preprocessor directives.
+ * @returns {import("./models").Token[]} Invalid top-level comma separator tokens.
+ */
+function findForLoopSeparatorErrors(tokens, sourceText = "") {
+	const invalid = [];
+	const ignoredLines = sourceText ? preprocessorLines(tokens, sourceText) : new Set();
+	for (let i = 0; i < tokens.length - 1; i++) {
+		if (tokens[i].value !== "for" || ignoredLines.has(tokens[i].line) || tokens[i + 1]?.value !== "(") continue;
+		let paren = 1, bracket = 0, brace = 0;
+		const commas = [];
+		let semicolons = 0;
+		for (let j = i + 2; j < tokens.length && paren > 0; j++) {
+			const value = tokens[j].value;
+			if (value === "(") paren++;
+			else if (value === ")") paren--;
+			else if (value === "[") bracket++;
+			else if (value === "]") bracket = Math.max(0, bracket - 1);
+			else if (value === "{") brace++;
+			else if (value === "}") brace = Math.max(0, brace - 1);
+			else if (paren === 1 && bracket === 0 && brace === 0) {
+				if (value === ",") commas.push(tokens[j]);
+				else if (value === ";") semicolons++;
+			}
+		}
+		// A normal LGC for header has two top-level semicolons. A comma at
+		// this level is almost always a mistaken separator in this language.
+		if (commas.length && semicolons < 2) invalid.push(...commas);
+	}
+	return invalid;
+}
+
+/**
+ * Finds adjacent assignment operators such as `value = = expression`.
+ * Equality operators are emitted as a single `==` token and remain valid.
+ *
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Complete source text, used to skip preprocessor directives.
+ * @returns {import("./models").Token[]} The second standalone equals token in each invalid run.
+ */
+function findRepeatedAssignmentTokens(tokens, sourceText = "") {
+	const invalid = [];
+	const ignoredLines = sourceText ? preprocessorLines(tokens, sourceText) : new Set();
+	for (let i = 0; i < tokens.length - 1; i++) {
+		if (ignoredLines.has(tokens[i].line)) continue;
+		if (tokens[i].value !== "=") continue;
+		const next = tokens[i + 1];
+		if (next && !ignoredLines.has(next.line) && (next.value === "=" || next.value === "==")) {
+			invalid.push(next);
+			i++;
+		}
+	}
+	return invalid;
+}
+
+/**
+ * Builds the active preprocessor branch path at a source offset. Declarations in
+ * opposite branches of the same conditional are mutually exclusive and are not
+ * considered duplicate declarations.
+ *
+ * @param {string} sourceText Complete source text.
+ * @param {number} offset Source offset.
+ * @returns {Array<{id:number, branch:number}>} Active conditional branch path.
+ */
+function preprocessorBranchPath(sourceText, offset) {
+	const stack = [];
+	let lineOffset = 0;
+	for (const line of sourceText.split(/\r?\n/)) {
+		if (lineOffset >= offset) break;
+		const directive = line.match(/^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b/);
+		if (directive) {
+			const kind = directive[1];
+			if (["if", "ifdef", "ifndef"].includes(kind)) stack.push({ id: lineOffset, branch: 0 });
+			else if (kind === "elif" || kind === "else") {
+				if (stack.length) stack[stack.length - 1].branch++;
+			} else if (kind === "endif" && stack.length) stack.pop();
+		}
+		lineOffset += line.length + 1;
+	}
+	return stack;
+}
+
+/**
+ * Returns whether two declarations are located in mutually exclusive preprocessor branches.
+ *
+ * @param {Array<{id:number, branch:number}>} left First declaration branch path.
+ * @param {Array<{id:number, branch:number}>} right Second declaration branch path.
+ * @returns {boolean} True when both paths select different branches of one conditional.
+ */
+function mutuallyExclusiveBranches(left, right) {
+	const rightById = new Map(right.map(item => [item.id, item.branch]));
+	return left.some(item => rightById.has(item.id) && rightById.get(item.id) !== item.branch);
+}
+
+/**
+ * Finds repeated variable declarations in the same lexical scope and repeated
+ * object-like or function-like `#define` names in the same preprocessor branch.
+ * Shadowing in nested scopes and mutually exclusive preprocessor alternatives remain valid.
+ *
+ * @param {import("./models").ParsedSource} parsed Parsed source with scoped declarations.
+ * @param {import("./models").Token[]} tokens Semantic token stream.
+ * @param {string} sourceText Complete source text.
+ * @returns {Array<{name:string, kind:"variable"|"constant", token:import("./models").Token}>} Duplicate declarations after the first declaration.
+ */
+function findDuplicateDeclarationTokens(parsed, tokens, sourceText) {
+	const duplicates = [];
+	for (const [name, declarations] of parsed.variables || []) {
+		const byScope = new Map();
+		for (const declaration of declarations) {
+			if (!declaration.token) continue;
+			const scopeKey = declaration.scope || "<file-scope>";
+			if (!byScope.has(scopeKey)) byScope.set(scopeKey, []);
+			byScope.get(scopeKey).push(declaration);
+		}
+		for (const scopedDeclarations of byScope.values()) {
+			scopedDeclarations.sort((left, right) => left.token.start - right.token.start);
+			const seen = [];
+			for (const declaration of scopedDeclarations) {
+				const branch = preprocessorBranchPath(sourceText, declaration.token.start);
+				const previous = seen.find(item => !mutuallyExclusiveBranches(item.branch, branch));
+				if (previous) duplicates.push({ name, kind: "variable", token: declaration.token });
+				else seen.push({ declaration, branch });
+			}
+		}
+	}
+
+	const tokenByStart = new Map(tokens.map(token => [token.start, token]));
+	const definePattern = /^\s*#\s*define\s+([A-Za-z_]\w*)/gm;
+	const seenDefines = new Map();
+	let match;
+	while ((match = definePattern.exec(sourceText)) !== null) {
+		const name = match[1];
+		const nameOffset = match.index + match[0].lastIndexOf(name);
+		const token = tokenByStart.get(nameOffset);
+		if (!token) continue;
+		const branch = preprocessorBranchPath(sourceText, nameOffset);
+		const previous = (seenDefines.get(name) || []).find(item => !mutuallyExclusiveBranches(item.branch, branch));
+		if (previous) duplicates.push({ name, kind: "constant", token });
+		else {
+			if (!seenDefines.has(name)) seenDefines.set(name, []);
+			seenDefines.get(name).push({ branch });
+		}
+	}
+	return duplicates;
+}
+
+module.exports = {
+	preprocessorLines,
+	findForLoopIntDeclarations,
+	findMissingSemicolonTokens,
+	findForLoopSeparatorErrors,
+	findRepeatedAssignmentTokens,
+	findDuplicateDeclarationTokens,
+	preprocessorBranchPath,
+	mutuallyExclusiveBranches
+};

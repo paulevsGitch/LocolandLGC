@@ -1,13 +1,15 @@
 "use strict";
 
+/** @type {typeof import("./language-constants.js")} */
 const { MULTI_OPERATORS } = require("./language-constants");
+/** @type {typeof import("./models.js")} */
 const { Token } = require("./models");
 
 /**
  * Converts LGC source text into a flat semantic token stream while preserving offsets.
  * Whitespace and comments are skipped; identifiers, literals, numbers and operators remain.
  * @param {string} text Complete LGC source text.
- * @returns {import("./models").Token[]} Tokens in source order with zero-based positions.
+ * @returns {import("./models.js").Token[]} Tokens in source order with zero-based positions.
  */
 function tokenize(text) {
 	const tokens = [];
@@ -74,7 +76,7 @@ function tokenize(text) {
 }
 /**
  * Finds the closing token paired with an opening delimiter, accounting for nesting.
- * @param {import("./models").Token[]} tokens Token stream.
+ * @param {import("./models.js").Token[]} tokens Token stream.
  * @param {number} openIndex Opening delimiter token index.
  * @param {string} openValue Opening token value, such as `(` or `{`.
  * @param {string} closeValue Matching closing token value, such as `)` or `}`.
@@ -91,4 +93,5 @@ function findMatching(tokens, openIndex, openValue, closeValue) {
 	}
 	return -1;
 }
+
 module.exports = { tokenize, findMatching };

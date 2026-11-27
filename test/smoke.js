@@ -38,7 +38,7 @@ Module._load = function(request, parent, isMain) {
 	return originalLoad.call(this, request, parent, isMain);
 };
 
-const extension = require("../src/extension.js");
+const extension = require("../src/extension");
 Module._load = originalLoad;
 
 const {

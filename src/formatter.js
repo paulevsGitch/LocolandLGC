@@ -24,6 +24,9 @@
  * @property {boolean} insertFinalNewline Whether formatted output ends with a newline.
  */
 
+/**
+ * @type {Readonly<object>}
+ */
 const DEFAULTS = Object.freeze({
 	indentStyle: "spaces",
 	indentSize: 4,
@@ -43,14 +46,19 @@ const DEFAULTS = Object.freeze({
 	insertFinalNewline: true
 });
 
+/** @type {Set<string>} */
 const CONTROL_PAREN_WORDS = new Set(["if", "iff", "for", "while", "switch", "catch"]);
+/** @type {Set<string>} */
 const WORD_LIKE = new Set(["identifier", "number", "string", "char", "preprocessor"]);
+/** @type {Set<string>} */
 const OPERATORS = new Set([
 	"=", "+", "-", "*", "/", "%", "==", "!=", "<", ">", "<=", ">=",
 	"&&", "||", "&", "|", "^", "<<", ">>", "+=", "-=", "*=", "/=", "%=",
 	"?", "~", "!", "<<=", ">>=", "&=", "|=", "^="
 ]);
+/** @type {Set<string>} */
 const UNARY_OPERATORS = new Set(["+", "-", "!", "~", "*", "&", "++", "--"]);
+/** @type {string[]} */
 const MULTI_CHAR = ["<<=", ">>=", "==", "!=", "<=", ">=", "++", "--", "&&", "||", "<<", ">>", "+=", "-=", "*=", "/=", "%=", "->", "&=", "|=", "^="];
 
 /**
@@ -228,12 +236,26 @@ function formatLgcText(source, rawOptions = {}) {
 	let lastClosedParenContext = null;
 	let lastWasTopLevelClose = false;
 
+	/**
+	 * @returns {boolean} Whether the trailing whitespace should be removed.
+	 */
 	const atLineStart = () => output.length === 0 || /[\r\n]$/.test(output);
+	/**
+	 * @returns {void} Appends the requested indentation or line break to the formatter output.
+	 */
 	const trimTrailingWhitespace = () => { output = output.replace(/[ \t]+$/g, ""); };
+	/**
+	 * @returns {number} Number of consecutive newline characters at the end of the output.
+	 */
 	const countTrailingNewlines = () => {
 		const match = output.match(/(?:\r\n|\r|\n)+$/);
 		return match ? (match[0].match(/\r\n|\r|\n/g) || []).length : 0;
 	};
+	/**
+	 * @param {string} value Character or token value to test.
+	 * @param {boolean} noIndent Whether the new line should omit indentation.
+	 * @returns {void} Appends the requested indentation or line break to the formatter output.
+	 */
 	const write = (value, noIndent = false) => {
 		if (!value) return;
 		if (atLineStart() && !noIndent && !/^[\r\n]/.test(value)) {
@@ -241,9 +263,16 @@ function formatLgcText(source, rawOptions = {}) {
 		}
 		output += value;
 	};
+	/**
+	 * @returns {void} Appends the requested indentation or line break to the formatter output.
+	 */
 	const space = () => {
 		if (output.length && !/[\s]$/.test(output)) output += " ";
 	};
+	/**
+	 * @param {number} count Number of indentation units to append.
+	 * @returns {void} Appends the requested indentation or line break to the formatter output.
+	 */
 	const newline = (count = 1) => {
 		trimTrailingWhitespace();
 		if (!output) return;
@@ -251,12 +280,24 @@ function formatLgcText(source, rawOptions = {}) {
 		const needed = Math.max(0, count - existing);
 		if (needed) output += eol.repeat(needed);
 	};
+	/**
+	 * @param {object} token Formatter token with its lexical kind and source value.
+	 * @returns {void} Appends the requested indentation or line break to the formatter output.
+	 */
 	const preserveBlankLines = token => {
 		if (!options.preserveBlankLines || !atLineStart() || !previous) return;
 		const count = Math.min(options.maxBlankLines, token.blankLinesBefore || 0);
 		if (count + 1 > countTrailingNewlines()) newline(count + 1);
 	};
+	/**
+	 * @param {object} token Formatter token with its lexical kind and source value.
+	 * @returns {boolean} Whether the trailing whitespace should be removed.
+	 */
 	const isWordLike = token => token && WORD_LIKE.has(token.kind);
+	/**
+	 * @param {number} index Token index to inspect.
+	 * @returns {boolean} Whether the trailing whitespace should be removed.
+	 */
 	const isUnary = index => {
 		const before = tokens[index - 1];
 		if (!before) return true;
@@ -265,6 +306,11 @@ function formatLgcText(source, rawOptions = {}) {
 			before.value === "?" || OPERATORS.has(before.value) ||
 			["return", "case"].includes(before.value);
 	};
+	/**
+	 * @param {object} left Previous formatter token.
+	 * @param {object} right Next formatter token.
+	 * @returns {boolean} Whether the trailing whitespace should be removed.
+	 */
 	const needsSpaceBetweenWords = (left, right) => isWordLike(left) && isWordLike(right);
 
 	for (let index = 0; index < tokens.length; index++) {

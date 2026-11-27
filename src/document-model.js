@@ -1,6 +1,8 @@
 "use strict";
 
+/** @type {typeof import("./parser")} */
 const { parseSyntax } = require("./parser");
+/** @type {typeof import("./analyzer")} */
 const { inferFunctionReturnTypes } = require("./analyzer");
 
 /**
@@ -19,4 +21,5 @@ function parseDocument(text, uri, getRelativePath, functionCatalog = []) {
 	inferFunctionReturnTypes(parsed.functions, parsed.tokens, parsed.variables, parsed.constants, functionCatalog);
 	return parsed;
 }
+
 module.exports = { parseDocument };

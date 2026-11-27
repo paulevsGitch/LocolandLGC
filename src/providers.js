@@ -1,10 +1,16 @@
 "use strict";
 
+/** @type {typeof import("./formatter")} */
 const { formatLgcText } = require("./formatter");
+/** @type {typeof import("./parser")} */
 const { resolveVariable } = require("./parser");
+/** @type {typeof import("./models")} */
 const { ActiveFunctionCall } = require("./models");
+/** @type {typeof import("./language-constants")} */
 const { KEYWORDS } = require("./language-constants");
+/** @type {typeof import("./lexer")} */
 const { tokenize } = require("./lexer");
+/** @type {typeof import("./refactor.js")} */
 const { renameVariableEdits, codeActionsForDiagnostics, findVariableAt } = require("./refactor");
 
 /**
@@ -259,7 +265,11 @@ class SignatureHelpProvider {
 class DefinitionProvider {
 	/** @param {*} vscode VS Code API namespace. @param {*} workspaceIndex Workspace declaration index. */
 	constructor(vscode, workspaceIndex) { this.vscode = vscode; this.workspaceIndex = workspaceIndex; }
-	/** Resolves a function reference to its indexed declaration location. */
+	/** Resolves a function reference to its indexed declaration location. 
+	 * @param {import("vscode").TextDocument} document Document containing the requested symbol.
+	 * @param {import("vscode").Position} position Cursor position used to resolve the symbol or call.
+	 * @returns {import("vscode").Definition | null} Definition location, or `null` when no workspace definition is available.
+	 */
 	provideDefinition(document, position) {
 		const vscode = this.vscode;
 		const range = document.getWordRangeAtPosition(position, /[A-Za-z_]\w*/);
@@ -276,7 +286,10 @@ class DefinitionProvider {
 class WorkspaceSymbolProvider {
 	/** @param {*} vscode VS Code API namespace. @param {*} workspaceIndex Workspace declaration index. */
 	constructor(vscode, workspaceIndex) { this.vscode = vscode; this.workspaceIndex = workspaceIndex; }
-	/** Returns workspace function symbols matching the supplied name query. */
+	/** Returns workspace function symbols matching the supplied name query. 
+	 * @param {string} query Case-insensitive workspace-symbol search text.
+	 * @returns {import("vscode").SymbolInformation[]} Matching indexed function symbols.
+	 */
 	provideWorkspaceSymbols(query) {
 		const vscode = this.vscode;
 		const symbols = [];
@@ -301,6 +314,9 @@ class RenameProvider {
 	/**
 	 * Confirms that the cursor selects a variable binding and returns its rename range.
 	 * @throws {Error} When the selected identifier is not a variable or parameter.
+	 * @param {import("vscode").TextDocument} document Document containing the requested symbol.
+	 * @param {import("vscode").Position} position Cursor position used to resolve the symbol or call.
+	 * @returns {{range: import("vscode").Range, placeholder: string}} Active call range and current parameter placeholder.
 	 */
 	prepareRename(document, position) {
 		const vscode = this.vscode;
@@ -312,7 +328,12 @@ class RenameProvider {
 		if (!declaration) throw new Error("Only variables and parameters can be renamed by this provider.");
 		return { range, placeholder: name };
 	}
-	/** Builds the scope-aware workspace edit for a variable rename. */
+	/** Builds the scope-aware workspace edit for a variable rename. 
+	 * @param {import("vscode").TextDocument} document Document containing the requested symbol.
+	 * @param {import("vscode").Position} position Cursor position used to resolve the symbol or call.
+	 * @param {string} newName Valid identifier to assign to the selected variable.
+	 * @returns {import("vscode").WorkspaceEdit | null} Scope-safe rename edit, or `null` when the cursor is not on a variable.
+	 */
 	provideRenameEdits(document, position, newName) {
 		const parsed = this.documentCache.get(document).parsedSource;
 		return renameVariableEdits(this.vscode, document, parsed, position, newName);
@@ -324,7 +345,12 @@ class RenameProvider {
 class CodeActionProvider {
 	/** @param {*} vscode VS Code API namespace. @param {Function} parseDocument LGC parser callback. */
 	constructor(vscode, parseDocument) { this.vscode = vscode; this.parseDocument = parseDocument; }
-	/** Provides fixes associated with the current document diagnostics. */
+	/** Provides fixes associated with the current document diagnostics. 
+	 * @param {import("vscode").TextDocument} document Document containing the requested symbol.
+	 * @param {import("vscode").Range} _range Requested selection range; unused because fixes target complete diagnostics.
+	 * @param {import("vscode").CodeActionContext} context Diagnostics and selection context supplied by VS Code.
+	 * @returns {import("vscode").CodeAction[]} Applicable Quick Fix actions for the selected diagnostics.
+	 */
 	provideCodeActions(document, _range, context) {
 		return codeActionsForDiagnostics(this.vscode, document, context, this.parseDocument);
 	}

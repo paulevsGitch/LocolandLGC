@@ -1,9 +1,10 @@
 "use strict";
 
+/** @type {typeof import("./models")} */
 const { DocumentCache } = require("./models");
 
 /**
- * Stores one parsed snapshot per open document URI and version.
+ * Removes every cached document snapshot.
  * The parsed syntax is reused when only the workspace index changes; merged function and
  * constant maps are created lazily against the current index generation.
  */
@@ -46,9 +47,14 @@ class DocumentCacheStore {
 		return entry;
 	}
 
-	/** Invalidates one document by URI or URI string. */
+	/** Invalidates one document by URI or URI string. 
+	 * @param {string | {toString(): string}} uri Document URI or its string representation.
+	 * @returns {void} Removes the selected document snapshot from the cache.
+	 */
 	delete(uri) { this.entries.delete(typeof uri === "string" ? uri : uri.toString()); }
-	/** Invalidates every cached document. */
+	/** Invalidates every cached document. 
+	 * @returns {void} Removes the selected document snapshot from the cache.
+	 */
 	clear() { this.entries.clear(); }
 }
 

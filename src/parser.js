@@ -1,7 +1,10 @@
 "use strict";
 
+/** @type {typeof import("./language-constants.js")} */
 const { CONTROL_WORDS, TYPE_WORDS } = require("./language-constants");
+/** @type {typeof import("./lexer")} */
 const { tokenize, findMatching } = require("./lexer");
+/** @type {typeof import("./models")} */
 const {
 	LgcParameter, LgcFunction, SourcePosition, Scope, VariableDeclaration,
 	LgcConstant, ParsedSource, FunctionDeclarationResult, ParameterRange
@@ -192,6 +195,8 @@ function innermostScopeAt(scopes, offset) {
  * @param {Map<string, import("./models").VariableDeclaration[]>} variables Variable map.
  * @param {string} name Variable identifier.
  * @param {import("./models").VariableDeclaration} declaration Parsed declaration.
+ 
+ * @returns {void} Populates the supplied scope tree with parsed lexical ranges.
  */
 function addVariable(variables, name, declaration) {
 	if (!variables.has(name)) variables.set(name, []);
@@ -231,6 +236,8 @@ function resolveVariable(variables, name, offset) {
  * @param {import("./models").ParameterRange[]} parameterRanges Function parameter regions.
  * @param {import("./models").Scope[]} [scopes] Lexical scopes used to detect file scope.
  * @returns {boolean} Whether the token begins a variable declaration.
+ 
+ * @param {Map<string, import("./models").LgcConstant>} constants Known macros used to classify parsed declarations.
  */
 function isDeclarationTypePosition(tokens, index, text, parameterRanges, scopes, constants = new Map()) {
 	const token = tokens[index];
@@ -347,6 +354,8 @@ function parseVariableDeclarator(part, type, scope, visibleFrom, declarationOffs
  * @param {string} text Original source text.
  * @param {import("./models").LgcFunction[]} functions Parsed functions and prototypes.
  * @returns {Map<string, import("./models").VariableDeclaration[]>} Declarations by name.
+ 
+ * @param {Map<string, import("./models").LgcConstant>} constants Known macros used to classify parsed declarations.
  */
 function parseVariables(tokens, text, functions, constants = new Map()) {
 	const variables = new Map();
@@ -443,6 +452,7 @@ function parseSyntax(text, uri, getRelativePath) {
 		variables, constants, text
 	});
 }
+
 module.exports = {
 	splitTokenArguments, parseParameter, preprocessorGuardsAt, parseFunctionDeclarations,
 	buildLexicalScopes, innermostScopeAt, addVariable, resolveVariable,

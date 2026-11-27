@@ -3,7 +3,7 @@
 	"displayName": "Locoland Logic Script",
 	"description": "Language support, IntelliSense and static checks for Locoland .lgc logic scripts.",
 	"icon": "icon.png",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"publisher": "community",
 	"license": "MIT",
 	"repository": "https://github.com/paulevsGitch/LocolandLGC/tree/main/src",
@@ -216,10 +216,25 @@
 					"default": true,
 					"description": "Report int declarations in for-loop initializers; declare the loop variable before the loop."
 				},
+				"lgc.analysis.checkForLoopSeparators": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report top-level commas used instead of semicolons between for-loop initializer, condition and increment expressions."
+				},
 				"lgc.analysis.checkSemicolons": {
 					"type": "boolean",
 					"default": true,
 					"description": "Report statement lines that appear to be missing a terminating semicolon, excluding preprocessor directives."
+				},
+				"lgc.analysis.checkDuplicateDeclarations": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report repeated variable declarations in the same lexical scope and repeated #define names in the same preprocessor branch."
+				},
+				"lgc.analysis.checkRepeatedAssignmentOperators": {
+					"type": "boolean",
+					"default": true,
+					"description": "Report adjacent assignment operators such as value = = expression."
 				},
 				"lgc.analysis.checkFunctionNameCollisions": {
 					"type": "boolean",
@@ -282,8 +297,8 @@
 		}
 	},
 	"scripts": {
-		"check": "node --check src/extension.js && node --check src/analyzer.js && node --check src/document-model.js && node --check src/document-cache.js && node --check src/workspace-index.js && node --check src/providers.js && node --check src/refactor.js && node --check src/lexer.js && node --check src/parser.js && node --check src/models.js && node --check src/formatter.js && node --check src/header-symbols.js && node --check src/define-highlighting.js && node --check test/header-and-global-symbols-regression.js && node --check test/game-scripts.js && node --check test/catalogue-header-source-smoke.js",
-		"test": "npm run check && node test/smoke.js && node test/refactor-smoke.js && node test/semantic-0.1.6-smoke.js && node test/catalogue-0.1.6-smoke.js && node test/header-and-global-symbols-regression.js && node test/catalogue-header-source-smoke.js",
+		"check": "node --check src/extension.js && node --check src/analyzer.js && node --check src/document-model.js && node --check src/document-cache.js && node --check src/workspace-index.js && node --check src/providers.js && node --check src/refactor.js && node --check src/lexer.js && node --check src/parser.js && node --check src/models.js && node --check src/formatter.js && node --check src/header-symbols.js && node --check src/define-highlighting.js && node --check src/lazy.js && node --check src/language-constants.js && node --check src/syntax-checks.js && node --check test/syntax-checks-smoke.js && node --check test/catalogue-0.1.7-smoke.js && node --check test/header-and-global-symbols-regression.js && node --check test/game-scripts.js && node --check test/catalogue-header-source-smoke.js",
+		"test": "npm run check && node test/syntax-checks-smoke.js && node test/smoke.js && node test/refactor-smoke.js && node test/semantic-0.1.6-smoke.js && node test/catalogue-0.1.6-smoke.js && node test/catalogue-0.1.7-smoke.js && node test/header-and-global-symbols-regression.js && node test/catalogue-header-source-smoke.js",
 		"test:game": "node test/game-scripts.js"
 	}
 }

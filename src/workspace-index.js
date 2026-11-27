@@ -1,10 +1,12 @@
 "use strict";
 
+/** @type {typeof import("./models")} */
 const { LgcFunction, LgcConstant } = require("./models");
+/** @type {typeof import("./header-symbols")} */
 const { isAlwaysAvailableSource, normalizeLgcSource } = require("./header-symbols");
 
 /**
- * Returns whether a parsed declaration is physically located in the standard game script
+ * Stops pending workspace indexing and releases its file watcher resources.
  * directory and matches the basename of its bundled catalogue source. Requiring the actual
  * maps/script path prevents a level-local file named `export.lgc` from replacing an API entry.
  * @param {object} declaration Parsed workspace/current-document function.
@@ -102,12 +104,18 @@ class WorkspaceIndex {
 		this.refreshTimer = undefined;
 	}
 
-	/** Merges engine, workspace and current-document functions for language providers. */
+	/** Merges engine, workspace and current-document functions for language providers. 
+	 * @param {import("./models").ParsedSource} parsed Current document declarations to merge with the workspace snapshot.
+	 * @returns {Map<string, import("./models").LgcFunction>} Current function lookup with standard API names reserved.
+	 */
 	makeFunctionMap(parsed) {
 		return createFunctionMap(parsed, this.functionCatalog, this.workspaceFunctions);
 	}
 
-	/** Merges engine, workspace and current-document constants for language providers. */
+	/** Merges engine, workspace and current-document constants for language providers. 
+	 * @param {import("./models").ParsedSource} parsed Current document declarations to merge with the workspace snapshot.
+	 * @returns {Map<string, import("./models").LgcConstant>} Current constant lookup including workspace defines.
+	 */
 	makeConstantMap(parsed) {
 		return createConstantMap(parsed, this.constantCatalog, this.workspaceConstants);
 	}
@@ -185,6 +193,7 @@ class WorkspaceIndex {
 	 * Schedules a debounced workspace refresh and invokes a callback after completion.
 	 * @param {() => void} [onUpdated] Callback used to refresh diagnostics after indexing.
 	 * @param {number} [delay=250] Debounce interval in milliseconds.
+	 * @returns {void} Invalidates the relevant index snapshot and schedules a refresh.
 	 */
 	scheduleRefresh(onUpdated = () => {}, delay = 250) {
 		if (this.refreshTimer) clearTimeout(this.refreshTimer);
@@ -194,7 +203,9 @@ class WorkspaceIndex {
 		}, delay);
 	}
 
-	/** Cancels a pending workspace refresh timer when the extension is deactivated. */
+	/** Cancels a pending workspace refresh timer when the extension is deactivated. 
+	 * @returns {void} Invalidates the relevant index snapshot and schedules a refresh.
+	 */
 	dispose() {
 		if (this.refreshTimer) clearTimeout(this.refreshTimer);
 		this.refreshTimer = undefined;

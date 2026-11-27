@@ -1,6 +1,10 @@
 "use strict";
 
+/**
+ * @type {ReadonlyArray<string>}
+ */
 const HEADER_SOURCE_FILES = require("../data/always-available-sources.json");
+/** @type {Set<string>} */
 const HEADER_SOURCE_KEYS = new Set(HEADER_SOURCE_FILES.map(normalizeLgcSource));
 
 /**

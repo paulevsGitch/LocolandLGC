@@ -89,13 +89,13 @@ The supplied scripts show several legacy aliases and macros, including lowercase
 - Array indexing preserves the primitive element type. Pointer operations and more complex engine-specific expressions remain `unknown`.
 
 
-## Declarations and identifier resolution (0.1.6)
+## Declarations and identifier resolution (0.1.6–0.1.7)
 
 - A comma-separated declaration has one leading type: `int a, b;`. Repeating the type (`int a, int b;`) is invalid and is reported at the repeated type token.
 - Supported primitive variable types are `int`, `string` and `char`. Unknown type spellings such as `bool` are reported rather than silently treated as variable names.
 - Identifiers used in value positions must resolve to a visible variable/parameter or known constant/macro. Unknown function arguments are reported at the identifier token.
 - Function identifiers are case-sensitive. `Sin` and `sin` are different names.
-- Standard functions are resolved from the `source` field in `data/functions.json`. A function is globally available when its source file belongs to the transitive include closure rooted at the standard `header.lgc` (27 source files in the supplied archive). This rule applies uniformly to all functions from those sources, including function-like macros such as `GETSPRITE_ARMY`; it does not depend on a function name or numeric ID.
+- Standard functions are resolved from the `source` field in `data/functions.json`. A function is globally available when its source file belongs to the transitive include closure rooted at the standard `header.lgc` (28 source files in the supplied archive). This rule applies uniformly to all functions from those sources, including function-like macros such as `GETSPRITE_ARMY`; it does not depend on a function name or numeric ID.
 - User functions from other sources must be declared before the call in the same file, or supplied by a preceding `#include`. A later definition does not satisfy an earlier call; a prototype before the call does.
 - File-scope variables declared in the current file or in an indexed source included by `header.lgc` / a preceding `#include` are visible to the checker. Workspace indexing retains their source path so unrelated `.lgc` files do not leak global names into the current script.
 - LGC does not implicitly convert an integer to a string for concatenation. Convert integers explicitly with `itoa(value)`, for example `"Score: " + itoa(score)`.
@@ -103,7 +103,7 @@ The supplied scripts show several legacy aliases and macros, including lowercase
 
 ## Static-analysis diagnostics
 
-The 0.1.6 analyser emits hard errors for unknown variable types, unresolved value identifiers, unknown/unavailable functions, calls before declarations, repeated type names, assignment/argument type mismatches and mixed string/integer addition. Each check can be disabled independently through `lgc.analysis.*` settings. Return types that cannot be inferred from engine declarations or script return expressions remain `unknown`; this is intentional and avoids inventing a type.
+The analyser emits hard errors for unknown variable types, unresolved value identifiers, unknown/unavailable functions, calls before declarations, repeated type names, assignment/argument type mismatches and mixed string/integer addition. Each check can be disabled independently through `lgc.analysis.*` settings. Return types that cannot be inferred from engine declarations or script return expressions remain `unknown`; this is intentional and avoids inventing a type.
 
 
 ## File-scope declarations and standard-header functions (0.1.6 hotfix)
@@ -111,7 +111,7 @@ The 0.1.6 analyser emits hard errors for unknown variable types, unresolved valu
 - File-scope variables are declarations even when preprocessor directives occur immediately before them. Root-scope declarations such as `int music_turn = -1;` and `int start_time, resource_pile;` are retained in the symbol table.
 - Standard functions are identified only by their `source` field in `data/functions.json` and the transitive source list in `data/always-available-sources.json`. Functions from every source in that header tree are visible in every script. Function names and numeric legacy IDs are not used as exceptions.
 - Workspace indexing retains global variables with their source path. Those variables are visible when the source is loaded by `header.lgc` or a preceding `#include`; unrelated files in the workspace do not automatically export their globals.
-- The analyser's regression snippets are embedded in test source. User-provided level scripts and exports are not copied into the repository's test fixtures. Each level gets its own symbol/function index; the 27 standard-header sources are shared, but unrelated levels and custom scenario folders do not participate in collision checks.
+- The analyser's regression snippets are embedded in test source. User-provided level scripts and exports are not copied into the repository's test fixtures. Each level gets its own symbol/function index; the 28 standard-header sources are shared, but unrelated levels and custom scenario folders do not participate in collision checks.
 
 ## Preprocessor defines and standard-header source visibility
 
@@ -126,7 +126,7 @@ Do not write `#define MAX_ARRIVALS = 32;`; `=` and `;` inside the directive are 
 
 Names defined by `#define` and constants from the bundled catalogue are rendered in **bold**. The extension applies a bold blue foreground (`#569CD6`) to known constants and `#define` names, including names defined in other indexed workspace files.
 
-The standard-header source list is the transitive include closure rooted at `header.lgc` and stored in `data/always-available-sources.json` (27 sources in the supplied archive). Function visibility is then decided from the catalogue `source` field. Do not add name-specific exceptions for standard functions. Global variables from these source files are indexed alongside the rest of the workspace and become visible to all scripts that load the standard header.
+The standard-header source list is the transitive include closure rooted at `header.lgc` and stored in `data/always-available-sources.json` (28 sources in the supplied archive). Function visibility is then decided from the catalogue `source` field. Do not add name-specific exceptions for standard functions. Global variables from these source files are indexed alongside the rest of the workspace and become visible to all scripts that load the standard header.
 
 To check the standard game scripts, pass the game installation directory to the additional integration test:
 
@@ -147,3 +147,34 @@ The analyser treats the following game-provided variables as visible in every le
 These entries are maintained in `data/global-variables.json` with their primitive type, array flag, source file, and English description. The `trainstactdeclares.lgc` declarations are an explicit game-compatibility set; this does not make every declaration from that file globally visible.
 
 Local variables declared in a function or nested block continue to use lexical scope resolution. A declaration statement is parsed as a single unit, including all comma-separated declarators, before the scanner proceeds to later expressions.
+
+## Additional syntax validation (0.1.7)
+
+### `for` clause separators
+
+A `for` statement has exactly three top-level clauses separated by semicolons. A comma at the top level of the header is an error; commas nested inside a function call or array expression are not clause separators:
+
+```c
+for (i = 0; i < 50; i++) { Action(i); }       // valid
+for (i = FirstUnit(a, b), i < 50, i++) {}     // invalid separators
+```
+
+The diagnostic is controlled by `lgc.analysis.checkForLoopSeparators`.
+
+### Duplicate declarations
+
+A variable cannot be declared more than once in the same lexical scope, and a `#define` name cannot be defined twice in the same active preprocessor branch. Shadowing an outer variable in a nested block remains valid. Definitions with the same name in mutually exclusive `#ifdef` / `#else` branches remain valid alternatives. The check is controlled by `lgc.analysis.checkDuplicateDeclarations`.
+
+### Repeated assignment operators
+
+An assignment uses one `=` token. Adjacent assignment operators such as `value = = expression` are reported as syntax errors. Equality comparisons such as `value == other` are not affected. Control the check with `lgc.analysis.checkRepeatedAssignmentOperators`.
+
+### Required function arguments
+
+When a known signature requires more arguments than a call supplies, the call is reported with Error severity. Parameters marked optional in the function catalogue may still be omitted. Too-many-argument diagnostics continue to use the configured static-analysis severity.
+
+## Documentation and type contracts (0.1.7)
+
+The function, constant and game-global JSON catalogues record explicit types and source files. Function records include typed parameter lists and a return type; uncertain engine return types deliberately remain `unknown`. Constant records use `int`, `string`, `char` or `function` for macro aliases. Global-variable records include the declared primitive type and an `isArray` flag. The generated reference tables are maintained in `docs/FUNCTIONS.md`, `docs/CONSTANTS.md` and `docs/GLOBAL_VARIABLES.md`.
+
+All source-module functions and methods have JSDoc with typed parameters and return values. Module-level imports, constants and shared state are also annotated with JSDoc types; semantic model properties are explicitly typed in `src/models.js`.

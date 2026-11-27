@@ -1,7 +1,10 @@
 "use strict";
 
+/** @type {typeof import("./lexer")} */
 const { tokenize } = require("./lexer");
+/** @type {typeof import("./parser")} */
 const { resolveVariable } = require("./parser");
+/** @type {typeof import("./language-constants")} */
 const { KEYWORDS } = require("./language-constants");
 
 /**

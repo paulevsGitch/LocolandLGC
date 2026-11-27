@@ -1,5 +1,6 @@
 "use strict";
 
+/** @type {typeof import("./lazy.js")} */
 const { Lazy } = require("./lazy");
 
 /**
@@ -10,6 +11,42 @@ const { Lazy } = require("./lazy");
  * `int`; the analyser does not invent semantic subtypes for those integer values.
  *
  * @typedef {"int" | "string" | "char" | "void" | "unknown"} LgcType
+ */
+
+/** Primitive type labels accepted by the bundled constant catalogue. @typedef {"int" | "string" | "char" | "function" | "unknown"} CatalogueConstantType */
+/**
+ * A documented engine or standard-header function record bundled with the extension.
+ * @typedef {object} FunctionCatalogueEntry
+ * @property {string} name Case-sensitive function identifier.
+ * @property {LgcType} returnType Explicit or evidence-backed return type.
+ * @property {LgcParameter[]} params Ordered parameters with explicit types and optionality.
+ * @property {string} signature Human-readable signature shown by completion and hover.
+ * @property {string} description English API documentation.
+ * @property {string} category Completion category.
+ * @property {string} source Declaration source file.
+ * @property {number|null} [id] Legacy engine function identifier, when one exists.
+ * @property {boolean} [external] Whether the record is an engine-provided external declaration.
+ */
+/**
+ * A typed preprocessor constant or compatibility alias from the bundled catalogue.
+ * @typedef {object} ConstantCatalogueEntry
+ * @property {string} name Case-sensitive constant or macro identifier.
+ * @property {string} value Original replacement text.
+ * @property {CatalogueConstantType} type Explicit replacement-value type.
+ * @property {string} description English description derived from source comments and use sites.
+ * @property {string} source Original declaration source file.
+ */
+/**
+ * A file-scope variable provided by the standard game script library.
+ * @typedef {object} GlobalVariableCatalogueEntry
+ * @property {string} name Case-sensitive variable identifier.
+ * @property {"int"|"string"|"char"} type Declared primitive element type.
+ * @property {boolean} isArray Whether the declaration is an array.
+ * @property {string} source File containing the declaration.
+ * @property {string} description English description based on comments and script usage.
+ */
+/**
+ * @type {Readonly<{INT:"int", STRING:"string", CHAR:"char", VOID:"void", UNKNOWN:"unknown"}>}
  */
 const LGC_TYPES = Object.freeze({
 	INT: "int",
@@ -215,6 +252,7 @@ class VariableDeclaration {
  * @property {string|null} [params] Parameter list for function-like macros.
  * @property {string} [description] Human-readable completion and hover text.
  * @property {string} [source] Catalogue or workspace source label.
+ * @property {CatalogueConstantType} [type] Explicit replacement-value type when loaded from the bundled catalogue.
  */
 class LgcConstant {
 	/** @param {object} [data={}] Constant metadata. */

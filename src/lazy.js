@@ -21,10 +21,13 @@ class Lazy {
 		}
 		return this.value;
 	}
-	/** Invalidates the cached value so the next `get()` invokes the supplier again. */
+	/** Invalidates the cached value so the next `get()` invokes the supplier again. 
+	 * @returns {void} Clears the cached value so the next read invokes the factory again.
+	 */
 	reset() {
 		this.value = undefined;
 		this.hasValue = false;
 	}
 }
+
 module.exports = { Lazy };
